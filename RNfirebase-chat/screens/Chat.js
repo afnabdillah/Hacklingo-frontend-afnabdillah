@@ -22,7 +22,16 @@ export default function Chat({ route, navigation }) {
   const [messages, setMessages] = useState([]);
   const recipientEmail = route.params?.recipientEmail || null;
   const recipientUsername = route.params?.recipientUsername || null;
-
+  
+  const mergeMessages = (oldMessages, newMessages) => {
+    const allMessages = [...oldMessages, ...newMessages];
+    const uniqueMessages = allMessages.filter(
+      (message, index, self) =>
+        index === self.findIndex((m) => m._id === message._id)
+    );
+  
+    return uniqueMessages.sort((a, b) => b.createdAt - a.createdAt);
+  };
   const onSignOut = () => {
     signOut(auth).catch(error => console.log('Error logging out: ', error));
   };
@@ -48,44 +57,34 @@ export default function Chat({ route, navigation }) {
   
     const q = query(
       collectionRef,
-      where('user._id', '==', currentUserEmail),
-      where('recipient', '==', recipientEmail),
+      where('user._id', 'in', [currentUserEmail, recipientEmail]),
+      where('recipient', 'in', [currentUserEmail, recipientEmail]),
       orderBy('createdAt', 'desc')
     );
   
-    const q2 = query(
-      collectionRef,
-      where('user._id', '==', recipientEmail),
-      where('recipient', '==', currentUserEmail),
-      orderBy('createdAt', 'desc')
-    );
-  
-    const unsubscribe1 = onSnapshot(q, querySnapshot => {
-      const messages1 = querySnapshot.docs.map(doc => ({
-        _id: doc.data()._id,
-        createdAt: doc.data().createdAt.toDate(),
-        text: doc.data().text,
-        user: doc.data().user,
-      }));
-      setMessages(messages => GiftedChat.append(messages, messages1));
-    });
-  
-    const unsubscribe2 = onSnapshot(q2, querySnapshot => {
-      const messages2 = querySnapshot.docs.map(doc => ({
-        _id: doc.data()._id,
-        createdAt: doc.data().createdAt.toDate(),
-        text: doc.data().text,
-        user: doc.data().user,
-      }));
-      setMessages(messages => GiftedChat.append(messages, messages2));
+    const unsubscribe = onSnapshot(q, querySnapshot => {
+      const fetchedMessages = querySnapshot.docs
+        .map(doc => ({
+          _id: doc.data()._id,
+          createdAt: doc.data().createdAt.toDate(),
+          text: doc.data().text,
+          user: doc.data().user,
+          recipient: doc.data().recipient,
+        }))
+        .filter(
+          message =>
+            (message.user._id === currentUserEmail &&
+              message.recipient === recipientEmail) ||
+            (message.user._id === recipientEmail &&
+              message.recipient === currentUserEmail)
+        );
+      setMessages((messages) => mergeMessages(messages, fetchedMessages));
     });
   
     return () => {
-      unsubscribe1();
-      unsubscribe2();
+      unsubscribe();
     };
-  }, []);
-  
+  }, []);  
 
   const onSend = useCallback((messages = []) => {
     setMessages(previousMessages =>
@@ -97,9 +96,11 @@ export default function Chat({ route, navigation }) {
       createdAt,
       text,
       user,
-      recipient: recipientEmail // Add the recipient field here
+      recipient: recipientEmail,
+      recipientName: recipientUsername
     });
   }, []);
+  
   
   return (
     <GiftedChat

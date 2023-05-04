@@ -16,7 +16,6 @@ function Contacts({ navigation }) {
   
   useEffect(() => {
     async function fetchContacts() {
-      console.log(auth.currentUser.uid)
       const currentUserEmail = auth.currentUser.email;
       const usersSnapshot = await getDocs(collection(database, 'users'));
       const usersData = usersSnapshot.docs
@@ -25,7 +24,7 @@ function Contacts({ navigation }) {
           ...doc.data(),
         }))
         .filter(user => user.email !== currentUserEmail); // Filter out current user
-      console.log(usersData, "<<<")
+      console.log(usersData, "<<< ini data users")
       setContacts(usersData);
     }
 
