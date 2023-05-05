@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { database } from '../config/firebase';
 import { auth } from '../config/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 
 function Contacts({ navigation }) {
   const [contacts, setContacts] = useState([]);
-
+  const { user } = useContext(AuthenticatedUserContext);
   async function getUsernameByEmail(email) {
     const userDocRef = doc(database, 'users', email);
     const userDoc = await getDoc(userDocRef);
@@ -46,7 +47,7 @@ function Contacts({ navigation }) {
             }}
             onPress={async () => {
               const recipientName = await getUsernameByEmail(item.id);
-              navigation.navigate('Chat', { recipientEmail: item.email, recipientUsername : item.username });
+              navigation.navigate('Chat', { recipientEmail: item.email, recipientName : item.username, senderEmail : user.email });
             }}
           >
             <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.username}</Text>
