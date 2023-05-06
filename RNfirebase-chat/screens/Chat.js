@@ -1,11 +1,10 @@
 import React, {
   useState,
   useEffect,
-  useLayoutEffect,
   useCallback,
   useContext
 } from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, ImageBackground, StyleSheet } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
 import {
   collection,
@@ -17,11 +16,17 @@ import {
   doc,
   getDocs
 } from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext'
 import { auth, database } from '../config/firebase';
+import bg from '../assets/BG.png'
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { View } from 'react-native';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { PopChatMenu } from './HeadersChat/PopChatMenu';
 
-export default function Chat({ route, navigation }) {
+export default function Chat({ route }) {
   const [messages, setMessages] = useState([]);
   const { recipientEmail, recipientName, senderEmail } = route.params;
   // console.log(route.params, "<<< recipientUsername")
@@ -51,6 +56,7 @@ export default function Chat({ route, navigation }) {
 
     fetchCurrentUserData();
   }, [currentUser]);
+
   const mergeMessages = (oldMessages, newMessages) => {
     const allMessages = [...oldMessages, ...newMessages];
     const uniqueMessages = allMessages.filter(
@@ -60,35 +66,16 @@ export default function Chat({ route, navigation }) {
 
     return uniqueMessages.sort((a, b) => b.createdAt - a.createdAt);
   };
-  const onSignOut = () => {
-    signOut(auth).catch(error => console.log('Error logging out: ', error));
-  };
-
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{
-            marginRight: 10
-          }}
-          onPress={onSignOut}
-        >
-          <Text>Logout</Text>
-        </TouchableOpacity>
-      )
-    });
-  }, [navigation]);
 
   useEffect(() => {
     const collectionRef = collection(database, 'chats');
     const currentUserEmail = auth.currentUser.email;
-  
+
     const q = query(
       collectionRef,
       orderBy('createdAt', 'desc')
     );
-  
+
     const unsubscribe = onSnapshot(q, querySnapshot => {
       const fetchedMessages = querySnapshot.docs
         .map(doc => ({
@@ -109,7 +96,7 @@ export default function Chat({ route, navigation }) {
         });
       setMessages((messages) => mergeMessages(messages, fetchedMessages));
     });
-  
+
     return () => {
       unsubscribe();
     };
@@ -138,17 +125,82 @@ export default function Chat({ route, navigation }) {
     });
   }, [currentUserData]);
 
+  const navigation = useNavigation()
 
   return (
-    <GiftedChat
-      messages={messages}
-      showAvatarForEveryMessage={true}
-      onSend={messages => onSend(messages)}
-      user={{
-        _id: currentUser.email,
-        username: currentUser.username,
-        avatar: currentUser.avatar || 'https://i.pravatar.cc/300'
-      }}
-    />
+    <SafeAreaView style={{ flex: 1 }}>
+      <ImageBackground source={bg} style={{ flex: 1 }}>
+        <View style={styles.headers}>
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity onPress={() => navigation.navigate('ChatList')}>
+              <AntDesign name="arrowleft" size={36} color="black" />
+            </TouchableOpacity>
+            <Image source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQsu34yqIKdjK5cAWEcuUq3ryD30iiqd2ArQ' }} style={styles.image} />
+            <Text style={{ fontStyle: 'italic', fontSize: 25 }}>{currentUserData?.username}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <MaterialIcons name="video-call" size={36} color="black" />
+            <PopChatMenu />
+          </View>
+        </View>
+        <GiftedChat
+          messages={messages}
+          showAvatarForEveryMessage={true}
+          onSend={messages => onSend(messages)}
+          user={{
+            _id: currentUser.email,
+            username: currentUser.username,
+            avatar: currentUser.avatar || 'https://i.pravatar.cc/300'
+          }}
+        />
+      </ImageBackground>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  headers: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    height: 50,
+    alignItems: 'center',
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 10,
+    paddingTop: 10,
+    flex: 0.06,
+    justifyContent: 'space-between'
+  },
+  container: {
+    flexDirection: 'row',
+    backgroundColor: 'whitesmoke',
+    padding: 5,
+    marginHorizontal: 10,
+    alignItems: 'center',
+    borderRadius: 20,
+  },
+  input: {
+    flex: 1,
+    backgroundColor: 'white',
+    padding: 5,
+    paddingHorizontal: 10,
+    marginHorizontal: 10,
+    borderRadius: 50,
+    borderColor: 'lightgray',
+    borderWidth: StyleSheet.hairlineWidth
+
+  },
+  send: {
+    backgroundColor: 'royalblue',
+    padding: 7,
+    borderRadius: 15,
+    overflow: 'hidden',
+  },
+  image: {
+    width: 45,
+    height: 45,
+    borderRadius: 30,
+    marginRight: 10,
+    marginLeft: 10
+  },
+})

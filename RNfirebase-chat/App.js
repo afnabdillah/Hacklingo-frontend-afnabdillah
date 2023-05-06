@@ -1,5 +1,5 @@
 import React, { useState, createContext, useContext, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { View, ActivityIndicator } from 'react-native';
@@ -11,30 +11,40 @@ import Signup from './screens/Signup';
 import Chat from './screens/Chat';
 import ChatList from './screens/Chatlist';
 import Contacts from './screens/Contacts';
+import { useLayoutEffect } from 'react';
+import { TouchableOpacity } from 'react-native';
+import { Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { HeaderChat } from './screens/HeadersChat/HeaderChat';
 
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
 function ChatTopTabNavigator() {
   return (
-    <TopTab.Navigator>
-      <TopTab.Screen name="Chat History" component={ChatList} />
-      <TopTab.Screen name="Contacts" component={Contacts} />
-    </TopTab.Navigator>
+    <SafeAreaView style={{ flex: 1 }}>
+      <HeaderChat />
+      <TopTab.Navigator>
+        <TopTab.Screen name="Chat History" component={ChatList} />
+        <TopTab.Screen name="Contacts" component={Contacts} />
+      </TopTab.Navigator>
+    </SafeAreaView>
   );
 }
 function ChatStack() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="ChatList" component={ChatTopTabNavigator} />
-      <Stack.Screen name="Chat" component={Chat} />
-    </Stack.Navigator>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack.Navigator>
+        <Stack.Screen name="ChatList" component={ChatTopTabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    </SafeAreaView>
   );
 }
 
 function AuthStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator>
       <Stack.Screen name='Login' component={Login} />
       <Stack.Screen name='Signup' component={Signup} />
     </Stack.Navigator>
@@ -55,7 +65,7 @@ function RootNavigator() {
   const { user, setUser } = useContext(AuthenticatedUserContext);
   const [isLoading, setIsLoading] = useState(true);
 
-   useEffect(() => {
+  useEffect(() => {
     // onAuthStateChanged returns an unsubscriber
     const unsubscribeAuth = onAuthStateChanged(
       auth,

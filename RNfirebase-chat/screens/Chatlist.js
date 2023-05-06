@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
-import { signOut } from 'firebase/auth';
-import { View, Text, TouchableOpacity, FlatList, Image } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
 import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
 import { database, auth } from '../config/firebase';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
@@ -21,41 +20,20 @@ function ChatList({ navigation }) {
       : { username: email, avatar: '' };
   }
 
-  async function onSignOut() {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error('Error signing out: ', error);
-    }
-  }
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{
-            marginRight: 10
-          }}
-          onPress={onSignOut}
-        >
-          <Text>Logout</Text>
-        </TouchableOpacity>
-      )
-    });
-  }, [navigation]);
 
   useEffect(() => {
     const collectionRef = collection(database, 'chats');
     const q = query(collectionRef, orderBy('createdAt', 'desc'));
-  
+
     const unsubscribe = onSnapshot(q, async querySnapshot => {
       const chatsData = {};
-  
+
       for (const doc of querySnapshot.docs) {
         const chat = doc.data();
-  
+
         let targetUser;
-  
+
         if (chat.user._id === user.email) {
           targetUser = chat.recipient;
         } else if (chat.recipient === user.email) {
@@ -63,7 +41,7 @@ function ChatList({ navigation }) {
         } else {
           continue;
         }
-  
+
         if (!chatsData[targetUser]) {
           if (!chat.recipientName) {
             const recipientData = await getUserDataByEmail(targetUser);
@@ -72,57 +50,94 @@ function ChatList({ navigation }) {
           }
           chatsData[targetUser] = [];
         }
-  
+
         chatsData[targetUser].push(chat);
       }
-  
+
       setChats(Object.values(chatsData).map(chatList => chatList[0]));
     });
-  
+
     return () => unsubscribe();
   }, [user]);
-  
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
-  <FlatList
-    data={chats}
-    keyExtractor={item => item._id}
-    renderItem={({ item }) => {
-      return (
-        <TouchableOpacity
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: 15,
-          borderBottomColor: '#ccc',
-          borderBottomWidth: 1,
+      <FlatList
+        data={chats}
+        keyExtractor={item => item._id}
+        renderItem={({ item }) => {
+          return (
+            <TouchableOpacity
+              style={styles.container}
+              onPress={async () => {
+                const recipientEmail = item.user._id === user.email ? item.recipient : item.user._id;
+                const recipientName = item.user._id === user.email ? item.recipientName : item.user.username;
+                const senderEmail = item.user._id === user.email ? user.email : item.recipient
+                navigation.navigate('Chat', {
+                  recipientEmail: recipientEmail,
+                  recipientName: recipientName,
+                  senderEmail: senderEmail
+                });
+              }}
+            >
+              <Image
+                source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQsu34yqIKdjK5cAWEcuUq3ryD30iiqd2ArQ' }}
+                style={styles.image}
+              />
+              <View style={styles.content}>
+                <View style={styles.row}>
+                  <Text numberOfLines={1} style={styles.name}>{item.recipient === user.email ? item.user.username : item.recipientName}</Text>
+                  <Text style={styles.subTitle}>3 day</Text>
+                </View>
+                <Text numberOfLines={2} style={styles.subTitle}>{item.text}</Text>
+              </View>
+            </TouchableOpacity>
+          );
         }}
-        onPress={async () => {
-          console.log(item, "<<<< ITEM");  
-          const recipientEmail = item.user._id === user.email ? item.recipient : item.user._id ;
-          const recipientName = item.user._id === user.email ? item.recipientName : item.user.username ;
-          const senderEmail = item.user._id === user.email ? user.email : item.recipient
-            navigation.navigate('Chat', {
-              recipientEmail: recipientEmail,
-              recipientName: recipientName,
-              senderEmail : senderEmail
-            });
-          }}
-        >
-          {/* <Image
-            source={{ uri: item.recipientAvatar }}
-            style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10 }}
-          /> */}
-          <View>
-            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.recipient === user.email ? item.user.username : item.recipientName }</Text>
-            <Text style={{ fontSize: 16 }}>{item.text}</Text>
-          </View>
-        </TouchableOpacity>
-      );
-    }}
-  />
-</View>
+      />
+    </View>
   );
 }
+const styles = StyleSheet.create({
+
+  container: {
+    flexDirection: 'row',
+    marginHorizontal: 10,
+    marginVertical: 5,
+    height: 70
+
+  },
+
+  image: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 10,
+
+  },
+
+  content: {
+    flex: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'lightgray',
+
+  },
+  row: {
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+  name: {
+    flex: 1,
+    fontWeight: 'bold',
+
+  },
+  subTitle: {
+    color: 'gray',
+  },
+
+
+
+})
+
 
 export default ChatList;
