@@ -24,9 +24,6 @@ import { auth, database } from '../config/firebase';
 export default function Chat({ route, navigation }) {
   const [messages, setMessages] = useState([]);
   const { recipientEmail, recipientName, senderEmail } = route.params;
-  // console.log(route.params, "<<< recipientUsername")
-  console.log(recipientEmail, recipientName, senderEmail)
-  // console.log(route.params)
   const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
 
@@ -99,7 +96,6 @@ export default function Chat({ route, navigation }) {
           recipient: doc.data().recipient,
         }))
         .filter(message => {
-          // console.log(message, "<<< message")
           return (
             (message.user._id === currentUserEmail &&
               message.recipient === recipientEmail) ||

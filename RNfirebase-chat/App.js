@@ -11,6 +11,8 @@ import Signup from './screens/Signup';
 import Chat from './screens/Chat';
 import ChatList from './screens/Chatlist';
 import Contacts from './screens/Contacts';
+import CreateGroupChat from './screens/CreateGroupChat'; // Import the CreateGroupChat component
+import GroupChat from './screens/GroupChat';
 
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -28,6 +30,8 @@ function ChatStack() {
     <Stack.Navigator>
       <Stack.Screen name="ChatList" component={ChatTopTabNavigator} />
       <Stack.Screen name="Chat" component={Chat} />
+      <Stack.Screen name="Group Chat" component={GroupChat} />
+      <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
     </Stack.Navigator>
   );
 }
@@ -55,7 +59,7 @@ function RootNavigator() {
   const { user, setUser } = useContext(AuthenticatedUserContext);
   const [isLoading, setIsLoading] = useState(true);
 
-   useEffect(() => {
+  useEffect(() => {
     // onAuthStateChanged returns an unsubscriber
     const unsubscribeAuth = onAuthStateChanged(
       auth,
