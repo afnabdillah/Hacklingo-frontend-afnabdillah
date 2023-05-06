@@ -1,99 +1,62 @@
-import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
-import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
-import { database, auth } from '../config/firebase';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { database } from '../config/firebase';
+import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
-import { doc, getDoc } from 'firebase/firestore';
 
-function ChatList({ navigation }) {
-  const { user } = useContext(AuthenticatedUserContext);
+function ChatList() {
   const [chats, setChats] = useState([]);
-
-  async function getUserDataByEmail(email) {
-    const userDocRef = doc(database, 'users', email);
-    const userDoc = await getDoc(userDocRef);
-    return userDoc.exists()
-      ? {
-        username: userDoc.data().username,
-        avatar: userDoc.data().avatar,
-      }
-      : { username: email, avatar: '' };
-  }
-
-
-
+  const navigation = useNavigation();
+  const { user } = useContext(AuthenticatedUserContext)
   useEffect(() => {
-    const collectionRef = collection(database, 'chats');
-    const q = query(collectionRef, orderBy('createdAt', 'desc'));
-
-    const unsubscribe = onSnapshot(q, async querySnapshot => {
-      const chatsData = {};
-
-      for (const doc of querySnapshot.docs) {
-        const chat = doc.data();
-
-        let targetUser;
-
-        if (chat.user._id === user.email) {
-          targetUser = chat.recipient;
-        } else if (chat.recipient === user.email) {
-          targetUser = chat.user._id;
-        } else {
-          continue;
-        }
-
-        if (!chatsData[targetUser]) {
-          if (!chat.recipientName) {
-            const recipientData = await getUserDataByEmail(targetUser);
-            chat.recipientName = recipientData.username;
-            chat.recipientAvatar = recipientData.avatar;
-          }
-          chatsData[targetUser] = [];
-        }
-
-        chatsData[targetUser].push(chat);
-      }
-
-      setChats(Object.values(chatsData).map(chatList => chatList[0]));
+    if (!user) return;
+    const personalChatsRef = collection(database, 'personalChats');
+    const personalChatsQuery = query(personalChatsRef, orderBy('createdAt', 'desc'));
+    const personalChatsUnsubscribe = onSnapshot(personalChatsQuery, snapshot => {
+      const personalChatsData = snapshot.docs.map(doc => ({ ...doc.data(), chatId: doc.id, isGroup: false }));
+      setChats(prevChats => mergeChatLists(prevChats, personalChatsData, user.email));
     });
 
-    return () => unsubscribe();
+    return () => {
+      personalChatsUnsubscribe();
+    };
   }, [user]);
 
+  const mergeChatLists = (prevChats, newChats, currentUserEmail) => {
+    const groupedChats = newChats.reduce((acc, chat) => {
+      const chatKey = chat.user._id === currentUserEmail ? chat.recipient : chat.user._id;
+
+      if (!acc[chatKey] && (chat.user._id === currentUserEmail || chat.recipient === currentUserEmail)) {
+        acc[chatKey] = { ...chat, recipient: chatKey };
+      } else if (chat.createdAt > acc[chatKey]?.createdAt) {
+        acc[chatKey] = { ...chat, recipient: chatKey };
+      }
+
+      return acc;
+    }, {});
+
+    const mergedChats = Object.values(groupedChats).sort((a, b) => b.createdAt - a.createdAt);
+
+    return mergedChats;
+  };
+  console.log(chats, "<<<< chats")
   return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
+    <View style={styles.container}>
       <FlatList
         data={chats}
-        keyExtractor={item => item._id}
+        keyExtractor={item => item.chatId}
         renderItem={({ item }) => {
+          // console.log(item, "<<< item")
           return (
-            <TouchableOpacity
-              style={styles.container}
-              onPress={async () => {
-                const recipientEmail = item.user._id === user.email ? item.recipient : item.user._id;
-                const recipientName = item.user._id === user.email ? item.recipientName : item.user.username;
-                const senderEmail = item.user._id === user.email ? user.email : item.recipient
-                navigation.navigate('Chat', {
-                  recipientEmail: recipientEmail,
-                  recipientName: recipientName,
-                  senderEmail: senderEmail
-                });
-              }}
-            >
-              <Image
-                source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQsu34yqIKdjK5cAWEcuUq3ryD30iiqd2ArQ' }}
-                style={styles.image}
-              />
-              <View style={styles.content}>
-                <View style={styles.row}>
-                  <Text numberOfLines={1} style={styles.name}>{item.recipient === user.email ? item.user.username : item.recipientName}</Text>
-                  <Text style={styles.subTitle}>3 day</Text>
-                </View>
-                <Text numberOfLines={2} style={styles.subTitle}>{item.text}</Text>
-              </View>
+            <TouchableOpacity style={styles.chatRow} onPress={() => {
+              navigation.navigate('Chat', { recipientEmail: item.recipient, recipientName: item.recipientName, senderEmail: item.user._id });
+            }}>
+              <Text style={styles.chatName}>{item.user._id === user.email ? item.recipientName : item.user.username}</Text>
             </TouchableOpacity>
-          );
-        }}
+          )
+        }
+        }
       />
     </View>
   );

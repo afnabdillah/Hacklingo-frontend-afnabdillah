@@ -25,7 +25,7 @@ function Contacts({ navigation }) {
           ...doc.data(),
         }))
         .filter(user => user.email !== currentUserEmail); // Filter out current user
-      // console.log(usersData, "<<< ini data users")
+      console.log(usersData, "<<< ini data users")
       setContacts(usersData);
     }
 
@@ -56,6 +56,7 @@ function Contacts({ navigation }) {
           </TouchableOpacity>
         )}
       />
+
     </View>
   );
 }

@@ -28,13 +28,9 @@ import { PopChatMenu } from './HeadersChat/PopChatMenu';
 
 export default function Chat({ route }) {
   const [messages, setMessages] = useState([]);
-  const { recipientEmail, recipientName, senderEmail } = route.params;
-  // console.log(route.params, "<<< recipientUsername")
-  console.log(recipientEmail, recipientName, senderEmail)
-  // console.log(route.params)
+  const { recipientEmail, recipientName } = route.params;
   const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
-
   async function getUserDataByEmail(email) {
     const usersCollectionRef = collection(database, 'users');
     const q = query(usersCollectionRef, where('email', '==', email));
@@ -67,8 +63,27 @@ export default function Chat({ route }) {
     return uniqueMessages.sort((a, b) => b.createdAt - a.createdAt);
   };
 
+  const onSignOut = () => {
+    signOut(auth).catch(error => console.log('Error logging out: ', error));
+  };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={{
+            marginRight: 10
+          }}
+          onPress={onSignOut}
+        >
+          <Text>Logout</Text>
+        </TouchableOpacity>
+      )
+    });
+  }, [navigation]);
+
   useEffect(() => {
-    const collectionRef = collection(database, 'chats');
+    const collectionRef = collection(database, 'personalChats');
     const currentUserEmail = auth.currentUser.email;
 
     const q = query(
@@ -86,7 +101,6 @@ export default function Chat({ route }) {
           recipient: doc.data().recipient,
         }))
         .filter(message => {
-          // console.log(message, "<<< message")
           return (
             (message.user._id === currentUserEmail &&
               message.recipient === recipientEmail) ||
@@ -94,7 +108,7 @@ export default function Chat({ route }) {
               message.recipient === currentUserEmail)
           );
         });
-      setMessages((messages) => mergeMessages(messages, fetchedMessages));
+      setMessages(messages => mergeMessages(messages, fetchedMessages));
     });
 
     return () => {
@@ -102,16 +116,14 @@ export default function Chat({ route }) {
     };
   }, [recipientEmail]);
 
-
   const onSend = useCallback((messages = []) => {
     if (!currentUserData) {
       console.error('User data not loaded yet. Please try again later.');
       return;
     }
-
     setMessages(previousMessages => GiftedChat.append(previousMessages, messages));
     const { _id, createdAt, text, user } = messages[0];
-    addDoc(collection(database, 'chats'), {
+    addDoc(collection(database, 'personalChats'), {
       _id,
       createdAt,
       text,

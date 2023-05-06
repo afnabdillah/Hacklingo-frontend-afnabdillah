@@ -16,6 +16,9 @@ import { TouchableOpacity } from 'react-native';
 import { Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeaderChat } from './screens/HeadersChat/HeaderChat';
+import CreateGroupChat from './screens/CreateGroupChat'; // Import the CreateGroupChat component
+import GroupChat from './screens/GroupChat';
+import Groups from './screens/Group';
 
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -25,8 +28,9 @@ function ChatTopTabNavigator() {
     <SafeAreaView style={{ flex: 1 }}>
       <HeaderChat />
       <TopTab.Navigator>
-        <TopTab.Screen name="Chat History" component={ChatList} />
-        <TopTab.Screen name="Contacts" component={Contacts} />
+        <TopTab.Screen name="Chat Lists" component={ChatList} />
+        <TopTab.Screen name="Find Contacts" component={Contacts} />
+        <TopTab.Screen name="Find Groups" component={Groups} />
       </TopTab.Navigator>
     </SafeAreaView>
   );
@@ -37,6 +41,8 @@ function ChatStack() {
       <Stack.Navigator>
         <Stack.Screen name="ChatList" component={ChatTopTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
+        <Stack.Screen name="Group Chat" component={GroupChat} />
+        <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
       </Stack.Navigator>
     </SafeAreaView>
   );
