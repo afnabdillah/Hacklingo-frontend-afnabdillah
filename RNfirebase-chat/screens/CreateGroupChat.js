@@ -5,20 +5,27 @@ import {
     TextInput,
     TouchableOpacity,
     FlatList,
-    StyleSheet
+    StyleSheet,
 } from 'react-native';
-import { database } from '../config/firebase';
-import { collection, getDocs } from 'firebase/firestore';
-import createGroupChat from '../helper/createGroupChat';
+import { database, auth } from '../config/firebase';
+import { collection, getDocs, addDoc, setDoc, doc } from 'firebase/firestore';
 
-function CreateGroupChat() {
-    const [groupName, setGroupName] = useState('');
+function CreateGroupChat({ route, navigation }) {
+    const { groupId, groupName: initialGroupName, groupLanguage: initialGroupLanguage, groupMembers, editMode } = route.params || {};
+    const [groupName, setGroupName] = useState(initialGroupName || '');
     const [users, setUsers] = useState([]);
-    const [selectedUsers, setSelectedUsers] = useState(new Set());
-    const [selectedLanguages, setSelectedLanguages] = useState(new Set());
+    const [selectedUsers, setSelectedUsers] = useState(new Set(groupMembers || []));
+    const [selectedLanguages, setSelectedLanguages] = useState(
+        new Set(
+            initialGroupLanguage
+                ? initialGroupLanguage.includes(', ')
+                    ? initialGroupLanguage.split(', ')
+                    : [initialGroupLanguage]
+                : []
+        )
+    );
 
     const languages = ['English', 'German', 'Japanese', 'French', 'Russian'];
-
     const CustomCheckBox = ({ isSelected, onPress }) => (
         <TouchableOpacity
             style={[
@@ -63,10 +70,32 @@ function CreateGroupChat() {
         setSelectedLanguages(newSelectedLanguages);
     };
 
-    const onCreateGroupChat = () => {
-        // Replace this with your actual implementation for creating a group chat
-        createGroupChat(groupName, Array.from(selectedUsers), Array.from(selectedLanguages));
+    const onCreateGroupChat = async () => {
+        const groupData = {
+            groupName,
+            users: Array.from(selectedUsers),
+            languages: Array.from(selectedLanguages),
+            createdAt: new Date(),
+            messages: [],
+            admin: auth.currentUser.email
+        };
+
+        const groupChatsRef = collection(database, 'groupChats');
+
+        if (editMode) {
+            const groupDocRef = doc(database, 'groupChats', groupId);
+            await setDoc(groupDocRef, groupData);
+            navigation.goBack();
+        } else {
+            await addDoc(groupChatsRef, groupData);
+        }
     };
+
+    useEffect(() => {
+        if (editMode) {
+            navigation.setOptions({ title: 'Edit Group Chat' });
+        }
+    }, [editMode, navigation]);
 
     return (
         <View style={styles.container}>

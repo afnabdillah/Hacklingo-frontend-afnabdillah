@@ -1,171 +1,63 @@
-import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
-import { signOut } from 'firebase/auth';
-import { View, Text, TouchableOpacity, FlatList, Image } from 'react-native';
-import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
-import { database, auth } from '../config/firebase';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { database } from '../config/firebase';
+import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
-import { doc, getDoc } from 'firebase/firestore';
-import { StyleSheet } from 'react-native';
 
-function ChatList({ navigation }) {
-  const { user } = useContext(AuthenticatedUserContext);
+function ChatList() {
   const [chats, setChats] = useState([]);
-  const [groupChats, setGroupChats] = useState([]);
-  async function getUserDataByEmail(email) {
-    const userDocRef = doc(database, 'users', email);
-    const userDoc = await getDoc(userDocRef);
-    return userDoc.exists()
-      ? {
-        username: userDoc.data().username,
-        avatar: userDoc.data().avatar,
-      }
-      : { username: email, avatar: '' };
-  }
-
-  async function onSignOut() {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error('Error signing out: ', error);
-    }
-  }
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{
-            marginRight: 10
-          }}
-          onPress={onSignOut}
-        >
-          <Text>Logout</Text>
-        </TouchableOpacity>
-      )
-    });
-  }, [navigation]);
-
+  const navigation = useNavigation();
+  const { user } = useContext(AuthenticatedUserContext)
   useEffect(() => {
-    const chatsCollectionRef = collection(database, 'chats');
-    const groupChatsCollectionRef = collection(database, 'groupChats');
-
-    const chatsQuery = query(chatsCollectionRef, orderBy('createdAt', 'desc'));
-    const groupChatsQuery = query(groupChatsCollectionRef);
-
-    const unsubscribeChats = onSnapshot(chatsQuery, async querySnapshot => {
-      const chatsData = {};
-
-      for (const doc of querySnapshot.docs) {
-        const chat = doc.data();
-
-        let targetUser;
-
-        if (chat.user._id === user.email) {
-          targetUser = chat.recipient;
-        } else if (chat.recipient === user.email) {
-          targetUser = chat.user._id;
-        } else {
-          continue;
-        }
-
-        if (!chatsData[targetUser]) {
-          if (!chat.recipientName) {
-            const recipientData = await getUserDataByEmail(targetUser);
-            chat.recipientName = recipientData.username;
-            chat.recipientAvatar = recipientData.avatar;
-          }
-          chatsData[targetUser] = [];
-        }
-
-        chatsData[targetUser].push(chat);
-      }
-
-      setChats(Object.values(chatsData).map(chatList => chatList[0]));
-    });
-
-    const unsubscribeGroupChats = onSnapshot(groupChatsQuery, async querySnapshot => {
-      const groupChatsData = {};
-
-      for (const doc of querySnapshot.docs) {
-        const groupChat = doc.data();
-        groupChatsData[doc.id] = groupChat;
-      }
-
-      setGroupChats(groupChatsData);
+    if (!user) return;
+    const personalChatsRef = collection(database, 'personalChats');
+    const personalChatsQuery = query(personalChatsRef, orderBy('createdAt', 'desc'));
+    const personalChatsUnsubscribe = onSnapshot(personalChatsQuery, snapshot => {
+      const personalChatsData = snapshot.docs.map(doc => ({ ...doc.data(), chatId: doc.id, isGroup: false }));
+      setChats(prevChats => mergeChatLists(prevChats, personalChatsData, user.email));
     });
 
     return () => {
-      unsubscribeChats();
-      unsubscribeGroupChats();
+      personalChatsUnsubscribe();
     };
   }, [user]);
+
+  const mergeChatLists = (prevChats, newChats, currentUserEmail) => {
+    const groupedChats = newChats.reduce((acc, chat) => {
+      const chatKey = chat.user._id === currentUserEmail ? chat.recipient : chat.user._id;
+
+      if (!acc[chatKey] && (chat.user._id === currentUserEmail || chat.recipient === currentUserEmail)) {
+        acc[chatKey] = { ...chat, recipient: chatKey };
+      } else if (chat.createdAt > acc[chatKey]?.createdAt) {
+        acc[chatKey] = { ...chat, recipient: chatKey };
+      }
+
+      return acc;
+    }, {});
+    
+    const mergedChats = Object.values(groupedChats).sort((a, b) => b.createdAt - a.createdAt);
+
+    return mergedChats;
+  };
+  console.log(chats, "<<<< chats")
   return (
     <View style={styles.container}>
       <FlatList
-        data={[...chats, ...Object.entries(groupChats).map(([id, value]) => ({ _id: id, ...value }))]}
-        keyExtractor={item => item._id}
+        data={chats}
+        keyExtractor={item => item.chatId}
         renderItem={({ item }) => {
-          if (item.groupName) {
-            return (
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  padding: 15,
-                  borderBottomColor: '#ccc',
-                  borderBottomWidth: 1,
-                }}
-                onPress={() => {
-                  navigation.navigate('Group Chat', {
-                    groupId: item._id,
-                    groupName: item.groupName,
-                  });
-                }}
-              >
-                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.groupName}</Text>
-              </TouchableOpacity>
-            );
-          } else {
-            return (
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  padding: 15,
-                  borderBottomColor: '#ccc',
-                  borderBottomWidth: 1,
-                }}
-                onPress={async () => {
-                  const recipientEmail = item.user._id === user.email ? item.recipient : item.user._id;
-                  const recipientName = item.user._id === user.email ? item.recipientName : item.user.username;
-                  const senderEmail = item.user._id === user.email ? user.email : item.recipient
-                  navigation.navigate('Chat', {
-                    recipientEmail: recipientEmail,
-                    recipientName: recipientName,
-                    senderEmail: senderEmail
-                  });
-                }}
-              >
-                {/* <Image
-            source={{ uri: item.recipientAvatar }}
-            style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10 }}
-          /> */}
-                <View>
-                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.recipient === user.email ? item.user.username : item.recipientName}</Text>
-                  <Text style={{ fontSize: 16 }}>{item.text}</Text>
-                </View>
-              </TouchableOpacity>
-            );
-          }
-        }}
+          // console.log(item, "<<< item")
+          return (
+            <TouchableOpacity style={styles.chatRow} onPress={() => {
+              navigation.navigate('Chat', { recipientEmail: item.recipient, recipientName: item.recipientName, senderEmail: item.user._id });
+            }}>
+              <Text style={styles.chatName}>{item.user._id === user.email ? item.recipientName : item.user.username}</Text>
+            </TouchableOpacity>
+          )
+        }
+        }
       />
-
-      <TouchableOpacity
-        style={styles.createGroupButton}
-        onPress={() => navigation.navigate('CreateGroupChat')}
-      >
-        <Text style={styles.createGroupButtonText}>Create Group Chat</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -173,7 +65,20 @@ function ChatList({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: 'white'
+  },
+  chatRow: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc'
+  },
+  chatName: {
+    fontSize: 18
+  },
+  buttonContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    paddingTop: 16,
   },
   createGroupButton: {
     backgroundColor: '#1E90FF',
@@ -191,6 +96,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
 
 export default ChatList;

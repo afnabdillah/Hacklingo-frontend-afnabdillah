@@ -23,10 +23,9 @@ import { auth, database } from '../config/firebase';
 
 export default function Chat({ route, navigation }) {
   const [messages, setMessages] = useState([]);
-  const { recipientEmail, recipientName, senderEmail } = route.params;
+  const { recipientEmail, recipientName } = route.params;
   const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
-
   async function getUserDataByEmail(email) {
     const usersCollectionRef = collection(database, 'users');
     const q = query(usersCollectionRef, where('email', '==', email));
@@ -48,6 +47,7 @@ export default function Chat({ route, navigation }) {
 
     fetchCurrentUserData();
   }, [currentUser]);
+
   const mergeMessages = (oldMessages, newMessages) => {
     const allMessages = [...oldMessages, ...newMessages];
     const uniqueMessages = allMessages.filter(
@@ -57,10 +57,10 @@ export default function Chat({ route, navigation }) {
 
     return uniqueMessages.sort((a, b) => b.createdAt - a.createdAt);
   };
+
   const onSignOut = () => {
     signOut(auth).catch(error => console.log('Error logging out: ', error));
   };
-
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -78,14 +78,14 @@ export default function Chat({ route, navigation }) {
   }, [navigation]);
 
   useEffect(() => {
-    const collectionRef = collection(database, 'chats');
+    const collectionRef = collection(database, 'personalChats');
     const currentUserEmail = auth.currentUser.email;
-  
+
     const q = query(
       collectionRef,
       orderBy('createdAt', 'desc')
     );
-  
+
     const unsubscribe = onSnapshot(q, querySnapshot => {
       const fetchedMessages = querySnapshot.docs
         .map(doc => ({
@@ -103,24 +103,22 @@ export default function Chat({ route, navigation }) {
               message.recipient === currentUserEmail)
           );
         });
-      setMessages((messages) => mergeMessages(messages, fetchedMessages));
+      setMessages(messages => mergeMessages(messages, fetchedMessages));
     });
-  
+
     return () => {
       unsubscribe();
     };
   }, [recipientEmail]);
-
 
   const onSend = useCallback((messages = []) => {
     if (!currentUserData) {
       console.error('User data not loaded yet. Please try again later.');
       return;
     }
-
     setMessages(previousMessages => GiftedChat.append(previousMessages, messages));
     const { _id, createdAt, text, user } = messages[0];
-    addDoc(collection(database, 'chats'), {
+    addDoc(collection(database, 'personalChats'), {
       _id,
       createdAt,
       text,
@@ -133,7 +131,6 @@ export default function Chat({ route, navigation }) {
       recipientName: recipientName,
     });
   }, [currentUserData]);
-
 
   return (
     <GiftedChat

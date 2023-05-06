@@ -13,6 +13,7 @@ import ChatList from './screens/Chatlist';
 import Contacts from './screens/Contacts';
 import CreateGroupChat from './screens/CreateGroupChat'; // Import the CreateGroupChat component
 import GroupChat from './screens/GroupChat';
+import Groups from './screens/Group';
 
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -20,8 +21,9 @@ const TopTab = createMaterialTopTabNavigator();
 function ChatTopTabNavigator() {
   return (
     <TopTab.Navigator>
-      <TopTab.Screen name="Chat History" component={ChatList} />
-      <TopTab.Screen name="Contacts" component={Contacts} />
+      <TopTab.Screen name="Chat Lists" component={ChatList} />
+      <TopTab.Screen name="Find Contacts" component={Contacts} />
+      <TopTab.Screen name="Find Groups" component={Groups} />
     </TopTab.Navigator>
   );
 }
