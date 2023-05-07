@@ -1,32 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Button, TextInput } from "react-native";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebase";
-import login from "../helper/loginLogic";
-import saveToAsyncStorage from "../helper/saveToAsyncStorage";
+import {
+  fetchUserDetails,
+  fetchUsersByNativeLanguage,
+  updateUserDetails,
+  userLogin,
+} from "../stores/usersSlice";
+import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const onHandleLogin = async () => {
-    if (email !== "" && password !== "") {
-      const response = await login({ email, password });
-      if (response.isSuccess) {
-        signInWithEmailAndPassword(auth, email, password)
-          .then(async () => {
-            await saveToAsyncStorage(response.data);
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.usersReducer.users);
 
-            const userId = await AsyncStorage.getItem("userid");
-            console.log(`Login success with user id ${userId}`);
-          })
-          .catch((err) => console.log(`Login err: ${err}`));
-      } else {
-        console.log(response.errMessage, "<<<< ini error validation");
-      }
+  const onHandleLogin = () => {
+    if (email !== "" && password !== "") {
+      dispatch(userLogin({ email, password }));
     }
   };
+
+  useEffect(() => {
+    AsyncStorage.getItem("userid").then((userId) =>
+      // List to do: if userId exists directly navigate into chat screen
+      console.log(userId, "<<< ini userId di useEffect")
+    );
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -56,6 +57,33 @@ export default function Login({ navigation }) {
         onPress={() => navigation.navigate("Signup")}
         title="Go to Signup"
       />
+      <Button
+        onPress={() => {
+          dispatch(fetchUsersByNativeLanguage("Indonesian/Bahasa Indonesia"));
+        }}
+        title='fetch users by "Indonesia"'
+      />
+      <Button
+        onPress={() => {
+          dispatch(fetchUserDetails());
+        }}
+        title="fetch current user details"
+      />
+      <Button
+        onPress={() => {
+          const update = {
+            username: "test edit via hp",
+          };
+          dispatch(updateUserDetails(update));
+        }}
+        title="update username 'test edit via hp'"
+      />
+      <View>
+        {users.length !== 0 &&
+          users.map((el) => {
+            return <Text>{el.username}</Text>;
+          })}
+      </View>
     </View>
   );
 }
