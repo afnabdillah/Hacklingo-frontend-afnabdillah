@@ -26,7 +26,6 @@ function Groups({ navigation }) {
       
         fetchGroups();
       }, []);
-      console.log(groups, "<<<")
     const navigateToCreateGroupChat = () => {
         navigation.navigate('CreateGroupChat');
     };

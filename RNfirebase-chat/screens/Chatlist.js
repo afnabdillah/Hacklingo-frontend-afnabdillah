@@ -27,15 +27,18 @@ function ChatList() {
     const groupedChats = newChats.reduce((acc, chat) => {
       const chatKey = chat.user._id === currentUserEmail ? chat.recipient : chat.user._id;
 
+      // Convert Firestore timestamp to JavaScript Date object
+      const chatDate = new Date(chat.createdAt.seconds * 1000);
+
       if (!acc[chatKey] && (chat.user._id === currentUserEmail || chat.recipient === currentUserEmail)) {
-        acc[chatKey] = { ...chat, recipient: chatKey };
-      } else if (chat.createdAt > acc[chatKey]?.createdAt) {
-        acc[chatKey] = { ...chat, recipient: chatKey };
+        acc[chatKey] = { ...chat, recipient: chatKey, createdAt: chatDate };
+      } else if (chatDate > acc[chatKey]?.createdAt) {
+        acc[chatKey] = { ...chat, recipient: chatKey, createdAt: chatDate };
       }
 
       return acc;
     }, {});
-    
+
     const mergedChats = Object.values(groupedChats).sort((a, b) => b.createdAt - a.createdAt);
 
     return mergedChats;
@@ -49,10 +52,28 @@ function ChatList() {
         renderItem={({ item }) => {
           // console.log(item, "<<< item")
           return (
-            <TouchableOpacity style={styles.chatRow} onPress={() => {
-              navigation.navigate('Chat', { recipientEmail: item.recipient, recipientName: item.recipientName, senderEmail: item.user._id });
-            }}>
-              <Text style={styles.chatName}>{item.user._id === user.email ? item.recipientName : item.user.username}</Text>
+            <TouchableOpacity
+              style={styles.chatRow}
+              onPress={() => {
+                navigation.navigate('Chat', {
+                  recipientEmail: item.recipient,
+                  recipientName: item.recipientName,
+                  senderEmail: item.user._id,
+                });
+              }}
+            >
+              <Text style={styles.chatName}>
+                {item.user._id === user.email ? item.recipientName : item.user.username}
+              </Text>
+              <Text style={styles.chatDate}>
+                {new Intl.DateTimeFormat('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                }).format(item.createdAt)}
+              </Text>
             </TouchableOpacity>
           )
         }
@@ -94,6 +115,10 @@ const styles = StyleSheet.create({
   createGroupButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  chatDate: {
+    fontSize: 12,
+    color: '#999',
   },
 });
 
