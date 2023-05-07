@@ -3,25 +3,31 @@ import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, database } from '../config/firebase';
 import { addDoc, collection } from 'firebase/firestore';
+import signUp from '../helper/signUpLogic';
 
 export default function Signup({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
 
-    const onHandleSignup = () => {
+    const onHandleSignup = async () => {
         if (email !== '' && password !== '' && username !== '') {
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    // Add the user's email and username to Firestore
-                    addDoc(collection(database, 'users'), {
-                        email: user.email,
-                        username: username
-                    });
-                    console.log('Signup success');
-                })
-                .catch(err => console.log(`Signup err: ${err}`));
+            const response = await signUp({email, password, username});
+            if (response.isSuccess) {
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        // Add the user's email and username to Firestore
+                        addDoc(collection(database, 'users'), {
+                            email: user.email,
+                            username: username
+                        });
+                        console.log('Signup success');
+                    })
+                    .catch(err => console.log(`Signup err: ${err}`));
+            } else {
+                console.log(response.data.errMessage, "<<<< ini error validation");
+            }
         }
     };
 
