@@ -30,15 +30,15 @@ export function PopChatMenu() {
                     <Animated.View style={[styles.popup, { transform: [{ scale }] }]}>
                         <TouchableOpacity style={styles.option}>
                             <Text>Cek Profile</Text>
-                            <Feather name="user" size={24} color="black" style={{ marginLeft: 10 }} />
+                            <Feather name="user" size={26} color="black" style={{ marginLeft: 10 }} />
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.option}>
                             <Text>Report</Text>
-                            <MaterialIcons name="report" size={26} color="black" style={{ marginLeft: 10 }} />
+                            <MaterialIcons name="report" size={26} color="black" style={{ marginLeft: 8 }} />
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.option}>
                             <Text>Block</Text>
-                            <Entypo name="block" size={22} color="black" style={{ marginLeft: 10 }} />
+                            <Entypo name="block" size={26} color="black" style={{ marginLeft: 10 }} />
                         </TouchableOpacity>
                     </Animated.View>
                 </SafeAreaView>

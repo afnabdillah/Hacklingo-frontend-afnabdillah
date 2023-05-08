@@ -5,10 +5,12 @@ import { Easing } from 'react-native';
 import { View, StyleSheet, Text, SafeAreaView, Modal, TouchableOpacity, Animated } from "react-native";
 import { auth } from '../../config/firebase';
 import { signOut } from 'firebase/auth';
+import { useNavigation } from '@react-navigation/native';
 
 
 
 export function PopMenu() {
+    const navigation = useNavigation()
     const [visible, setVisible] = useState(false)
     const scale = useRef(new Animated.Value(0)).current
 
@@ -27,7 +29,7 @@ export function PopMenu() {
     return (
         <>
             <TouchableOpacity onPress={() => resizeBox(1)}>
-                <FontAwesome name="user-circle" size={45} color="black" />
+                <FontAwesome name="user-circle" size={50} color="black" />
             </TouchableOpacity>
             <Modal transparent visible={visible}>
                 <SafeAreaView
@@ -35,17 +37,17 @@ export function PopMenu() {
                     onTouchStart={() => resizeBox(0)}
                 >
                     <Animated.View style={[styles.popup, { transform: [{ scale }] }]}>
-                        <TouchableOpacity style={styles.option}>
+                        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Profile')}>
                             <Text>Profile</Text>
-                            <Feather name="user" size={24} color="black" style={{ marginLeft: 10 }} />
+                            <Feather name="user" size={26} color="black" style={{ marginLeft: 10 }} />
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.option}>
+                        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('CreateGroupChat')}>
                             <Text>Add Group</Text>
-                            <AntDesign name="addusergroup" size={24} color="black" style={{ marginLeft: 10 }} />
+                            <AntDesign name="addusergroup" size={26} color="black" style={{ marginLeft: 10 }} />
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.option} onPress={onSignOut}>
                             <Text>Logout</Text>
-                            <MaterialIcons name="logout" size={24} color="black" style={{ marginLeft: 10 }} />
+                            <MaterialIcons name="logout" size={26} color="black" style={{ marginLeft: 10 }} />
                         </TouchableOpacity>
                     </Animated.View>
                 </SafeAreaView>
@@ -62,8 +64,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         paddingHorizontal: 10,
         position: 'absolute',
-        top: 40,
-        left: 45
+        top: 47,
+        left: 47
     },
     option: {
         flexDirection: 'row',

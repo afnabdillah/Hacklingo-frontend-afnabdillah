@@ -19,6 +19,7 @@ import { HeaderChat } from './screens/HeadersChat/HeaderChat';
 import CreateGroupChat from './screens/CreateGroupChat'; // Import the CreateGroupChat component
 import GroupChat from './screens/GroupChat';
 import Groups from './screens/Group';
+import Profile from './components/Profile';
 
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -43,6 +44,7 @@ function ChatStack() {
         <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
         <Stack.Screen name="Group Chat" component={GroupChat} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
+        <Stack.Screen name="Profile" component={Profile} />
       </Stack.Navigator>
     </SafeAreaView>
   );

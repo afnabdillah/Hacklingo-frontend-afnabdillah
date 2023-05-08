@@ -2,10 +2,11 @@ import React, {
   useState,
   useEffect,
   useCallback,
-  useContext
+  useContext,
+  useLayoutEffect
 } from 'react';
 import { TouchableOpacity, Text, ImageBackground, StyleSheet } from 'react-native';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { Actions, Bubble, GiftedChat, InputToolbar } from 'react-native-gifted-chat';
 import {
   collection,
   addDoc,
@@ -14,19 +15,24 @@ import {
   onSnapshot,
   where,
   doc,
-  getDocs
+  getDocs,
+  signOut
 } from 'firebase/firestore';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext'
 import { auth, database } from '../config/firebase';
 import bg from '../assets/BG.png'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View } from 'react-native';
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { AntDesign, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { PopChatMenu } from './HeadersChat/PopChatMenu';
 
 export default function Chat({ route }) {
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImageView, setSeletedImageView] = useState("");
+
   const [messages, setMessages] = useState([]);
   const { recipientEmail, recipientName } = route.params;
   const { user: currentUser } = useContext(AuthenticatedUserContext);
@@ -137,6 +143,7 @@ export default function Chat({ route }) {
     });
   }, [currentUserData]);
 
+  console.log(currentUserData, ">>>>>");
   const navigation = useNavigation()
 
   return (
@@ -147,11 +154,13 @@ export default function Chat({ route }) {
             <TouchableOpacity onPress={() => navigation.navigate('ChatList')}>
               <AntDesign name="arrowleft" size={36} color="black" />
             </TouchableOpacity>
-            <Image source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQsu34yqIKdjK5cAWEcuUq3ryD30iiqd2ArQ' }} style={styles.image} />
-            <Text style={{ fontStyle: 'italic', fontSize: 25 }}>{currentUserData?.username}</Text>
+            <Image source={{ uri: 'https://i.pravatar.cc/300' }} style={styles.image} />
+            <Text style={{ fontStyle: 'italic', fontSize: 25 }}>{recipientName}</Text>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-            <MaterialIcons name="video-call" size={36} color="black" />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, }}>
+            <TouchableOpacity>
+              <MaterialIcons name="video-call" size={36} color="black" />
+            </TouchableOpacity>
             <PopChatMenu />
           </View>
         </View>
@@ -164,6 +173,116 @@ export default function Chat({ route }) {
             username: currentUser.username,
             avatar: currentUser.avatar || 'https://i.pravatar.cc/300'
           }}
+          renderActions={(props) => (
+            <Actions
+              {...props}
+              containerStyle={{
+                position: "absolute",
+                right: 50,
+                bottom: 5,
+                zIndex: 9999,
+              }}
+
+              icon={() => (
+                <Ionicons name="camera" size={30} color={'grey'} />
+              )}
+            />
+          )}
+          timeTextStyle={{ right: { color: 'grey' } }}
+          renderSend={(props) => {
+            const { text, messageIdGenerator, user, onSend } = props;
+            return (
+              <TouchableOpacity
+                style={{
+                  height: 40,
+                  width: 40,
+                  borderRadius: 40,
+                  backgroundColor: 'primary',
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 5,
+                  paddingRight: 5
+                }}
+                onPress={() => {
+                  if (text && onSend) {
+                    onSend(
+                      {
+                        text: text.trim(),
+                        user,
+                        _id: messageIdGenerator(),
+                      },
+                      true
+                    );
+                  }
+                }}
+              >
+                <MaterialCommunityIcons
+                  name={text && onSend ? "send" : "microphone"}
+                  size={23}
+                  color={'black'}
+                />
+              </TouchableOpacity>
+            );
+          }}
+          renderInputToolbar={(props) => (
+            <InputToolbar
+              {...props}
+              containerStyle={{
+                marginLeft: 10,
+                marginRight: 10,
+                marginBottom: 2,
+                borderRadius: 20,
+                paddingTop: 5,
+              }}
+            />
+          )}
+          renderBubble={(props) => (
+            <Bubble
+              {...props}
+              textStyle={{ right: { color: 'grey' } }}
+              wrapperStyle={{
+                left: {
+                  backgroundColor: 'white',
+                },
+                right: {
+                  backgroundColor: '#dcf8c6',
+                },
+              }}
+            />
+          )}
+        // renderMessageImage={(props) => {
+        //   console.log(props, "????????");
+        //   return (
+        //     <View style={{ borderRadius: 15, padding: 2 }}>
+        //       <TouchableOpacity
+        //         onPress={() => {
+        //           setModalVisible(true);
+        //           setSeletedImageView(props.currentMessage.image);
+        //         }}
+        //       >
+        //         <Image
+        //           resizeMode="contain"
+        //           style={{
+        //             width: 200,
+        //             height: 200,
+        //             padding: 6,
+        //             borderRadius: 15,
+        //             resizeMode: "cover",
+        //           }}
+        //           source={{ uri: props.currentMessage.image }}
+        //         />
+        //         {selectedImageView ? (
+        //           <ImageView
+        //             imageIndex={0}
+        //             visible={modalVisible}
+        //             onRequestClose={() => setModalVisible(false)}
+        //             images={[{ uri: selectedImageView }]}
+        //           />
+        //         ) : null}
+        //       </TouchableOpacity>
+        //     </View>
+        //   );
+        // }}
         />
       </ImageBackground>
     </SafeAreaView>

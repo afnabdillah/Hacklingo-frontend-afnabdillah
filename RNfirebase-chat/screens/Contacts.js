@@ -34,27 +34,30 @@ function Contacts({ navigation }) {
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
+    <View style={{ flex: 1, backgroundColor: 'white', paddingTop: 10 }}>
       <FlatList
         data={contacts}
         keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.container}
-            onPress={async () => {
-              const recipientName = await getUsernameByEmail(item.id);
-              navigation.navigate('Chat', { recipientEmail: item.email, recipientName: item.username, senderEmail: user.email });
-            }}
-          >
-            <Image source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQsu34yqIKdjK5cAWEcuUq3ryD30iiqd2ArQ' }}
-              style={styles.image}
-            />
-            <View style={styles.content}>
-              <Text numberOfLines={1} style={styles.name}>{item.username}</Text>
-              <Text numberOfLines={2} style={styles.subTitle}>{item.email}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => {
+          console.log(item, "contac<<<<<");
+          return (
+            <TouchableOpacity
+              style={styles.container}
+              onPress={async () => {
+                const recipientName = await getUsernameByEmail(item.id);
+                navigation.navigate('Chat', { recipientEmail: item.email, recipientName: item.username, senderEmail: user.email });
+              }}
+            >
+              <Image source={{ uri: 'https://i.pravatar.cc/300' }}
+                style={styles.image}
+              />
+              <View style={styles.content}>
+                <Text numberOfLines={1} style={styles.name}>{item.username}</Text>
+                <Text numberOfLines={2} style={styles.subTitle}>{item.email}</Text>
+              </View>
+            </TouchableOpacity>
+          )
+        }}
       />
 
     </View>
@@ -82,13 +85,20 @@ const styles = StyleSheet.create({
 
   name: {
     fontWeight: 'bold',
+    fontSize: 20,
+    fontStyle: 'italic'
   },
 
   content: {
+    width: '100%',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'lightgray',
+    paddingBottom: 5
   },
 
   subTitle: {
-    color: "gray"
+    color: "gray",
+    fontStyle: 'italic'
   }
 
 })

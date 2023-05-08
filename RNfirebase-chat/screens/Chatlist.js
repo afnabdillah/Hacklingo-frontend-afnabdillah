@@ -1,9 +1,14 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { database } from '../config/firebase';
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
+import { Image } from 'react-native';
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+
 
 function ChatList() {
   const [chats, setChats] = useState([]);
@@ -26,11 +31,12 @@ function ChatList() {
   const mergeChatLists = (prevChats, newChats, currentUserEmail) => {
     const groupedChats = newChats.reduce((acc, chat) => {
       const chatKey = chat.user._id === currentUserEmail ? chat.recipient : chat.user._id;
+      const chatDate = new Date(chat.createdAt.seconds * 1000);
 
       if (!acc[chatKey] && (chat.user._id === currentUserEmail || chat.recipient === currentUserEmail)) {
-        acc[chatKey] = { ...chat, recipient: chatKey };
-      } else if (chat.createdAt > acc[chatKey]?.createdAt) {
-        acc[chatKey] = { ...chat, recipient: chatKey };
+        acc[chatKey] = { ...chat, recipient: chatKey, createdAt: chatDate };
+      } else if (chatDate > acc[chatKey]?.createdAt) {
+        acc[chatKey] = { ...chat, recipient: chatKey, createdAt: chatDate };
       }
 
       return acc;
@@ -40,19 +46,29 @@ function ChatList() {
 
     return mergedChats;
   };
-  console.log(chats, "<<<< chats")
+  // console.log(chats, "<<<< chats")
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, paddingTop: 10, backgroundColor: '#fff' }}>
       <FlatList
         data={chats}
         keyExtractor={item => item.chatId}
         renderItem={({ item }) => {
-          // console.log(item, "<<< item")
+          // console.log(item.user.avatar, "<<< item")
           return (
-            <TouchableOpacity style={styles.chatRow} onPress={() => {
+            <TouchableOpacity style={styles.container} onPress={() => {
               navigation.navigate('Chat', { recipientEmail: item.recipient, recipientName: item.recipientName, senderEmail: item.user._id });
             }}>
-              <Text style={styles.chatName}>{item.user._id === user.email ? item.recipientName : item.user.username}</Text>
+              <Image
+                source={{ uri: item.user.avatar }}
+                style={styles.image}
+              />
+              <View style={styles.content}>
+                <View style={styles.row}>
+                  <Text numberOfLines={1} style={styles.name}>{item.recipient === user.email ? item.user.username : item.recipientName}</Text>
+                  <Text style={styles.subTitle}>{dayjs(item.createdAt).fromNow(false)}</Text>
+                </View>
+                <Text style={styles.subTitle}>{item.text}</Text>
+              </View>
             </TouchableOpacity>
           )
         }
@@ -67,8 +83,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 10,
     marginVertical: 5,
-    height: 70
-
+    height: 70,
+    alignItems: 'center'
   },
 
   image: {
@@ -92,13 +108,15 @@ const styles = StyleSheet.create({
   name: {
     flex: 1,
     fontWeight: 'bold',
-
+    fontSize: 20,
+    fontStyle: 'italic'
   },
   subTitle: {
     color: 'gray',
+    fontStyle: 'italic',
+    marginBottom: 5,
+    marginRight: 5
   },
-
-
 
 })
 

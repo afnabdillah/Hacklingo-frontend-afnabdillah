@@ -9,6 +9,7 @@ import { Image } from "react-native";
 import logo from '../../assets/HACKLINGO.png'
 import { StyleSheet } from "react-native";
 import { PopMenu } from "./PopMenu";
+import { SearchChat } from "../../components/SearchChat";
 
 export function HeaderChat() {
     const navigation = useNavigation()
@@ -20,7 +21,7 @@ export function HeaderChat() {
                         <PopMenu />
                     </View>
                     <View style={{ flex: 1, marginRight: 10, marginTop: 5, marginBottom: 5, flexDirection: 'row' }}>
-                        <Searchbar placeholder="Search" style={{ flex: 1, width: 70 }} />
+                        <SearchChat />
                     </View>
                     <Image source={logo} style={styles.image} />
                 </View>
