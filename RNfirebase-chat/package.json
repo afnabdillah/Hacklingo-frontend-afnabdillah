@@ -16,19 +16,19 @@
     "@react-navigation/material-top-tabs": "^6.6.2",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/stack": "^6.3.16",
-<<<<<<< HEAD
     "@reduxjs/toolkit": "^1.9.5",
     "axios": "^1.4.0",
-=======
     "dayjs": "^1.11.7",
->>>>>>> 09b1bf0093a7fb1634b7258b4a43e1b3b1170fc7
     "dotenv": "^16.0.3",
     "expo": "~48.0.15",
     "expo-constants": "~14.2.1",
+    "expo-document-picker": "~11.2.2",
     "expo-status-bar": "~1.4.4",
     "firebase": "^9.21.0",
     "react": "18.2.0",
     "react-native": "0.71.7",
+    "react-native-audio-recorder-player": "^3.5.3",
+    "react-native-document-picker": "^8.2.0",
     "react-native-gesture-handler": "~2.9.0",
     "react-native-gifted-chat": "^2.0.1",
     "react-native-paper": "^5.7.2",
@@ -36,7 +36,8 @@
     "react-native-screens": "~3.20.0",
     "react-native-tab-view": "^3.5.1",
     "react-redux": "^8.0.5",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "expo-image-picker": "~14.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

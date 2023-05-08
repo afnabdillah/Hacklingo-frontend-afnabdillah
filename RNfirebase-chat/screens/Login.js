@@ -23,7 +23,7 @@ export default function Login({ navigation }) {
   const forums = useSelector((state) => state.forumsReducer.forums);
 
   // console.log(forumDetails, "<<<< ini forum details");
-  console.log(forums, "<<<< ini forum details");
+  // console.log(forums, "<<<< ini forum details");
 
   const onHandleLogin = () => {
     if (email !== "" && password !== "") {
