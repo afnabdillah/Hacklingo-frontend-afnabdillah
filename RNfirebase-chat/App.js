@@ -1,5 +1,6 @@
+import 'expo-dev-client';
 import React, { useState, createContext, useContext, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { View, ActivityIndicator } from 'react-native';
@@ -11,38 +12,53 @@ import Signup from './screens/Signup';
 import Chat from './screens/Chat';
 import ChatList from './screens/Chatlist';
 import Contacts from './screens/Contacts';
+import { useLayoutEffect } from 'react';
+import { TouchableOpacity } from 'react-native';
+import { Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { HeaderChat } from './screens/HeadersChat/HeaderChat';
 import CreateGroupChat from './screens/CreateGroupChat'; // Import the CreateGroupChat component
 import GroupChat from './screens/GroupChat';
 import Groups from './screens/Group';
-
+import Profile from './components/Profile';
+import { Provider } from 'react-redux';
+import { store } from './stores/mainReducer';
+import VideoChat from './screens/VideoChat';
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
 function ChatTopTabNavigator() {
   return (
-    <TopTab.Navigator>
-      <TopTab.Screen name="Chat Lists" component={ChatList} />
-      <TopTab.Screen name="Find Contacts" component={Contacts} />
-      <TopTab.Screen name="Find Groups" component={Groups} />
-    </TopTab.Navigator>
+    <SafeAreaView style={{ flex: 1 }}>
+      <HeaderChat />
+      <TopTab.Navigator>
+        <TopTab.Screen name="Chat Lists" component={ChatList} />
+        <TopTab.Screen name="Find Contacts" component={Contacts} />
+        <TopTab.Screen name="Find Groups" component={Groups} />
+      </TopTab.Navigator>
+    </SafeAreaView>
   );
 }
 function ChatStack() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="ChatList" component={ChatTopTabNavigator} />
-      <Stack.Screen name="Chat" component={Chat} />
-      <Stack.Screen name="Group Chat" component={GroupChat} />
-      <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
-    </Stack.Navigator>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack.Navigator>
+        <Stack.Screen name="ChatList" component={ChatTopTabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
+        <Stack.Screen name="Group Chat" component={GroupChat} />
+        <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
+        <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="Video Chat" component={VideoChat} options={{ headerShown: false }}/>
+      </Stack.Navigator>
+    </SafeAreaView>
   );
 }
 
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name='Login' component={Login} />
-      <Stack.Screen name='Signup' component={Signup} />
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Signup" component={Signup} />
     </Stack.Navigator>
   );
 }
@@ -65,7 +81,7 @@ function RootNavigator() {
     // onAuthStateChanged returns an unsubscriber
     const unsubscribeAuth = onAuthStateChanged(
       auth,
-      async authenticatedUser => {
+      async (authenticatedUser) => {
         authenticatedUser ? setUser(authenticatedUser) : setUser(null);
         setIsLoading(false);
       }
@@ -75,11 +91,10 @@ function RootNavigator() {
     return unsubscribeAuth;
   }, [user]);
 
-
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size='large' />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
@@ -93,8 +108,10 @@ function RootNavigator() {
 
 export default function App() {
   return (
-    <AuthenticatedUserProvider>
-      <RootNavigator />
-    </AuthenticatedUserProvider>
+    <Provider store={store}>
+      <AuthenticatedUserProvider>
+        <RootNavigator />
+      </AuthenticatedUserProvider>
+    </Provider>
   );
 }
