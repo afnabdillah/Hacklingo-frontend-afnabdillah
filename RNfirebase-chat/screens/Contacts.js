@@ -32,7 +32,10 @@ function Contacts({ navigation }) {
 
     fetchContacts();
   }, []);
+<<<<<<< HEAD
   console.log(contacts, "<<< contacts")
+=======
+>>>>>>> 9665be8872cd83f36f4042ee05fdbf7706b0b185
   return (
     <View style={{ flex: 1, backgroundColor: 'white', paddingTop: 10 }}>
       <FlatList
