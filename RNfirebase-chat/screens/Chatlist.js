@@ -54,21 +54,23 @@ function ChatList() {
         renderItem={({ item }) => {
           const lastMessage = item.messages[item.messages.length - 1];
           const otherUser = item.users.find(u => u.email !== user.email);
-          console.log(otherUser.user.avatar, "<<<< item")
+          console.log(otherUser, "<<<< otheruser")
+          console.log(lastMessage, "<<<< item")
+          console.log(item, "<<<< lastmessage")
           return (
             <TouchableOpacity style={styles.container} onPress={() => {
-              navigation.navigate('Chat', { recipientEmail: item.recipient, recipientName: item.recipientName, senderEmail: item.user._id });
+              navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username });
             }}>
               <Image
-                source={{ uri: item.user.avatar }}
+                source={{ uri: otherUser.avatar }}
                 style={styles.image}
               />
               <View style={styles.content}>
                 <View style={styles.row}>
-                  <Text numberOfLines={1} style={styles.name}>{item.recipient === user.email ? item.user.username : item.recipientName}</Text>
+                  <Text numberOfLines={1} style={styles.name}>{otherUser.username}</Text>
                   <Text style={styles.subTitle}>{dayjs(item.createdAt).fromNow(false)}</Text>
                 </View>
-                <Text style={styles.subTitle}>{item.text}</Text>
+                <Text style={styles.subTitle}>{lastMessage.text}</Text>
               </View>
             </TouchableOpacity>
           )
