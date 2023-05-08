@@ -3,29 +3,42 @@ import { StyleSheet, Text, View, Button, TextInput } from "react-native";
 import {
   fetchUserDetails,
   fetchUsersByNativeLanguage,
-  updateUserDetails,
   userLogin,
+  updateUserDetails,
+  deleteUser,
 } from "../stores/usersSlice";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { fetchForumDetails, fetchAllForums } from "../stores/forumsSlice";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errMessage, setErrMessage] = useState("");
 
   const dispatch = useDispatch();
   const users = useSelector((state) => state.usersReducer.users);
+  const userDetails = useSelector((state) => state.usersReducer.userDetails);
+  const forumDetails = useSelector((state) => state.forumsReducer.forumDetails);
+  const forums = useSelector((state) => state.forumsReducer.forums);
+
+  // console.log(forumDetails, "<<<< ini forum details");
+  console.log(forums, "<<<< ini forum details");
 
   const onHandleLogin = () => {
     if (email !== "" && password !== "") {
-      dispatch(userLogin({ email, password }));
+      dispatch(userLogin({ email, password }))
+        .unwrap()
+        .catch((err) => {
+          setErrMessage(err.message);
+        });
     }
   };
 
   useEffect(() => {
-    AsyncStorage.getItem("userid").then((userId) =>
+    AsyncStorage.getItem("userid").then((userId) => {
       // List to do: if userId exists directly navigate into chat screen
-      console.log(userId, "<<< ini userId di useEffect")
+    }
     );
   }, []);
 
@@ -57,7 +70,7 @@ export default function Login({ navigation }) {
         onPress={() => navigation.navigate("Signup")}
         title="Go to Signup"
       />
-      <Button
+      {/* <Button
         onPress={() => {
           dispatch(fetchUsersByNativeLanguage("Indonesian/Bahasa Indonesia"));
         }}
@@ -71,19 +84,38 @@ export default function Login({ navigation }) {
       />
       <Button
         onPress={() => {
+          dispatch(deleteUser());
+        }}
+        title="delete current user"
+      />
+      <Button
+        onPress={() => {
+          dispatch(fetchForumDetails("64582c32ee5092be8f155f5f")); // English forum id
+        }}
+        title="fetch forum 'english' details"
+      />
+      <Button
+        onPress={() => {
+          dispatch(fetchAllForums()); // English forum id
+        }}
+        title="fetch all forums"
+      />
+      <Button
+        onPress={() => {
           const update = {
-            username: "test edit via hp",
+            username: "test edit via hp 2",
           };
-          dispatch(updateUserDetails(update));
+          dispatch(updateUserDetails(update))
+            .unwrap()
+            .then((response) =>
+              console.log(
+                `Update success for id ${response.userId} with new username ${response.username}`
+              )
+            ).catch(err => console.log(err.message));
         }}
         title="update username 'test edit via hp'"
       />
-      <View>
-        {users.length !== 0 &&
-          users.map((el) => {
-            return <Text>{el.username}</Text>;
-          })}
-      </View>
+      {errMessage && <Text>{errMessage}</Text>} */}
     </View>
   );
 }

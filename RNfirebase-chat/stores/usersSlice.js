@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import {
   createUserWithEmailAndPassword,
@@ -9,139 +9,171 @@ import { auth, database } from "../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
 
-const base_url = "https://966a-103-171-161-131.ngrok-free.app";
+const base_url = "https://8fad-114-10-115-11.ngrok-free.app";
+
+export const fetchUserDetails = createAsyncThunk(
+  "usersSlice/fetchUserDetails", // this is the action name
+  async () => {
+    // this is the action
+    const userId = await AsyncStorage.getItem("userid");
+    const response = await axios({
+      method: "GET",
+      url: `${base_url}/users/${userId}`,
+      headers: {
+        userid: userId,
+      },
+    });
+    return response.data;
+  }
+);
+
+export const fetchUsersByNativeLanguage = createAsyncThunk(
+  "usersSlice/fetchUsersByNativeLanguage",
+  async (nativeLanguage) => {
+    const userId = await AsyncStorage.getItem("userid");
+    const response = await axios({
+      method: "GET",
+      url: `${base_url}/users`,
+      headers: {
+        userid: userId,
+      },
+      params: {
+        nativeLanguage,
+      },
+    });
+    return response.data;
+  }
+);
+
+export const userLogin = createAsyncThunk(
+  "usersSlice/userLogin",
+  async (input, { rejectWithValue }) => {
+    try {
+      const { email, password } = input;
+      // Login first to the project db for validation
+      const response = await axios({
+        method: "POST",
+        url: `${base_url}/users/login`,
+        data: input,
+      });
+      // Login to firebase after success
+      await signInWithEmailAndPassword(auth, email, password);
+      await saveToAsyncStorage(response.data);
+    } catch (err) {
+      if (err.response) {
+        return rejectWithValue(err.response.data);
+      } else {
+        throw err;
+      }
+    }
+  }
+);
+
+export const userSignUp = createAsyncThunk(
+  "usersSlice/userSignUp",
+  async (input, { rejectWithValue }) => {
+    try {
+      // these are temporary additionals
+      const additionals = {
+        nativeLanguage: "Indonesian/Bahasa Indonesia",
+        targetLanguage: ["English", "German/Deutsch"],
+        role: "regular",
+      };
+      // Sign up first to the project database
+      const { email, password, username } = input;
+      const response = await axios({
+        method: "POST",
+        url: `${base_url}/users/register`,
+        data: {
+          ...input,
+          ...additionals,
+        },
+      });
+      // Sign Up to firebase if success
+      const { user } = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      // Save it to firebase database
+      await addDoc(collection(database, "users"), {
+        email: user.email,
+        username: username,
+      });
+      // Save it to async storage
+      await saveToAsyncStorage(response.data);
+      const userId = await AsyncStorage.getItem("itemid");
+      return userId;
+    } catch (err) {
+      // return err.response if it was an axios error with reject with value
+      if (err.response) {
+        return rejectWithValue(err.response.data);
+      } else {
+        throw err;
+      }
+    }
+  }
+);
+
+export const deleteUser = createAsyncThunk(
+  "usersSlice/deleteUser",
+  async (input, { rejectWithValue }) => {
+    try {
+      const userId = await AsyncStorage.getItem("userid");
+      const response = await axios({
+        method: "DELETE",
+        url: `${base_url}/users/${userId}`,
+        headers: {
+          userid: userId,
+        },
+        data: input,
+      });
+      return response.data;
+    } catch (err) {
+      // return err.response if it was an axios error with reject with value
+      if (err.response) {
+        return rejectWithValue(err.response.data);
+      } else {
+        throw err;
+      }
+    }
+  }
+);
 
 const usersSlice = createSlice({
   name: "usersSlice",
   initialState: {
     users: [],
     userDetails: {},
+    status: {
+      userDetails: "idle",
+      users: "idle",
+    },
   },
-  reducers: {
-    fetchUsersByNativeLanguage(state, action) {
-      // Add logic function here
-      AsyncStorage.getItem("userid")
-        .then((userId) => {
-          return axios({
-            method: "GET",
-            url: `${base_url}/users`,
-            headers: {
-              userid: userId,
-            },
-            params: {
-              nativeLanguage: action.payload,
-            },
-          });
-        })
-        .then((response) => {
-          console.log(response.data, "ini hasil");
-        })
-        .catch((err) => console.log(err, "<<<< ini error di reducer"));
-    },
-
-    fetchUserDetails(state, action) {
-      // Add logic function here
-      AsyncStorage.getItem("userid")
-        .then((userId) => {
-          return axios({
-            method: "GET",
-            url: `${base_url}/users/${userId}`,
-            headers: {
-              userid: userId,
-            },
-          });
-        })
-        .then((response) => {
-          console.log(response.data.posts, "ini hasil posts user details");
-          console.log(
-            response.data.comments,
-            "ini hasil comments user details"
-          );
-        })
-        .catch((err) => console.log(err, "<<<< ini error di reducer"));
-    },
-
-    updateUserDetails(state, action) {
-      // Add logic function here
-      AsyncStorage.getItem("userid")
-        .then((userId) => {
-          return axios({
-            method: "PUT",
-            url: `${base_url}/users/${userId}`,
-            headers: {
-              userid: userId,
-            },
-            data: action.payload,
-          });
-        })
-        .then((response) => {
-          console.log(response.data, "ini hasil update user");
-          console.log(response.data.username, "ini hasil update user");
-        })
-        .catch((err) => console.log(err, "<<<< ini error di reducer"));
-    },
-
-    userLogin(state, action) {
-      // First we log in into the database, then we log in into the firebase account
-      // List to do: add userId from response.data._id into firebase
-      const { email, password } = action.payload;
-      let result = {}; // To save login response from axios
-      axios({
-        method: "POST",
-        url: `${base_url}/users/login`,
-        data: action.payload,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUserDetails.pending, (state, action) => {
+        state.status.userDetails = "loading";
       })
-        .then((response) => {
-          result = response.data;
-          return signInWithEmailAndPassword(auth, email, password);
-        })
-        .then(() => saveToAsyncStorage(result))
-        .then(() => AsyncStorage.getItem("userid"))
-        .then((userId) => console.log(`Login success with user id ${userId}`))
-        .catch((err) => console.log(err, "<<<< ini error di reducer"));
-    },
-
-    userSignUp(state, action) {
-      // these are temporary additionals
-      const { email, password, username } = action.payload;
-      const additionals = {
-        nativeLanguage: "Indonesian/Bahasa Indonesia",
-        targetLanguage: ["English", "German/Deutsch"],
-        role: "regular",
-      };
-      let result = {};
-      axios({
-        method: "POST",
-        url: `${base_url}/users/register`,
-        data: { ...action.payload, ...additionals },
+      .addCase(fetchUserDetails.fulfilled, (state, action) => {
+        state.status.userDetails = "idle";
+        state.userDetails = action.payload;
       })
-        .then((response) => {
-          console.log("selesai axios");
-          result = response.data;
-          return createUserWithEmailAndPassword(auth, email, password);
-        })
-        .then((userCredential) => {
-          console.log("selesai firebase");
-          const user = userCredential.user;
-          // Add the user's email and username to Firestore
-          addDoc(collection(database, "users"), {
-            email: user.email,
-            username: username,
-          });
-        })
-        .then(() => saveToAsyncStorage(result))
-        .then(() => AsyncStorage.getItem("userid"))
-        .then((userId) => console.log(`signup success with user id ${userId}`))
-        .catch((err) => console.log(err, "<<<< ini error di reducer"));
-    },
+      .addCase(fetchUserDetails.rejected, (state, action) => {
+        state.status.userDetails = "error";
+      })
+      .addCase(fetchUsersByNativeLanguage.pending, (state, action) => {
+        state.status.users = "loading";
+      })
+      .addCase(fetchUsersByNativeLanguage.fulfilled, (state, action) => {
+        state.status.users = "idle";
+        state.users = action.payload;
+      })
+      .addCase(fetchUsersByNativeLanguage.rejected, (state, action) => {
+        state.status.users = "error";
+      });
   },
 });
 
-export const {
-  fetchUsersByNativeLanguage,
-  fetchUserDetails,
-  updateUserDetails,
-  userLogin,
-  userSignUp,
-} = usersSlice.actions;
 export default usersSlice.reducer;
