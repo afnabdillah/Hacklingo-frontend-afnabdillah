@@ -84,25 +84,6 @@ export default function Chat({ route }) {
       : `${email2}_${email1}`;
   };
 
-  const onSignOut = () => {
-    dispatch(logoutUser());
-  };
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{
-            marginRight: 10
-          }}
-          onPress={onSignOut}
-        >
-          <Text>Logout</Text>
-        </TouchableOpacity>
-      )
-    });
-  }, [navigation]);
-
   useEffect(() => {
     const createRoomId = generateRoomId(currentUser.email, recipientEmail);
     const roomDocRef = doc(database, "personalChats", createRoomId);
@@ -171,9 +152,8 @@ export default function Chat({ route }) {
     });
   }, [currentUserData]);
 
-  console.log(currentUserData, ">>>>>");
   const navigation = useNavigation()
-
+  console.log(recipientName, recipientEmail);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground source={bg} style={{ flex: 1 }}>
@@ -189,7 +169,7 @@ export default function Chat({ route }) {
             <TouchableOpacity>
               <MaterialIcons name="video-call" size={36} color="black" />
             </TouchableOpacity>
-            <PopChatMenu />
+            <PopChatMenu name={recipientName} email={recipientEmail}/>
           </View>
         </View>
         <GiftedChat

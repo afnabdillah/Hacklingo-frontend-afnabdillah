@@ -70,7 +70,7 @@ function ChatList() {
                   <Text numberOfLines={1} style={styles.name}>{otherUser.username}</Text>
                   <Text style={styles.subTitle}>{dayjs(item.createdAt).fromNow(false)}</Text>
                 </View>
-                <Text style={styles.subTitle}>{lastMessage.text}</Text>
+                <Text style={styles.subTitle}>{lastMessage?.text}</Text>
               </View>
             </TouchableOpacity>
           )
