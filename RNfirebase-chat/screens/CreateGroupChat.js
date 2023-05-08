@@ -6,6 +6,8 @@ import {
     TouchableOpacity,
     FlatList,
     StyleSheet,
+    Switch,
+    Alert
 } from 'react-native';
 import { database, auth } from '../config/firebase';
 import { collection, getDocs, addDoc, setDoc, doc } from 'firebase/firestore';
@@ -14,6 +16,7 @@ function CreateGroupChat({ route, navigation }) {
     const { groupId, groupName: initialGroupName, groupLanguage: initialGroupLanguage, groupMembers, editMode } = route.params || {};
     const [groupName, setGroupName] = useState(initialGroupName || '');
     const [users, setUsers] = useState([]);
+    const [isProGroup, setIsProGroup] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState(new Set(groupMembers || []));
     const [selectedLanguages, setSelectedLanguages] = useState(
         new Set(
@@ -55,10 +58,19 @@ function CreateGroupChat({ route, navigation }) {
         if (selectedUsers.has(user)) {
             newSelectedUsers.delete(user);
         } else {
+            if (!isProGroup && newSelectedUsers.size >= 5) {
+                Alert.alert(
+                    'Member Limit Reached',
+                    'Non-Pro groups can have a maximum of 5 members. Upgrade to a Pro group to add more members.',
+                    [{ text: 'OK' }]
+                );
+                return;
+            }
             newSelectedUsers.add(user);
         }
         setSelectedUsers(newSelectedUsers);
     };
+
 
     const toggleLanguageSelection = language => {
         const newSelectedLanguages = new Set(selectedLanguages);
@@ -77,7 +89,8 @@ function CreateGroupChat({ route, navigation }) {
             languages: Array.from(selectedLanguages),
             createdAt: new Date(),
             messages: [],
-            admin: auth.currentUser.email
+            admin: auth.currentUser.email,
+            isProGroup
         };
 
         const groupChatsRef = collection(database, 'groupChats');
@@ -130,6 +143,15 @@ function CreateGroupChat({ route, navigation }) {
                         <Text style={styles.languageName}>{language}</Text>
                     </View>
                 ))}
+            </View>
+            <View style={styles.proGroupRow}>
+                <Text style={styles.proGroupText}>Pro Group</Text>
+                <Switch
+                    value={isProGroup}
+                    onValueChange={setIsProGroup}
+                    trackColor={{ false: '#767577', true: '#81b0ff' }}
+                    thumbColor={isProGroup ? '#f5dd4b' : '#f4f3f4'}
+                />
             </View>
             <TouchableOpacity style={styles.createButton} onPress={onCreateGroupChat}>
                 <Text style={styles.buttonText}>Create Group Chat</Text>
@@ -193,6 +215,16 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ccc',
         marginRight: 8,
+    },
+    proGroupRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 16,
+    },
+    proGroupText: {
+        fontWeight: 'bold',
+        fontSize: 18,
     },
 });
 

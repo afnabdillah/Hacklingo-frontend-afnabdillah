@@ -16,7 +16,10 @@ import {
   where,
   doc,
   getDocs,
-  signOut
+  getDoc,
+  setDoc,
+  updateDoc,
+  arrayUnion
 } from 'firebase/firestore';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext'
 import { auth, database } from '../config/firebase';
@@ -37,6 +40,8 @@ export default function Chat({ route }) {
   const { recipientEmail, recipientName } = route.params;
   const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
+  const [roomId, setRoomId] = useState(null);
+
   async function getUserDataByEmail(email) {
     const usersCollectionRef = collection(database, 'users');
     const q = query(usersCollectionRef, where('email', '==', email));
@@ -68,6 +73,11 @@ export default function Chat({ route }) {
 
     return uniqueMessages.sort((a, b) => b.createdAt - a.createdAt);
   };
+  const generateRoomId = (email1, email2) => {
+    return email1 < email2
+      ? `${email1}_${email2}`
+      : `${email2}_${email1}`;
+  };
 
   const onSignOut = () => {
     signOut(auth).catch(error => console.log('Error logging out: ', error));
@@ -89,57 +99,70 @@ export default function Chat({ route }) {
   }, [navigation]);
 
   useEffect(() => {
-    const collectionRef = collection(database, 'personalChats');
-    const currentUserEmail = auth.currentUser.email;
+    const createRoomId = generateRoomId(currentUser.email, recipientEmail);
+    const roomDocRef = doc(database, "personalChats", createRoomId);
 
-    const q = query(
-      collectionRef,
-      orderBy('createdAt', 'desc')
-    );
-
-    const unsubscribe = onSnapshot(q, querySnapshot => {
-      const fetchedMessages = querySnapshot.docs
-        .map(doc => ({
-          _id: doc.data()._id,
-          createdAt: doc.data().createdAt.toDate(),
-          text: doc.data().text,
-          user: doc.data().user,
-          recipient: doc.data().recipient,
-        }))
-        .filter(message => {
-          return (
-            (message.user._id === currentUserEmail &&
-              message.recipient === recipientEmail) ||
-            (message.user._id === recipientEmail &&
-              message.recipient === currentUserEmail)
-          );
-        });
-      setMessages(messages => mergeMessages(messages, fetchedMessages));
+    const unsubscribe = onSnapshot(roomDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const fetchedMessages = docSnapshot.data().messages.map((message) => ({
+          ...message,
+          createdAt: message.createdAt.toDate(),
+        }));
+        setMessages((messages) => mergeMessages(messages, fetchedMessages));
+      } else {
+        setMessages([]);
+      }
     });
-
+    setRoomId(createRoomId)
     return () => {
       unsubscribe();
     };
-  }, [recipientEmail]);
-
-  const onSend = useCallback((messages = []) => {
+  }, [recipientEmail, currentUser.email]);
+  const onSend = useCallback(async (messages = []) => {
     if (!currentUserData) {
-      console.error('User data not loaded yet. Please try again later.');
+      console.error("User data not loaded yet. Please try again later.");
       return;
     }
-    setMessages(previousMessages => GiftedChat.append(previousMessages, messages));
-    const { _id, createdAt, text, user } = messages[0];
-    addDoc(collection(database, 'personalChats'), {
-      _id,
-      createdAt,
-      text,
+
+    setMessages((previousMessages) =>
+      GiftedChat.append(previousMessages, messages)
+    );
+
+    const roomId = generateRoomId(currentUser.email, recipientEmail);
+
+    const roomDocRef = doc(database, "personalChats", roomId);
+    const roomDocSnapshot = await getDoc(roomDocRef);
+
+    if (!roomDocSnapshot.exists()) {
+      await setDoc(roomDocRef, {
+        users: [
+          {
+            email: currentUser.email,
+            username: currentUserData.username,
+            avatar: currentUserData.avatar || "https://i.pravatar.cc/300",
+          },
+          {
+            email: recipientEmail,
+            username: recipientName,
+            avatar: "https://i.pravatar.cc/300", // Set the recipient avatar if available
+          },
+        ],
+        messages: [],
+      });
+    }
+    const message = {
+      _id: messages[0]._id,
+      createdAt: messages[0].createdAt,
+      text: messages[0].text,
       user: {
         _id: currentUser.email,
         username: currentUserData.username,
-        avatar: currentUserData.avatar || 'https://i.pravatar.cc/300',
+        avatar: currentUserData.avatar || "https://i.pravatar.cc/300",
       },
-      recipient: recipientEmail,
-      recipientName: recipientName,
+    };
+
+    await updateDoc(roomDocRef, {
+      messages: arrayUnion(message),
     });
   }, [currentUserData]);
 
