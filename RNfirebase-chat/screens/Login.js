@@ -10,6 +10,20 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchForumDetails, fetchAllForums } from "../stores/forumsSlice";
+import {
+  deletePostById,
+  fetchPostDetails,
+  fetchPostsBySearch,
+  insertNewPost,
+  updatePostById,
+} from "../stores/postsSlice";
+import {
+  deleteCommentById,
+  fetchCommentDetails,
+  insertNewComment,
+  updateCommentById,
+} from "../stores/commentsSlice";
+import { fetchArticleById, fetchArticles } from "../stores/articlesSlices";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -20,10 +34,24 @@ export default function Login({ navigation }) {
   const users = useSelector((state) => state.usersReducer.users);
   const userDetails = useSelector((state) => state.usersReducer.userDetails);
   const forumDetails = useSelector((state) => state.forumsReducer.forumDetails);
+  const postDetails = useSelector((state) => state.postsReducer.postDetails);
+  const articleDetails = useSelector((state) => state.articlesReducer.articleDetails);
+  const commentDetails = useSelector(
+    (state) => state.commentsReducer.commentDetails
+  );
+  const posts = useSelector((state) => state.postsReducer.posts);
   const forums = useSelector((state) => state.forumsReducer.forums);
+  const articles = useSelector((state) => state.articlesReducer.articles);
 
+  // console.log(postDetails, "<<<< ini post details");
+  // console.log(commentDetails, "<<<< ini comment details");
+  // console.log(posts, "<<<< ini posts");
+  // console.log(users, "<<< ini users");
+  // console.log(userDetails, "<<< ini user details");
   // console.log(forumDetails, "<<<< ini forum details");
-  console.log(forums, "<<<< ini forum details");
+  // console.log(forums, "<<<< ini forum details");
+  // console.log(articles, "<<<< ini articles");
+  console.log(articleDetails, "<<<< ini article details");
 
   const onHandleLogin = () => {
     if (email !== "" && password !== "") {
@@ -39,8 +67,7 @@ export default function Login({ navigation }) {
     AsyncStorage.getItem("userid").then((userId) => {
       // List to do: if userId exists directly navigate into chat screen
       console.log(userId, "<<<< ini userid di async storage");
-    }
-    );
+    });
   }, []);
 
   return (
@@ -73,49 +100,178 @@ export default function Login({ navigation }) {
       />
       <Button
         onPress={() => {
-          dispatch(fetchUsersByNativeLanguage("Indonesian/Bahasa Indonesia"));
+          dispatch(fetchCommentDetails("64582e05ee5092be8f155fbb"))
+            .unwrap()
+            .catch((err) => console.log(err));
+        }}
+        title="fetch comment details"
+      />
+      <Button
+        onPress={() => {
+          const input = {
+            content: "balesan 100 juta rupiah",
+            postId: "64582c67ee5092be8f155f68",
+          };
+          dispatch(insertNewComment(input))
+            .unwrap()
+            .then((data) => console.log(data))
+            .catch((err) => console.log(err));
+        }}
+        title="post new comment"
+      />
+      <Button
+        onPress={() => {
+          const input = {
+            content: "balesan edit edit 100 juta rupiah",
+          };
+          dispatch(
+            updateCommentById({ input, commentId: "6458aa1d08d061b54ba06cc5" })
+          )
+            .unwrap()
+            .then((data) => console.log(data))
+            .catch((err) => console.log(err));
+        }}
+        title="update comment"
+      />
+      <Button
+        onPress={() => {
+          dispatch(
+            deleteCommentById("6458aa1d08d061b54ba06cc5")
+          )
+            .unwrap()
+            .then((data) => console.log(data))
+            .catch((err) => console.log(err));
+        }}
+        title="delete comment"
+      />
+      <Button
+        onPress={() => {
+          dispatch(
+            fetchArticles("German")
+          )
+            .unwrap()
+            .catch((err) => console.log(err));
+        }}
+        title="fetch articles with title 'german'"
+      />
+      <Button
+        onPress={() => {
+          dispatch(
+            fetchArticleById("6458b19a08d061b54ba06d49")
+          )
+            .unwrap()
+            .catch((err) => console.log(err));
+        }}
+        title="fetch article details"
+      />
+      {/* <Button
+        onPress={() => {
+          dispatch(fetchUsersByNativeLanguage("Indonesian/Bahasa Indonesia"))
+          .unwrap()
+          .catch(err => console.log(err));
         }}
         title='fetch users by "Indonesia"'
       />
       <Button
         onPress={() => {
-          dispatch(fetchUserDetails());
+          dispatch(fetchUserDetails())
+          .unwrap()
+          .catch(err => console.log(err))
         }}
         title="fetch current user details"
       />
       <Button
         onPress={() => {
-          dispatch(deleteUser());
+          dispatch(deleteUser())
+          .unwrap()
+          .then(data => console.log(data, "<<< delete user success"))
+          .catch(err => console.log(err));
         }}
-        title="delete current user"
+        title="delete current user (jangan nakal ya)"
       />
       <Button
         onPress={() => {
-          dispatch(fetchForumDetails("64582c32ee5092be8f155f5f")); // English forum id
+          dispatch(fetchPostsBySearch("test"))
+          .unwrap()
+          .catch(err => console.log(err));
+        }}
+        title="fetch posts containing 'test' in title"
+      />
+      <Button
+        onPress={() => {
+          const input = {
+            content : "halo dari hp edit content"
+          }
+          dispatch(updatePostById({input, postId : "64582bafee5092be8f155f5b"}))
+          .unwrap()
+          .then(data => console.log(`post id 64582bafee5092be8f155f5b successfully updated!`))
+          .catch(err => console.log(err));
+        }}
+        title="update first post content in db"
+      />
+      <Button
+        onPress={() => {
+          dispatch(deletePostById("64582db7ee5092be8f155f9f"))
+          .unwrap()
+          .catch(err => console.log(err));
+        }}
+        title="delete last post in db"
+      />
+      <Button
+        onPress={() => {
+          const input = {
+            title : "halo dari hp",
+            content : "halo dari hp",
+            forumId : "64582c32ee5092be8f155f5f"
+          }
+          dispatch(insertNewPost(input))
+          .unwrap()
+          .then(data => console.log(data, "<<< ini post baru"))
+          .catch(err => console.log(err, "<<< ini error validation"));
+        }}
+        title="insert post 'halo dari hp'"
+      />
+      <Button
+        onPress={() => {
+          dispatch(fetchForumDetails("64582c32ee5092be8f155f5f")) // English forum id
+          .unwrap()
+          .catch(err => console.log(err));
         }}
         title="fetch forum 'english' details"
       />
       <Button
         onPress={() => {
-          dispatch(fetchAllForums()); // English forum id
+          dispatch(fetchAllForums()) // English forum id
+          .unwrap()
+          .catch(err => console.log(err));
         }}
         title="fetch all forums"
       />
       <Button
         onPress={() => {
+          console.log("masuk button fetch posts");
+          dispatch(fetchPostDetails("64582bafee5092be8f155f5b")) // Post pertama
+          .unwrap()
+          .catch(err => console.log(err));
+        }}
+        title="fetch post details"
+      />
+      <Button
+        onPress={() => {
           const update = {
-            username: "test edit via hp 2",
+            username: "test edit via hp 4",
           };
           dispatch(updateUserDetails(update))
             .unwrap()
             .then((response) =>
               console.log(
-                `Update success for id ${response.userId} with new username ${response.username}`
+                `Update success for id ${response._id} with new username ${response.username}`
               )
-            ).catch(err => console.log(err.message));
+            )
+            .catch((err) => console.log(err));
         }}
         title="update username 'test edit via hp'"
-      />
+      /> */}
       {errMessage && <Text>{errMessage}</Text>}
     </View>
   );

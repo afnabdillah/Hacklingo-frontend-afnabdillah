@@ -14,23 +14,32 @@ const base_url = "https://8fad-114-10-115-11.ngrok-free.app";
 
 export const fetchUserDetails = createAsyncThunk(
   "usersSlice/fetchUserDetails", // this is the action name
-  async () => {
+  async (_, {rejectWithValue}) => {
     // this is the action
-    const userId = await AsyncStorage.getItem("userid");
-    const response = await axios({
-      method: "GET",
-      url: `${base_url}/users/${userId}`,
-      headers: {
-        userid: userId,
-      },
-    });
-    return response.data;
+    try {
+      const userId = await AsyncStorage.getItem("userid");
+      const response = await axios({
+        method: "GET",
+        url: `${base_url}/users/${userId}`,
+        headers: {
+          userid: userId,
+        },
+      });
+      return response.data;
+    } catch(err) {
+      if (err.response) {
+        return rejectWithValue(err.response.data);
+      } else {
+        throw err;
+      }
+    }
   }
 );
 
 export const fetchUsersByNativeLanguage = createAsyncThunk(
   "usersSlice/fetchUsersByNativeLanguage",
   async (nativeLanguage) => {
+    try {
     const userId = await AsyncStorage.getItem("userid");
     const response = await axios({
       method: "GET",
@@ -43,6 +52,13 @@ export const fetchUsersByNativeLanguage = createAsyncThunk(
       },
     });
     return response.data;
+  } catch(err) {
+    if (err.response) {
+      return rejectWithValue(err.response.data);
+    } else {
+      throw err;
+    }
+  }
   }
 );
 
@@ -128,9 +144,34 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
+export const updateUserDetails = createAsyncThunk(
+  "usersSlice/updateUserDetails",
+  async (input, { rejectWithValue }) => {
+    try {
+      const userId = await AsyncStorage.getItem("userid");
+      const response = await axios({
+        method: "PUT",
+        url: `${base_url}/users/${userId}`,
+        headers: {
+          userid: userId,
+        },
+        data: input,
+      });
+      return response.data;
+    } catch (err) {
+      // return err.response if it was an axios error with reject with value
+      if (err.response) {
+        return rejectWithValue(err.response.data);
+      } else {
+        throw err;
+      }
+    }
+  }
+);
+
 export const deleteUser = createAsyncThunk(
   "usersSlice/deleteUser",
-  async (input, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const userId = await AsyncStorage.getItem("userid");
       const response = await axios({
@@ -138,8 +179,7 @@ export const deleteUser = createAsyncThunk(
         url: `${base_url}/users/${userId}`,
         headers: {
           userid: userId,
-        },
-        data: input,
+        }
       });
       return response.data;
     } catch (err) {
