@@ -38,6 +38,7 @@ export default function Login({ navigation }) {
   useEffect(() => {
     AsyncStorage.getItem("userid").then((userId) => {
       // List to do: if userId exists directly navigate into chat screen
+      console.log(userId, "<<<< ini userid di async storage");
     }
     );
   }, []);
@@ -70,7 +71,7 @@ export default function Login({ navigation }) {
         onPress={() => navigation.navigate("Signup")}
         title="Go to Signup"
       />
-      {/* <Button
+      <Button
         onPress={() => {
           dispatch(fetchUsersByNativeLanguage("Indonesian/Bahasa Indonesia"));
         }}
@@ -115,7 +116,7 @@ export default function Login({ navigation }) {
         }}
         title="update username 'test edit via hp'"
       />
-      {errMessage && <Text>{errMessage}</Text>} */}
+      {errMessage && <Text>{errMessage}</Text>}
     </View>
   );
 }

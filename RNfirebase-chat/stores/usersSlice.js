@@ -4,6 +4,7 @@ import axios from "axios";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { auth, database } from "../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
@@ -111,6 +112,18 @@ export const userSignUp = createAsyncThunk(
       } else {
         throw err;
       }
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  "usersSlice/logoutUser",
+  async () => {
+    try {
+      await AsyncStorage.multiRemove(["username", "email", "userid"]);
+      await signOut(auth);
+    } catch (err) {
+      console.log("Error logging out: ", err);
     }
   }
 );
