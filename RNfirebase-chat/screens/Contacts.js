@@ -38,7 +38,6 @@ function Contacts({ navigation }) {
         data={contacts}
         keyExtractor={item => item.id}
         renderItem={({ item }) => {
-          console.log(item, "contac<<<<<");
           return (
             <TouchableOpacity
               style={styles.container}

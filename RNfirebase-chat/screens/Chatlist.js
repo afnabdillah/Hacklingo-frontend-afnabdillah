@@ -54,9 +54,6 @@ function ChatList() {
         renderItem={({ item }) => {
           const lastMessage = item.messages[item.messages.length - 1];
           const otherUser = item.users.find(u => u.email !== user.email);
-          console.log(otherUser, "<<<< otheruser")
-          console.log(lastMessage, "<<<< item")
-          console.log(item, "<<<< lastmessage")
           return (
             <TouchableOpacity style={styles.container} onPress={() => {
               navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username });
