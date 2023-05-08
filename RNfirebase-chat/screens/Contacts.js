@@ -31,7 +31,6 @@ function Contacts({ navigation }) {
 
     fetchContacts();
   }, []);
-console.log(contacts, "<<< contacts")
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <FlatList
