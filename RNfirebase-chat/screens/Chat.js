@@ -24,6 +24,8 @@ import {
 import { signOut } from 'firebase/auth';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext'
 import { auth, database } from '../config/firebase';
+import { logoutUser } from '../stores/usersSlice';
+import { useDispatch } from 'react-redux';
 
 export default function Chat({ route, navigation }) {
   const [messages, setMessages] = useState([]);
@@ -31,6 +33,9 @@ export default function Chat({ route, navigation }) {
   const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [roomId, setRoomId] = useState(null);
+
+  const dispatch = useDispatch();
+
 
   async function getUserDataByEmail(email) {
     const usersCollectionRef = collection(database, 'users');
@@ -70,7 +75,7 @@ export default function Chat({ route, navigation }) {
   };
 
   const onSignOut = () => {
-    signOut(auth).catch(error => console.log('Error logging out: ', error));
+    dispatch(logoutUser());
   };
 
   useLayoutEffect(() => {
