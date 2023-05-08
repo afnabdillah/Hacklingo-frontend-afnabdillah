@@ -138,3 +138,11 @@ export default function App() {
     </Provider>
   );
 }
+
+export default function App() {
+  return (
+    <AuthenticatedUserProvider>
+      <RootNavigator />
+    </AuthenticatedUserProvider>
+  );
+}
