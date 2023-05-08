@@ -23,6 +23,8 @@ import {
 } from 'firebase/firestore';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext'
 import { auth, database } from '../config/firebase';
+import { logoutUser } from '../stores/usersSlice';
+import { useDispatch } from 'react-redux';
 import bg from '../assets/BG.png'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View } from 'react-native';
@@ -41,6 +43,9 @@ export default function Chat({ route }) {
   const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [roomId, setRoomId] = useState(null);
+
+  const dispatch = useDispatch();
+
 
   async function getUserDataByEmail(email) {
     const usersCollectionRef = collection(database, 'users');
@@ -80,7 +85,7 @@ export default function Chat({ route }) {
   };
 
   const onSignOut = () => {
-    signOut(auth).catch(error => console.log('Error logging out: ', error));
+    dispatch(logoutUser());
   };
 
   useLayoutEffect(() => {
