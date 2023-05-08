@@ -31,13 +31,14 @@ function Contacts({ navigation }) {
 
     fetchContacts();
   }, []);
-
+console.log(contacts, "<<< contacts")
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <FlatList
         data={contacts}
         keyExtractor={item => item.id}
-        renderItem={({ item }) => (
+        renderItem={({ item }) => {
+          return (
           <TouchableOpacity
             style={{
               padding: 15,
@@ -45,14 +46,15 @@ function Contacts({ navigation }) {
               borderBottomWidth: 1,
             }}
             onPress={async () => {
-              const recipientName = await getUsernameByEmail(item.id);
               navigation.navigate('Chat', { recipientEmail: item.email, recipientName : item.username, senderEmail : user.email });
             }}
           >
             <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.username}</Text>
             <Text style={{ fontSize: 16 }}>{item.email}</Text>
           </TouchableOpacity>
-        )}
+          )
+        }
+        }
       />
       
     </View>

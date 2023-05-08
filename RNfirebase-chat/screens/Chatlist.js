@@ -8,14 +8,20 @@ import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 function ChatList() {
   const [chats, setChats] = useState([]);
   const navigation = useNavigation();
-  const { user } = useContext(AuthenticatedUserContext)
+  const { user } = useContext(AuthenticatedUserContext);
+
   useEffect(() => {
     if (!user) return;
     const personalChatsRef = collection(database, 'personalChats');
-    const personalChatsQuery = query(personalChatsRef, orderBy('createdAt', 'desc'));
+    const personalChatsQuery = query(personalChatsRef);
     const personalChatsUnsubscribe = onSnapshot(personalChatsQuery, snapshot => {
       const personalChatsData = snapshot.docs.map(doc => ({ ...doc.data(), chatId: doc.id, isGroup: false }));
-      setChats(prevChats => mergeChatLists(prevChats, personalChatsData, user.email));
+      const userChats = personalChatsData.filter(chat => {
+        return chat.users.some(userObj => userObj.email === user.email);
+      });
+      
+
+      setChats(prevChats => mergeChatLists(prevChats, userChats, user.email));
     });
 
     return () => {
@@ -24,46 +30,38 @@ function ChatList() {
   }, [user]);
 
   const mergeChatLists = (prevChats, newChats, currentUserEmail) => {
-    const groupedChats = newChats.reduce((acc, chat) => {
-      const chatKey = chat.user._id === currentUserEmail ? chat.recipient : chat.user._id;
+    const mergedChats = newChats
+      .map(chat => {
+        const recipient = chat.users.find(user => user !== currentUserEmail);
+        return { ...chat, recipient };
+      })
+      .sort((a, b) => b.createdAt - a.createdAt);
+      return mergedChats;
+    };
+    
 
-      // Convert Firestore timestamp to JavaScript Date object
-      const chatDate = new Date(chat.createdAt.seconds * 1000);
-
-      if (!acc[chatKey] && (chat.user._id === currentUserEmail || chat.recipient === currentUserEmail)) {
-        acc[chatKey] = { ...chat, recipient: chatKey, createdAt: chatDate };
-      } else if (chatDate > acc[chatKey]?.createdAt) {
-        acc[chatKey] = { ...chat, recipient: chatKey, createdAt: chatDate };
-      }
-
-      return acc;
-    }, {});
-
-    const mergedChats = Object.values(groupedChats).sort((a, b) => b.createdAt - a.createdAt);
-
-    return mergedChats;
-  };
-  console.log(chats, "<<<< chats")
+  // console.log(chats, '<<<< chats');
   return (
     <View style={styles.container}>
       <FlatList
         data={chats}
         keyExtractor={item => item.chatId}
         renderItem={({ item }) => {
-          // console.log(item, "<<< item")
+          const lastMessage = item.messages[item.messages.length - 1];
+          const otherUser = item.users.find(u => u.email !== user.email);
+          console.log(otherUser, "<<<< item")
           return (
             <TouchableOpacity
               style={styles.chatRow}
               onPress={() => {
                 navigation.navigate('Chat', {
-                  recipientEmail: item.recipient,
-                  recipientName: item.recipientName,
-                  senderEmail: item.user._id,
+                  recipientEmail: otherUser.email,
+                  recipientName: otherUser.username,
                 });
               }}
             >
               <Text style={styles.chatName}>
-                {item.user._id === user.email ? item.recipientName : item.user.username}
+                {otherUser.username}
               </Text>
               <Text style={styles.chatDate}>
                 {new Intl.DateTimeFormat('en-US', {
