@@ -24,6 +24,10 @@ import {
   updateCommentById,
 } from "../stores/commentsSlice";
 import { fetchArticleById, fetchArticles } from "../stores/articlesSlices";
+import pickImage from "../helper/imagePicker";
+import axios from "axios";
+import pickAudio from "../helper/audioPicker";
+import showToast from "../helper/showToast";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -35,14 +39,28 @@ export default function Login({ navigation }) {
   const userDetails = useSelector((state) => state.usersReducer.userDetails);
   const forumDetails = useSelector((state) => state.forumsReducer.forumDetails);
   const postDetails = useSelector((state) => state.postsReducer.postDetails);
-  const articleDetails = useSelector((state) => state.articlesReducer.articleDetails);
+  const articleDetails = useSelector(
+    (state) => state.articlesReducer.articleDetails
+  );
   const commentDetails = useSelector(
     (state) => state.commentsReducer.commentDetails
   );
   const posts = useSelector((state) => state.postsReducer.posts);
   const forums = useSelector((state) => state.forumsReducer.forums);
   const articles = useSelector((state) => state.articlesReducer.articles);
+  const updateUserStatus = useSelector(
+    (state) => state.usersReducer.status.updateUserDetails
+  );
+  const signUpStatus = useSelector(
+    (state) => state.usersReducer.status.userSignUp
+  );
+  const loginStatus = useSelector(
+    (state) => state.usersReducer.status.userLogin
+  );
 
+  // console.log(updateUserStatus, "<<< ini status update user profile");
+  // console.log(signUpStatus, "<<< ini status sign up");
+  // console.log(loginStatus, "<<< ini status login");
   // console.log(postDetails, "<<<< ini post details");
   // console.log(commentDetails, "<<<< ini comment details");
   // console.log(posts, "<<<< ini posts");
@@ -51,7 +69,7 @@ export default function Login({ navigation }) {
   // console.log(forumDetails, "<<<< ini forum details");
   // console.log(forums, "<<<< ini forum details");
   // console.log(articles, "<<<< ini articles");
-  console.log(articleDetails, "<<<< ini article details");
+  // console.log(articleDetails, "<<<< ini article details");
 
   const onHandleLogin = () => {
     if (email !== "" && password !== "") {
@@ -64,9 +82,8 @@ export default function Login({ navigation }) {
   };
 
   useEffect(() => {
-    AsyncStorage.getItem("userid").then((userId) => {
-      // List to do: if userId exists directly navigate into chat screen
-      console.log(userId, "<<<< ini userid di async storage");
+    AsyncStorage.getItem("username").then((username) => {
+      console.log(username, "<<<< ini username di async storage");
     });
   }, []);
 
@@ -93,11 +110,14 @@ export default function Login({ navigation }) {
         value={password}
         onChangeText={(text) => setPassword(text)}
       />
+      {loginStatus === "error" && showToast("error", "Login error", errMessage)}
+      {loginStatus === "loading" && showToast("info", "Please wait a few seconds", "logging you in ...")}
       <Button onPress={onHandleLogin} color="#f57c00" title="Login" />
       <Button
         onPress={() => navigation.navigate("Signup")}
         title="Go to Signup"
       />
+      <Button onPress={showToast} title="show toast" />
       <Button
         onPress={() => {
           dispatch(fetchCommentDetails("64582e05ee5092be8f155fbb"))
@@ -135,9 +155,7 @@ export default function Login({ navigation }) {
       />
       <Button
         onPress={() => {
-          dispatch(
-            deleteCommentById("6458aa1d08d061b54ba06cc5")
-          )
+          dispatch(deleteCommentById("6458aa1d08d061b54ba06cc5"))
             .unwrap()
             .then((data) => console.log(data))
             .catch((err) => console.log(err));
@@ -146,9 +164,7 @@ export default function Login({ navigation }) {
       />
       <Button
         onPress={() => {
-          dispatch(
-            fetchArticles("German")
-          )
+          dispatch(fetchArticles("German"))
             .unwrap()
             .catch((err) => console.log(err));
         }}
@@ -156,13 +172,53 @@ export default function Login({ navigation }) {
       />
       <Button
         onPress={() => {
-          dispatch(
-            fetchArticleById("6458b19a08d061b54ba06d49")
-          )
+          console.log("masuk sini");
+          dispatch(fetchArticleById("6458b19a08d061b54ba06d49"))
             .unwrap()
             .catch((err) => console.log(err));
         }}
         title="fetch article details"
+      />
+      <Button
+        onPress={() => {
+          const input = {
+            username: "test edit username via image",
+          };
+          pickImage().then((imageData) => {
+            const formData = new FormData();
+            formData.append("file", imageData);
+            formData.append("username", input.username);
+            return dispatch(updateUserDetails(formData));
+          });
+        }}
+        title="edit image user profile"
+      />
+      <Button
+        onPress={() => {
+          const input = {
+            username: "test edit username via audio",
+          };
+          pickAudio().then((audioData) => {
+            const formData = new FormData();
+            formData.append("file", audioData);
+            formData.append("username", input.username);
+            return dispatch(updateUserDetails(formData));
+          });
+        }}
+        title="upload audio"
+      />
+      <Button
+        onPress={() => {
+          axios({
+            method: "GET",
+            url: "https://ad2b-103-171-163-143.ngrok-free.app",
+          })
+            .then((response) => console.log(response.data))
+            .catch((err) => console.error(err));
+          // .unwrap()
+          // .catch((err) => console.log(err, "<<<< ini error di login"));
+        }}
+        title="try connect"
       />
       {/* <Button
         onPress={() => {
@@ -272,7 +328,6 @@ export default function Login({ navigation }) {
         }}
         title="update username 'test edit via hp'"
       /> */}
-      {errMessage && <Text>{errMessage}</Text>}
     </View>
   );
 }

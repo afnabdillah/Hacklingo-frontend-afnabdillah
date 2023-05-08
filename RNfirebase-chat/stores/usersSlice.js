@@ -9,8 +9,7 @@ import {
 import { auth, database } from "../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
-
-const base_url = "https://8fad-114-10-115-11.ngrok-free.app";
+import base_url from "./base_url";
 
 export const fetchUserDetails = createAsyncThunk(
   "usersSlice/fetchUserDetails", // this is the action name
@@ -148,22 +147,27 @@ export const updateUserDetails = createAsyncThunk(
   "usersSlice/updateUserDetails",
   async (input, { rejectWithValue }) => {
     try {
+      // console.log(input, "<<<< ini input di axios");
+      input.append("context", "image");
       const userId = await AsyncStorage.getItem("userid");
       const response = await axios({
         method: "PUT",
         url: `${base_url}/users/${userId}`,
         headers: {
           userid: userId,
+          "Content-Type" : "multipart/form-data"
         },
         data: input,
       });
+      console.log(response.data, "<<< ini hasil dari axios");
       return response.data;
     } catch (err) {
       // return err.response if it was an axios error with reject with value
       if (err.response) {
+        console.log(err.response.data);
         return rejectWithValue(err.response.data);
       } else {
-        throw err;
+        console.log(err, "masuk throw error");
       }
     }
   }
@@ -201,6 +205,9 @@ const usersSlice = createSlice({
     status: {
       userDetails: "idle",
       users: "idle",
+      updateUserDetails: "idle",
+      userSignUp: "idle",
+      userLogin: "idle"
     },
   },
   reducers: {},
@@ -225,6 +232,33 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsersByNativeLanguage.rejected, (state, action) => {
         state.status.users = "error";
+      })
+      .addCase(updateUserDetails.pending, (state, action) => {
+        state.status.updateUserDetails = "loading";
+      })
+      .addCase(updateUserDetails.fulfilled, (state, action) => {
+        state.status.updateUserDetails = "idle";
+      })
+      .addCase(updateUserDetails.rejected, (state, action) => {
+        state.status.updateUserDetails = "error";
+      })
+      .addCase(userSignUp.pending, (state, action) => {
+        state.status.userSignUp = "loading";
+      })
+      .addCase(userSignUp.fulfilled, (state, action) => {
+        state.status.userSignUp = "idle";
+      })
+      .addCase(userSignUp.rejected, (state, action) => {
+        state.status.userSignUp = "error";
+      })
+      .addCase(userLogin.pending, (state, action) => {
+        state.status.userLogin = "loading";
+      })
+      .addCase(userLogin.fulfilled, (state, action) => {
+        state.status.userLogin = "idle";
+      })
+      .addCase(userLogin.rejected, (state, action) => {
+        state.status.userLogin = "error";
       });
   },
 });

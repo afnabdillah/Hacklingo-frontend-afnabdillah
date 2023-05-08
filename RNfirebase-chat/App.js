@@ -19,6 +19,8 @@ import CreateGroupChat from './screens/CreateGroupChat'; // Import the CreateGro
 import Profile from './components/Profile';
 import { onAuthStateChanged } from "@firebase/auth";
 import { auth } from "./config/firebase";
+import Toast from 'react-native-toast-message';
+import toastConfig from "./config/toastConfig";
 
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -106,6 +108,7 @@ export default function App() {
     <Provider store={store}>
       <AuthenticatedUserProvider>
         <RootNavigator />
+        <Toast config={toastConfig} />
       </AuthenticatedUserProvider>
     </Provider>
   );
