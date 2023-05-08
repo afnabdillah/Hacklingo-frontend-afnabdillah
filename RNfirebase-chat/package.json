@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --dev-client --tunnel",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
@@ -16,22 +16,24 @@
     "@react-navigation/material-top-tabs": "^6.6.2",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/stack": "^6.3.16",
-<<<<<<< HEAD
     "@reduxjs/toolkit": "^1.9.5",
+    "agora-react-native-rtm": "^1.5.1",
+    "agora-rn-uikit": "^5.0.1",
     "axios": "^1.4.0",
-=======
     "dayjs": "^1.11.7",
->>>>>>> 09b1bf0093a7fb1634b7258b4a43e1b3b1170fc7
     "dotenv": "^16.0.3",
     "expo": "~48.0.15",
     "expo-constants": "~14.2.1",
+    "expo-dev-client": "^2.2.1",
     "expo-status-bar": "~1.4.4",
     "firebase": "^9.21.0",
     "react": "18.2.0",
     "react-native": "0.71.7",
+    "react-native-agora": "^4.1.2",
     "react-native-gesture-handler": "~2.9.0",
     "react-native-gifted-chat": "^2.0.1",
     "react-native-paper": "^5.7.2",
+    "react-native-reanimated": "~2.14.4",
     "react-native-safe-area-context": "4.5.0",
     "react-native-screens": "~3.20.0",
     "react-native-tab-view": "^3.5.1",

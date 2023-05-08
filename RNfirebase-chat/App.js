@@ -1,23 +1,4 @@
-<<<<<<< HEAD
-import React, { useState, createContext, useContext, useEffect } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { View, ActivityIndicator } from "react-native";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./config/firebase";
-import { Provider } from "react-redux";
-import AuthenticatedUserContext from "./helper/AuthenticatedUserContext";
-import Login from "./screens/Login";
-import Signup from "./screens/Signup";
-import Chat from "./screens/Chat";
-import ChatList from "./screens/Chatlist";
-import Contacts from "./screens/Contacts";
-import CreateGroupChat from "./screens/CreateGroupChat"; // Import the CreateGroupChat component
-import GroupChat from "./screens/GroupChat";
-import Groups from "./screens/Group";
-import { store } from "./stores/mainReducer";
-=======
+import 'expo-dev-client';
 import React, { useState, createContext, useContext, useEffect } from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -40,8 +21,10 @@ import CreateGroupChat from './screens/CreateGroupChat'; // Import the CreateGro
 import GroupChat from './screens/GroupChat';
 import Groups from './screens/Group';
 import Profile from './components/Profile';
->>>>>>> 09b1bf0093a7fb1634b7258b4a43e1b3b1170fc7
-
+import { Provider } from 'react-redux';
+import { store } from './stores/mainReducer';
+import VideoChat from './screens/VideoChat';
+import Home from './screens/Home'
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
@@ -53,6 +36,7 @@ function ChatTopTabNavigator() {
         <TopTab.Screen name="Chat Lists" component={ChatList} />
         <TopTab.Screen name="Find Contacts" component={Contacts} />
         <TopTab.Screen name="Find Groups" component={Groups} />
+        <TopTab.Screen name="Home" component={Home} />
       </TopTab.Navigator>
     </SafeAreaView>
   );
@@ -66,6 +50,7 @@ function ChatStack() {
         <Stack.Screen name="Group Chat" component={GroupChat} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
         <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="Video Chat" component={VideoChat} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </SafeAreaView>
   );
@@ -73,15 +58,9 @@ function ChatStack() {
 
 function AuthStack() {
   return (
-<<<<<<< HEAD
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Signup" component={Signup} />
-=======
-    <Stack.Navigator>
-      <Stack.Screen name='Login' component={Login} />
-      <Stack.Screen name='Signup' component={Signup} />
->>>>>>> 09b1bf0093a7fb1634b7258b4a43e1b3b1170fc7
     </Stack.Navigator>
   );
 }
