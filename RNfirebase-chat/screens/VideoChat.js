@@ -4,14 +4,14 @@ import { Button, View, TextInput, StyleSheet } from 'react-native';
 
 const VideoChat = ({ route }) => {
     const [videoCall, setVideoCall] = useState(false);
-    const { channel, username } = route.params
-
+    const { roomId, username } = route.params
+    console.log(route.params, "<<<<")
     /**
      * @type {import('agora-rn-uikit').ConnectionData}
      */
     const connectionData = {
         appId: 'ab2001a4b2014114a6d31426bfc7185b',
-        channel: channel,
+        channel: roomId,
         username: username
     }
 
