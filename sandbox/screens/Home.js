@@ -7,53 +7,50 @@ import {
     Text,
   } from 'react-native';
   import React from 'react';
-  import CustomImageCarousalSquare from './Landingpage/CustomImageCarousalSquare';
   import CustomImageCarousalLandscape from './Landingpage/CustomImageCarousalLandscape';
+  import Carousel from './Landingpage/Carousel'
   
-  const Home = () => {
+  const App = () => {
     const data = [
       {
-        image: require('../assets/image-product-1.jpg'),
+        title: 'Anise Aroma Art Bazar', url: 'https://i.ibb.co/hYjK44F/anise-aroma-art-bazaar-277253.jpg',
+        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+        id: 1
+  
       },
       {
-        image: require('../assets/image-product-2.jpg'),
+        title: 'Food inside a Bowl', url: 'https://i.ibb.co/JtS24qP/food-inside-bowl-1854037.jpg',
+        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+        id: 2
       },
-      {
-        image: require('../assets/image-product-3.jpg'),
-      },
-      {
-        image: require('../assets/image-product-4.jpg'),
-      },
+      {   
+        title: 'Vegatable Salad', url: 'https://i.ibb.co/JxykVBt/flat-lay-photography-of-vegetable-salad-on-plate-1640777.jpg',
+        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+        id: 3
+      }
     ];
     const data2 = [
       {
-        image: require('../assets/image-product-1-landscape.jpg'),
+        image: require('../assets/flag_inggris.jpeg'),
       },
       {
-        image: require('../assets/image-product-2-landscape.jpg'),
-      },
-      {
-        image: require('../assets/image-product-3-landscape.jpg'),
-      },
-      {
-        image: require('../assets/image-product-4-landscape.jpg'),
-      },
+        image: require('../assets/Flag_Indonesia.png'),
+      }
     ];
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.carouselContainer}>
-  
-          <CustomImageCarousalSquare
+          <Carousel
             data={data}
             autoPlay={true}
             pagination={true}
           />
         </View>
         <View style={styles.carouselContainer}>
-  
+          <Text style={styles.text}>SELECT LANGUAGE</Text>
           <CustomImageCarousalLandscape
             data={data2}
-            autoPlay={true}
+            autoPlay={false}
             pagination={true}
           />
         </View>
@@ -61,7 +58,7 @@ import {
     );
   };
   
-  export default Home;
+  export default App;
   
   const styles = StyleSheet.create({
     container: {
@@ -69,8 +66,14 @@ import {
       paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
       backgroundColor: 'white',
     },
-    text: {textAlign: 'center', color: 'black', marginBottom: 10},
+    text: {
+      textAlign: 'center',
+      color: 'black',
+      marginBottom: 10,
+      fontSize: 22,
+      fontWeight: "bold",
+    },
     carouselContainer: {
-      marginBottom: 20,
+      marginBottom: 40,
     },
   });

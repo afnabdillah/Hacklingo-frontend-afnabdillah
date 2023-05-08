@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   dots: {
     height: 10,
     backgroundColor: 'orange',
-    marginHorizontal: 10,
+    marginHorizontal: 5,
     borderRadius: 5,
   },
 });
