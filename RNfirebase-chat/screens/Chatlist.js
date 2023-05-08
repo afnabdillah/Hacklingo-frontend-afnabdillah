@@ -1,9 +1,14 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { database } from '../config/firebase';
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
+import { Image } from 'react-native';
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+
 
 function ChatList() {
   const [chats, setChats] = useState([]);
@@ -19,7 +24,7 @@ function ChatList() {
       const userChats = personalChatsData.filter(chat => {
         return chat.users.some(userObj => userObj.email === user.email);
       });
-      
+
 
       setChats(prevChats => mergeChatLists(prevChats, userChats, user.email));
     });
@@ -36,42 +41,37 @@ function ChatList() {
         return { ...chat, recipient };
       })
       .sort((a, b) => b.createdAt - a.createdAt);
-      return mergedChats;
-    };
-    
+    return mergedChats;
+  };
+
 
   // console.log(chats, '<<<< chats');
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, paddingTop: 10, backgroundColor: '#fff' }}>
       <FlatList
         data={chats}
         keyExtractor={item => item.chatId}
         renderItem={({ item }) => {
           const lastMessage = item.messages[item.messages.length - 1];
           const otherUser = item.users.find(u => u.email !== user.email);
-          console.log(otherUser, "<<<< item")
+          console.log(otherUser, "<<<< otheruser")
+          console.log(lastMessage, "<<<< item")
+          console.log(item, "<<<< lastmessage")
           return (
-            <TouchableOpacity
-              style={styles.chatRow}
-              onPress={() => {
-                navigation.navigate('Chat', {
-                  recipientEmail: otherUser.email,
-                  recipientName: otherUser.username,
-                });
-              }}
-            >
-              <Text style={styles.chatName}>
-                {otherUser.username}
-              </Text>
-              <Text style={styles.chatDate}>
-                {new Intl.DateTimeFormat('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                }).format(item.createdAt)}
-              </Text>
+            <TouchableOpacity style={styles.container} onPress={() => {
+              navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username });
+            }}>
+              <Image
+                source={{ uri: otherUser.avatar }}
+                style={styles.image}
+              />
+              <View style={styles.content}>
+                <View style={styles.row}>
+                  <Text numberOfLines={1} style={styles.name}>{otherUser.username}</Text>
+                  <Text style={styles.subTitle}>{dayjs(item.createdAt).fromNow(false)}</Text>
+                </View>
+                <Text style={styles.subTitle}>{lastMessage.text}</Text>
+              </View>
             </TouchableOpacity>
           )
         }
@@ -80,44 +80,48 @@ function ChatList() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
+
   container: {
+    flexDirection: 'row',
+    marginHorizontal: 10,
+    marginVertical: 5,
+    height: 70,
+    alignItems: 'center'
+  },
+
+  image: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 10,
+
+  },
+
+  content: {
     flex: 1,
-    backgroundColor: 'white'
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'lightgray',
+
   },
-  chatRow: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc'
+  row: {
+    flexDirection: 'row',
+    marginBottom: 5,
   },
-  chatName: {
-    fontSize: 18
-  },
-  buttonContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-    paddingTop: 16,
-  },
-  createGroupButton: {
-    backgroundColor: '#1E90FF',
-    borderRadius: 25,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-  },
-  createGroupButtonText: {
-    color: 'white',
+  name: {
+    flex: 1,
     fontWeight: 'bold',
+    fontSize: 20,
+    fontStyle: 'italic'
   },
-  chatDate: {
-    fontSize: 12,
-    color: '#999',
+  subTitle: {
+    color: 'gray',
+    fontStyle: 'italic',
+    marginBottom: 5,
+    marginRight: 5
   },
-});
+
+})
+
 
 export default ChatList;
