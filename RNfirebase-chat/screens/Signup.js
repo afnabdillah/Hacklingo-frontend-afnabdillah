@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, Button, TextInput } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { userSignUp } from "../stores/usersSlice";
 
 export default function Signup({ navigation }) {
@@ -8,6 +8,10 @@ export default function Signup({ navigation }) {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [errMessage, setErrMessage] = useState("");
+  
+  const signUpStatus = useSelector(
+    (state) => state.usersReducer.status.userSignUp
+    );
   const dispatch = useDispatch();
 
   const onHandleSignup = async () => {
@@ -50,37 +54,38 @@ export default function Signup({ navigation }) {
         value={password}
         onChangeText={(text) => setPassword(text)}
       />
+      {signUpStatus === "error" && <Text>{errMessage}</Text>}
+      {signUpStatus === "loading" && <Text>Signing you up ...</Text>}
       <Button onPress={onHandleSignup} color="#f57c00" title="Signup" />
       <Button
         onPress={() => navigation.navigate("Login")}
         title="Go to Login"
       />
-      {errMessage && <Text>{errMessage}</Text>}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 50,
-    paddingHorizontal: 12,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: "#444",
-    alignSelf: "center",
-    paddingBottom: 24,
-  },
-  input: {
-    backgroundColor: "#fff",
-    marginBottom: 20,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: "#333",
-    borderRadius: 8,
-    padding: 12,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingTop: 50,
+        paddingHorizontal: 12
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: '600',
+        color: '#444',
+        alignSelf: 'center',
+        paddingBottom: 24
+    },
+    input: {
+        backgroundColor: '#fff',
+        marginBottom: 20,
+        fontSize: 16,
+        borderWidth: 1,
+        borderColor: '#333',
+        borderRadius: 8,
+        padding: 12
+    }
 });
