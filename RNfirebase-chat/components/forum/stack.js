@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import DetailScreen from '../../screen/forum/DetailScreen';
+import DetailScreen from '../../screens/forum/DetailScreen';
 import DrawerNav from './drawers';
 import { FontAwesome } from '@expo/vector-icons';
 import HeaderPost from './HeaderPost';

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import HomeScreen from '../../screen/forum/HomeScreen';
+import HomeScreen from '../../screens/forum/HomeScreen';
 import { FontAwesome } from '@expo/vector-icons';
 import HeaderForum from './components/Header';
 const Drawer = createDrawerNavigator();
