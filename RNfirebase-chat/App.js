@@ -12,7 +12,7 @@ import Contacts from "./screens/Contacts";
 import GroupChat from "./screens/GroupChat";
 import Groups from "./screens/Group";
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context'; 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeaderChat } from './screens/HeadersChat/HeaderChat';
 import CreateGroupChat from './screens/CreateGroupChat'; // Import the CreateGroupChat component
 import Profile from './components/Profile';
@@ -20,23 +20,17 @@ import { onAuthStateChanged } from "@firebase/auth";
 import { auth } from "./config/firebase";
 import Toast from 'react-native-toast-message';
 import toastConfig from "./config/toastConfig";
-<<<<<<< HEAD
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Provider, useDispatch, useSelector } from 'react-redux';
-=======
 
 import { Provider } from 'react-redux';
 import DetailProfile from './screens/ProfileDetail';
->>>>>>> 6336606cd8cb5bc0bf9241ea4dacf6c433211955
 import { store } from './stores/mainReducer';
 import VideoChat from './screens/VideoChat';
 import Home from './screens/Home'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-<<<<<<< HEAD
 import { loginSuccess } from './stores/authSlice';
-=======
 import MyStack from './components/forum/stack';
->>>>>>> 6336606cd8cb5bc0bf9241ea4dacf6c433211955
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -57,12 +51,8 @@ function ChatTopTabNavigator() {
 function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-<<<<<<< HEAD
       <HeaderChat />
       <BottomTab.Navigator initialRouteName='Home'>
-=======
-      <BottomTab.Navigator screenOptions={{headerShown: false}}>
->>>>>>> 6336606cd8cb5bc0bf9241ea4dacf6c433211955
         <BottomTab.Screen name="Home" component={Home} />
         <BottomTab.Screen
           name="Chats"
@@ -129,7 +119,7 @@ function RootNavigator() {
   useEffect(() => {
     const checkAsyncStorage = async () => {
       const storedUserId = await AsyncStorage.getItem("userid");
-      // dispatch(loginSuccess(storedUserId))
+      dispatch(loginSuccess(storedUserId))
   
       const unsubscribeAuth = onAuthStateChanged(auth, (authenticatedUser) => {
         authenticatedUser ? setUser(authenticatedUser) : setUser(null);
