@@ -9,8 +9,8 @@ import {
 import { auth, database } from "../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
-
-const base_url = "https://8fad-114-10-115-11.ngrok-free.app";
+import { NavigationActions, StackActions } from 'react-navigation';
+const base_url = "https://25da-139-228-111-126.ngrok-free.app";
 
 export const fetchUserDetails = createAsyncThunk(
   "usersSlice/fetchUserDetails", // this is the action name
@@ -50,7 +50,7 @@ export const userLogin = createAsyncThunk(
   "usersSlice/userLogin",
   async (input, { rejectWithValue }) => {
     try {
-      const { email, password } = input;
+      const { email, password, navigation } = input;
       // Login first to the project db for validation
       const response = await axios({
         method: "POST",
@@ -60,6 +60,11 @@ export const userLogin = createAsyncThunk(
       // Login to firebase after success
       await signInWithEmailAndPassword(auth, email, password);
       await saveToAsyncStorage(response.data);
+      const navigateToHome = StackActions.replace({
+        routeName: 'Home',
+      });
+  
+      navigation.dispatch(navigateToHome);
     } catch (err) {
       if (err.response) {
         return rejectWithValue(err.response.data);

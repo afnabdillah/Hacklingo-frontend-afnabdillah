@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const base_url = "https://8fad-114-10-115-11.ngrok-free.app";
+const base_url = "https://25da-139-228-111-126.ngrok-free.app";
 
 export const fetchForumDetails = createAsyncThunk(
   "forumsSlice/fetchForumDetails", // this is the action name

@@ -43,9 +43,6 @@ function ChatList() {
       .sort((a, b) => b.createdAt - a.createdAt);
     return mergedChats;
   };
-
-
-  // console.log(chats, '<<<< chats');
   return (
     <View style={{ flex: 1, paddingTop: 10, backgroundColor: '#fff' }}>
       <FlatList
@@ -67,7 +64,7 @@ function ChatList() {
                   <Text numberOfLines={1} style={styles.name}>{otherUser.username}</Text>
                   <Text style={styles.subTitle}>{dayjs(item.createdAt).fromNow(false)}</Text>
                 </View>
-                <Text style={styles.subTitle}>{lastMessage.text}</Text>
+                <Text style={styles.subTitle}>{lastMessage?.text}</Text>
               </View>
             </TouchableOpacity>
           )

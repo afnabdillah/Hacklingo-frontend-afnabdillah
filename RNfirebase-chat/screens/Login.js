@@ -1,17 +1,38 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, Button, TextInput } from "react-native";
+import {
+  fetchUserDetails,
+  fetchUsersByNativeLanguage,
+  userLogin,
+  updateUserDetails,
+  deleteUser,
+} from "../stores/usersSlice";
+import { useDispatch, useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { fetchForumDetails, fetchAllForums } from "../stores/forumsSlice";
+import { useNavigation } from "@react-navigation/native";
 
-export default function Login({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errMessage, setErrMessage] = useState("");
+  const navigation = useNavigation()
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.usersReducer.users);
+  const userDetails = useSelector((state) => state.usersReducer.userDetails);
+  const forumDetails = useSelector((state) => state.forumsReducer.forumDetails);
+  const forums = useSelector((state) => state.forumsReducer.forums);
+
+  // console.log(forumDetails, "<<<< ini forum details");
+  console.log(forums, "<<<< ini forum details");
 
   const onHandleLogin = () => {
-    if (email !== '' && password !== '') {
-     signInWithEmailAndPassword(auth, email, password)
-        .then(() => console.log('Login success'))
-        .catch(err => console.log(`Login err: ${err}`));
+    if (email !== "" && password !== "") {
+      dispatch(userLogin({ email, password, navigation }))
+        .unwrap()
+        .catch((err) => {
+          setErrMessage(err.message);
+        });
     }
   };
 
