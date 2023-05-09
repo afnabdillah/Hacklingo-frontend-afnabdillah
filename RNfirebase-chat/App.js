@@ -1,6 +1,5 @@
 import 'expo-dev-client';
 import React, { useState, useContext, useEffect } from "react";
-import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { View, ActivityIndicator } from "react-native";
@@ -36,7 +35,7 @@ function ChatTopTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <HeaderChat />
-      <TopTab.Navigator>
+      <TopTab.Navigator screenOptions={{ headerShown: false }}>
         <TopTab.Screen name="Find Contacts" component={Contacts} />
         <TopTab.Screen name="Find Groups" component={Groups} />
       </TopTab.Navigator>
@@ -47,18 +46,20 @@ function ChatTopTabNavigator() {
 function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <HeaderChat />
-      <BottomTab.Navigator>
+      <BottomTab.Navigator screenOptions={{ headerShown: false }}>
         <BottomTab.Screen name="Home" component={Home} />
         <BottomTab.Screen
           name="Chats"
           options={{ tabBarLabel: 'Chats' }}
           children={() => (
-            <TopTab.Navigator>
-              <TopTab.Screen name="Chat Lists" component={ChatList} />
-              <TopTab.Screen name="Find Contacts" component={Contacts} />
-              <TopTab.Screen name="Find Groups" component={Groups} />
-            </TopTab.Navigator>
+            <>
+              <HeaderChat />
+              <TopTab.Navigator>
+                <TopTab.Screen name="Chat Lists" component={ChatList} />
+                <TopTab.Screen name="Find Contacts" component={Contacts} />
+                <TopTab.Screen name="Find Groups" component={Groups} />
+              </TopTab.Navigator>
+            </>
           )}
         />
       </BottomTab.Navigator>
@@ -71,7 +72,7 @@ function ChatStack() {
       <Stack.Navigator>
         <Stack.Screen name="ChatList" component={ChatBottomTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
-        <Stack.Screen name="Group Chat" component={GroupChat} />
+        <Stack.Screen name="Group Chat" component={GroupChat} options={{ headerShown: false }} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="Video Chat" component={VideoChat} options={{ headerShown: false }} />

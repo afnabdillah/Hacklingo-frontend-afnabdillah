@@ -37,7 +37,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 
 export default function Chat({ route }) {
-  console.log(DocumentPicker.getDocumentAsync, "Docukmenttttttt<<<<<<<<<<<<<");
+
   const selectDoc = async () => {
     try {
       const picker = await DocumentPicker.getDocumentAsync()
@@ -201,9 +201,9 @@ export default function Chat({ route }) {
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground source={bg} style={{ flex: 1 }}>
         <View style={styles.headers}>
-          <View style={{ flexDirection: 'row' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity onPress={() => navigation.navigate('ChatList')}>
-              <AntDesign name="arrowleft" size={36} color="black" />
+              <AntDesign name="arrowleft" size={30} color="black" />
             </TouchableOpacity>
             <Image source={{ uri: 'https://i.pravatar.cc/300' }} style={styles.image} />
             <Text style={{ fontStyle: 'italic', fontSize: 25 }}>{recipientName}</Text>

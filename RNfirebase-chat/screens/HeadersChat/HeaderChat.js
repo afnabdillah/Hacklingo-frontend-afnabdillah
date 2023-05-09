@@ -15,12 +15,12 @@ export function HeaderChat() {
     const navigation = useNavigation()
     return (
         <>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', backgroundColor: 'white' }}>
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
                     <View style={{ justifyContent: 'center', marginRight: 10, marginLeft: 10 }}>
                         <PopMenu />
                     </View>
-                    <View style={{ flex: 1, marginRight: 10, marginTop: 5, marginBottom: 5, flexDirection: 'row' }}>
+                    <View style={{ flex: 1, marginRight: 10, marginTop: 5, marginBottom: 5, flexDirection: 'row', alignItems: 'center' }}>
                         <SearchChat />
                     </View>
                     <Image source={logo} style={styles.image} />

@@ -13,117 +13,43 @@ import * as DocumentPicker from 'expo-document-picker'
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from 'expo-image-picker';
-// import GlobalContext from "../context/Context";
-// import { pickImage, askForPermission, uploadImage } from "../utils";
-// import { auth, db } from "../firebase";
-// import { updateProfile } from "@firebase/auth";
-// import { doc, setDoc } from "@firebase/firestore";
-import { fetchUserDetails } from "../stores/usersSlice";
+import { fetchUserDetails, updateUserDetails } from "../stores/usersSlice";
 import { useDispatch, useSelector } from "react-redux";
+import pickImage from "../helper/imagePicker";
+import * as FileSystem from 'expo-file-system';
 
 export default function Profile() {
-    // const selectImage = async () => {
-    //     try {
-    //         let result = await ImagePicker.launchImageLibraryAsync({
-    //             mediaTypes: ImagePicker.MediaTypeOptions.All,
-    //             allowsEditing: true,
-    //             aspect: [4, 3],
-    //             quality: 1,
-    //         });
-    //         if (!result.canceled) {
-    //             const formData = new FormData();
-    //             formData.append('file', {
-    //                 uri: Platform.OS === 'ios' ? result.uri.replace('file://', '') : result.uri,
-    //                 type: 'image/jpeg',
-    //                 name: 'photo.jpg',
-    //             });
-    //             const response = await fetch('https://example.com/upload-image', {
-    //                 method: 'POST',
-    //                 body: formData,
-    //                 headers: {
-    //                     'Content-Type': 'multipart/form-data',
-    //                 },
-    //             });
-    //             console.log(response);
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
-
-
-    // const [displayName, setDisplayName] = useState("");
-    // const [selectedImage, setSelectedImage] = useState(null);
+    const [displayName, setDisplayName] = useState("");
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedImageData, setSelectedImageData] = useState({})
     const dispatch = useDispatch()
     const userDetail = useSelector(state => state.usersReducer.userDetails)
+    const navigation = useNavigation()
+
+    function handlePress() {
+        const formData = new FormData();
+        formData.append("file", selectedImageData);
+        formData.append("username", displayName);
+        dispatch(updateUserDetails(formData));
+        navigation.navigate('Home')
+    }
     useEffect(() => {
         dispatch(fetchUserDetails())
             .unwrap()
+            .then((data) => {
+                setDisplayName(data.username)
+                setSelectedImage(data.profileImageUrl)
+            })
             .catch((err) => console.log(err))
     }, [])
 
-    console.log(userDetail.username, ">>>>>>>>>>>>>>>>>>>>");
-    // const [permissionStatus, setPermissionStatus] = useState(null);
-    // const navigation = useNavigation();
-    // useEffect(() => {
-    //     (async () => {
-    //         const status = await askForPermission();
-    //         setPermissionStatus(status);
-    //     })();
-    // }, []);
-
-    // const {
-    //     theme: { colors },
-    // } = useContext(GlobalContext);
-
-    // async function handlePress() {
-    //     const user = auth.currentUser;
-    //     let photoURL;
-    //     if (selectedImage) {
-    //         const { url } = await uploadImage(
-    //             selectedImage,
-    //             `images/${user.uid}`,
-    //             "profilePicture"
-    //         );
-    //         photoURL = url;
-    //     }
-    //     const userData = {
-    //         displayName,
-    //         email: user.email,
-    //     };
-    //     if (photoURL) {
-    //         userData.photoURL = photoURL;
-    //     }
-
-    //     await Promise.all([
-    //         updateProfile(user, userData),
-    //         setDoc(doc(db, "users", user.uid), { ...userData, uid: user.uid }),
-    //     ]);
-    //     navigation.navigate("home");
-    // }
-
-    // async function handleProfilePicture() {
-    //     const result = await pickImage();
-    //     if (!result.cancelled) {
-    //         setSelectedImage(result.uri);
-    //     }
-    // }
-
-    // if (!permissionStatus) {
-    //     return <Text>Loading</Text>;
-    // }
-    // if (permissionStatus !== "granted") {
-    //     return <Text>You need to allow this permission</Text>;
-    // }
     return (
         <React.Fragment>
-            <StatusBar style="auto" />
             <View
                 style={{
                     alignItems: "center",
                     justifyContent: "center",
                     flex: 1,
-                    paddingTop: Constants.statusBarHeight + 20,
                     padding: 20,
                 }}
             >
@@ -134,8 +60,10 @@ export default function Profile() {
                     Please provide your name and an optional profile photo
                 </Text>
                 <TouchableOpacity
-                    //   onPress={handleProfilePicture}
-                    // onPress={selectImage}
+                    onPress={() => pickImage().then((imagedata) => {
+                        setSelectedImage(imagedata.uri)
+                        setSelectedImageData(imagedata)
+                    })}
                     style={{
                         marginTop: 30,
                         borderRadius: 120,
@@ -147,18 +75,26 @@ export default function Profile() {
                 >
 
 
-                    <MaterialCommunityIcons
-                        name="camera-plus"
-                        size={45}
-                    />
+                    {!userDetail.profileImageUrl ? (
+                        <MaterialCommunityIcons
+                            name="camera-plus"
+                            color={'grey'}
+                            size={45}
+                        />
+                    ) : (
+                        <Image
+                            source={{ uri: selectedImage }}
+                            style={{ width: "100%", height: "100%", borderRadius: 120 }}
+                        />
+                    )}
 
 
 
                 </TouchableOpacity>
                 <TextInput
                     placeholder="Type your name"
-                    // value={displayName}
-                    // onChangeText={setDisplayName}
+                    value={displayName}
+                    onChangeText={text => setDisplayName(text)}
                     style={{
                         borderBottomColor: 'red',
                         marginTop: 40,
@@ -166,15 +102,15 @@ export default function Profile() {
                         width: "100%",
                     }}
                 />
-                <View style={{ marginTop: "auto", width: 80 }}>
+                <View style={{ marginTop: 50, width: 80 }}>
                     <Button
-                        title="Next"
-                    // color={colors.secondary}
-                    // onPress={handlePress}
+                        title="Update"
+                        // color={colors.secondary}
+                        onPress={handlePress}
                     // disabled={!displayName}
                     />
                 </View>
             </View>
-        </React.Fragment>
+        </React.Fragment >
     );
 }
