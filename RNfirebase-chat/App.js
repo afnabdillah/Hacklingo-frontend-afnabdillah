@@ -1,26 +1,26 @@
 import 'expo-dev-client';
-import React, { useState, createContext, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { View, ActivityIndicator } from "react-native";
+import AuthenticatedUserContext from "./helper/AuthenticatedUserContext";
+import Login from "./screens/Login";
+import Signup from "./screens/Signup";
+import Chat from "./screens/Chat";
+import ChatList from "./screens/Chatlist";
+import Contacts from "./screens/Contacts";
+import GroupChat from "./screens/GroupChat";
+import Groups from "./screens/Group";
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { View, ActivityIndicator } from 'react-native';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './config/firebase';
-import AuthenticatedUserContext from './helper/AuthenticatedUserContext';
-import Login from './screens/Login';
-import Signup from './screens/Signup';
-import Chat from './screens/Chat';
-import ChatList from './screens/Chatlist';
-import Contacts from './screens/Contacts';
-import { useLayoutEffect } from 'react';
-import { TouchableOpacity } from 'react-native';
-import { Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeaderChat } from './screens/HeadersChat/HeaderChat';
 import CreateGroupChat from './screens/CreateGroupChat'; // Import the CreateGroupChat component
-import GroupChat from './screens/GroupChat';
-import Groups from './screens/Group';
 import Profile from './components/Profile';
+import { onAuthStateChanged } from "@firebase/auth";
+import { auth } from "./config/firebase";
+import Toast from 'react-native-toast-message';
+import toastConfig from "./config/toastConfig";
+
 import { Provider } from 'react-redux';
 import { store } from './stores/mainReducer';
 import VideoChat from './screens/VideoChat';
@@ -142,6 +142,7 @@ export default function App() {
     <Provider store={store}>
       <AuthenticatedUserProvider>
         <RootNavigator />
+        <Toast config={toastConfig} />
       </AuthenticatedUserProvider>
     </Provider>
   );
