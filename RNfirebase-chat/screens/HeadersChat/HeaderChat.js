@@ -11,11 +11,12 @@ import { StyleSheet } from "react-native";
 import { PopMenu } from "./PopMenu";
 import { SearchChat } from "../../components/SearchChat";
 
+
 export function HeaderChat() {
     const navigation = useNavigation()
     return (
         <>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', backgroundColor: "white" }}>
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
                     <View style={{ justifyContent: 'center', marginRight: 10, marginLeft: 10 }}>
                         <PopMenu />
@@ -34,7 +35,6 @@ const styles = StyleSheet.create({
     image: {
         width: 50,
         height: 50,
-        borderRadius: 30,
         marginRight: 10
     }
 })
