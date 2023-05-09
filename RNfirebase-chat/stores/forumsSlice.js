@@ -1,38 +1,53 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-
-const base_url = "https://8fad-114-10-115-11.ngrok-free.app";
+import base_url from "./base_url";
 
 export const fetchForumDetails = createAsyncThunk(
   "forumsSlice/fetchForumDetails", // this is the action name
-  async (input) => {
+  async (input, {rejectWithValue}) => {
     // this is the action
-    const userId = await AsyncStorage.getItem("userid");
-    const response = await axios({
-      method: "GET",
-      url: `${base_url}/forums/${input}`,
-      headers: {
-        userid: userId,
-      },
-    });
-    return response.data;
+    try {
+      const userId = await AsyncStorage.getItem("userid");
+      const response = await axios({
+        method: "GET",
+        url: `${base_url}/forums/${input}`,
+        headers: {
+          userid: userId,
+        },
+      });
+      return response.data;
+    } catch(err) {
+      if (err.response) {
+        return rejectWithValue(err.response.data);
+      } else {
+        throw err;
+      }
+    }
   }
 );
 
 export const fetchAllForums = createAsyncThunk(
   "forumsSlice/fetchAllForums", // this is the action name
-  async (input) => {
+  async (input, {rejectWithValue}) => {
     // this is the action
-    const userId = await AsyncStorage.getItem("userid");
-    const response = await axios({
-      method: "GET",
-      url: `${base_url}/forums`,
-      headers: {
-        userid: userId,
-      },
-    });
-    return response.data;
+    try {
+      const userId = await AsyncStorage.getItem("userid");
+      const response = await axios({
+        method: "GET",
+        url: `${base_url}/forums`,
+        headers: {
+          userid: userId,
+        },
+      });
+      return response.data;
+    } catch(err) {
+      if (err.response) {
+        return rejectWithValue(err.response.data);
+      } else {
+        throw err;
+      }
+    }
   }
 );
 

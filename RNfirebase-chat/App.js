@@ -1,11 +1,7 @@
-<<<<<<< HEAD
-import React, { useState, createContext, useContext, useEffect } from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import React, { useState, useContext, useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { View, ActivityIndicator } from "react-native";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./config/firebase";
 import { Provider } from "react-redux";
 import AuthenticatedUserContext from "./helper/AuthenticatedUserContext";
 import Login from "./screens/Login";
@@ -13,34 +9,18 @@ import Signup from "./screens/Signup";
 import Chat from "./screens/Chat";
 import ChatList from "./screens/Chatlist";
 import Contacts from "./screens/Contacts";
-import CreateGroupChat from "./screens/CreateGroupChat"; // Import the CreateGroupChat component
 import GroupChat from "./screens/GroupChat";
 import Groups from "./screens/Group";
 import { store } from "./stores/mainReducer";
-=======
-import React, { useState, createContext, useContext, useEffect } from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { View, ActivityIndicator } from 'react-native';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './config/firebase';
-import AuthenticatedUserContext from './helper/AuthenticatedUserContext';
-import Login from './screens/Login';
-import Signup from './screens/Signup';
-import Chat from './screens/Chat';
-import ChatList from './screens/Chatlist';
-import Contacts from './screens/Contacts';
-import { useLayoutEffect } from 'react';
-import { TouchableOpacity } from 'react-native';
-import { Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeaderChat } from './screens/HeadersChat/HeaderChat';
 import CreateGroupChat from './screens/CreateGroupChat'; // Import the CreateGroupChat component
-import GroupChat from './screens/GroupChat';
-import Groups from './screens/Group';
 import Profile from './components/Profile';
->>>>>>> 09b1bf0093a7fb1634b7258b4a43e1b3b1170fc7
+import { onAuthStateChanged } from "@firebase/auth";
+import { auth } from "./config/firebase";
+import Toast from 'react-native-toast-message';
+import toastConfig from "./config/toastConfig";
 
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
@@ -73,15 +53,9 @@ function ChatStack() {
 
 function AuthStack() {
   return (
-<<<<<<< HEAD
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Signup" component={Signup} />
-=======
-    <Stack.Navigator>
-      <Stack.Screen name='Login' component={Login} />
-      <Stack.Screen name='Signup' component={Signup} />
->>>>>>> 09b1bf0093a7fb1634b7258b4a43e1b3b1170fc7
     </Stack.Navigator>
   );
 }
@@ -134,6 +108,7 @@ export default function App() {
     <Provider store={store}>
       <AuthenticatedUserProvider>
         <RootNavigator />
+        <Toast config={toastConfig} />
       </AuthenticatedUserProvider>
     </Provider>
   );
