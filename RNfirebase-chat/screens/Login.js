@@ -4,12 +4,22 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
 
 export default function Login({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errMessage, setErrMessage] = useState("");
+
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.usersReducer.users);
+  const userDetails = useSelector((state) => state.usersReducer.userDetails);
+  const forumDetails = useSelector((state) => state.forumsReducer.forumDetails);
+  const forums = useSelector((state) => state.forumsReducer.forums);
+
+  // console.log(forumDetails, "<<<< ini forum details");
+  // console.log(forums, "<<<< ini forum details");
 
   const onHandleLogin = () => {
     if (email !== '' && password !== '') {
-     signInWithEmailAndPassword(auth, email, password)
+      signInWithEmailAndPassword(auth, email, password)
         .then(() => console.log('Login success'))
         .catch(err => console.log(`Login err: ${err}`));
     }

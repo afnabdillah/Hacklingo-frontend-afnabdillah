@@ -50,7 +50,7 @@ function ChatStack() {
         <Stack.Screen name="Group Chat" component={GroupChat} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
         <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="Video Chat" component={VideoChat} options={{ headerShown: false }}/>
+        <Stack.Screen name="Video Chat" component={VideoChat} options={{ headerShown: false }} />
       </Stack.Navigator>
     </SafeAreaView>
   );

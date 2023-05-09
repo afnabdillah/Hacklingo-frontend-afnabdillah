@@ -9,17 +9,60 @@ import {
     Button,
 } from "react-native";
 import Constants from "expo-constants";
-// import GlobalContext from "../context/Context";
+import * as DocumentPicker from 'expo-document-picker'
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from 'expo-image-picker';
+// import GlobalContext from "../context/Context";
 // import { pickImage, askForPermission, uploadImage } from "../utils";
 // import { auth, db } from "../firebase";
 // import { updateProfile } from "@firebase/auth";
 // import { doc, setDoc } from "@firebase/firestore";
-import { useNavigation } from "@react-navigation/native";
+import { fetchUserDetails } from "../stores/usersSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Profile() {
+    // const selectImage = async () => {
+    //     try {
+    //         let result = await ImagePicker.launchImageLibraryAsync({
+    //             mediaTypes: ImagePicker.MediaTypeOptions.All,
+    //             allowsEditing: true,
+    //             aspect: [4, 3],
+    //             quality: 1,
+    //         });
+    //         if (!result.canceled) {
+    //             const formData = new FormData();
+    //             formData.append('file', {
+    //                 uri: Platform.OS === 'ios' ? result.uri.replace('file://', '') : result.uri,
+    //                 type: 'image/jpeg',
+    //                 name: 'photo.jpg',
+    //             });
+    //             const response = await fetch('https://example.com/upload-image', {
+    //                 method: 'POST',
+    //                 body: formData,
+    //                 headers: {
+    //                     'Content-Type': 'multipart/form-data',
+    //                 },
+    //             });
+    //             console.log(response);
+    //         }
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
+
+
     // const [displayName, setDisplayName] = useState("");
     // const [selectedImage, setSelectedImage] = useState(null);
+    const dispatch = useDispatch()
+    const userDetail = useSelector(state => state.usersReducer.userDetails)
+    useEffect(() => {
+        dispatch(fetchUserDetails())
+            .unwrap()
+            .catch((err) => console.log(err))
+    }, [])
+
+    console.log(userDetail.username, ">>>>>>>>>>>>>>>>>>>>");
     // const [permissionStatus, setPermissionStatus] = useState(null);
     // const navigation = useNavigation();
     // useEffect(() => {
@@ -92,6 +135,7 @@ export default function Profile() {
                 </Text>
                 <TouchableOpacity
                     //   onPress={handleProfilePicture}
+                    // onPress={selectImage}
                     style={{
                         marginTop: 30,
                         borderRadius: 120,
@@ -102,10 +146,12 @@ export default function Profile() {
                     }}
                 >
 
+
                     <MaterialCommunityIcons
                         name="camera-plus"
                         size={45}
                     />
+
 
 
                 </TouchableOpacity>
