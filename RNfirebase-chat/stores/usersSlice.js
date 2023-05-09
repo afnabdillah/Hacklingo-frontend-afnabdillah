@@ -11,6 +11,7 @@ import { addDoc, collection } from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
 import { NavigationActions, StackActions } from 'react-navigation';
 import base_url from "./base_url";
+import { loginSuccess } from "./authSlice";
 
 export const fetchUserDetails = createAsyncThunk(
   "usersSlice/fetchUserDetails", // this is the action name
@@ -64,7 +65,7 @@ export const fetchUsersByNativeLanguage = createAsyncThunk(
 
 export const userLogin = createAsyncThunk(
   "usersSlice/userLogin",
-  async (input, { rejectWithValue }) => {
+  async (input, { rejectWithValue, dispatch }) => {
     try {
       const { email, password, navigation } = input;
       // Login first to the project db for validation
@@ -76,6 +77,7 @@ export const userLogin = createAsyncThunk(
       // Login to firebase after success
       await signInWithEmailAndPassword(auth, email, password);
       await saveToAsyncStorage(response.data);
+      dispatch(loginSuccess(response.data._id))
       return true;
     } catch (err) {
       if (err.response) {
