@@ -25,6 +25,9 @@ import { Provider } from 'react-redux';
 import { store } from './stores/mainReducer';
 import VideoChat from './screens/VideoChat';
 import Home from './screens/Home'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
@@ -33,11 +36,31 @@ function ChatTopTabNavigator() {
     <SafeAreaView style={{ flex: 1 }}>
       <HeaderChat />
       <TopTab.Navigator>
-        <TopTab.Screen name="Chat Lists" component={ChatList} />
         <TopTab.Screen name="Find Contacts" component={Contacts} />
         <TopTab.Screen name="Find Groups" component={Groups} />
-        <TopTab.Screen name="Home" component={Home} />
       </TopTab.Navigator>
+    </SafeAreaView>
+  );
+}
+
+function ChatBottomTabNavigator() {
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <HeaderChat />
+      <BottomTab.Navigator>
+        <BottomTab.Screen name="Home" component={Home} />
+        <BottomTab.Screen
+          name="Chats"
+          options={{ tabBarLabel: 'Chats' }}
+          children={() => (
+            <TopTab.Navigator>
+              <TopTab.Screen name="Chat Lists" component={ChatList} />
+              <TopTab.Screen name="Find Contacts" component={Contacts} />
+              <TopTab.Screen name="Find Groups" component={Groups} />
+            </TopTab.Navigator>
+          )}
+        />
+      </BottomTab.Navigator>
     </SafeAreaView>
   );
 }
@@ -45,12 +68,12 @@ function ChatStack() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Stack.Navigator>
-        <Stack.Screen name="ChatList" component={ChatTopTabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="ChatList" component={ChatBottomTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
         <Stack.Screen name="Group Chat" component={GroupChat} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
         <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="Video Chat" component={VideoChat} options={{ headerShown: false }}/>
+        <Stack.Screen name="Video Chat" component={VideoChat} options={{ headerShown: false }} />
       </Stack.Navigator>
     </SafeAreaView>
   );
@@ -103,7 +126,13 @@ function RootNavigator() {
 
   return (
     <NavigationContainer>
-      {user ? <ChatStack /> : <AuthStack />}
+      {user ? (
+        <Stack.Navigator>
+          <Stack.Screen name="ChatStack" component={ChatStack} options={{ headerShown: false }} />
+        </Stack.Navigator>
+      ) : (
+        <AuthStack />
+      )}
     </NavigationContainer>
   );
 }
