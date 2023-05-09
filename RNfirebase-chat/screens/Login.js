@@ -77,14 +77,23 @@ export default function Login() {
       dispatch(userLogin({ email, password }))
         .unwrap()
         .then(() => {
-          // Navigate to Home after successful login
-          navigation.navigate('ChatStack')
+          // Navigate to ChatList after successful login
+          navigation.navigate({
+            screen : 'ChatStack',
+            params : {
+              screen : 'ChatList',
+              params : {
+                screen : 'Home'
+              }
+            }
+          });
         })
         .catch((err) => {
           setErrMessage(err.message);
         });
     }
   };
+
 
   useEffect(() => {
     AsyncStorage.getItem("username").then((username) => {
