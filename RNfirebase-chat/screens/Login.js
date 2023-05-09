@@ -74,32 +74,32 @@ export default function Login() {
 
   const onHandleLogin = () => {
     if (email !== "" && password !== "") {
+      console.log("masuk login");
       dispatch(userLogin({ email, password }))
         .unwrap()
         .then(() => {
           // Navigate to ChatList after successful login
           navigation.navigate({
-            screen : 'ChatStack',
-            params : {
-              screen : 'ChatList',
-              params : {
-                screen : 'Home'
-              }
-            }
+            screen: "ChatStack",
+            params: {
+              screen: "ChatList",
+              params: {
+                screen: "Home",
+              },
+            },
           });
         })
         .catch((err) => {
-          setErrMessage(err.message);
+          showToast("error", "Login error", err.message);
         });
     }
   };
 
-
   useEffect(() => {
-    AsyncStorage.getItem("username").then((username) => {
-      console.log(username, "<<<< ini username di async storage");
-    });
-  }, []);
+    if (loginStatus === "loading") {
+      showToast("info", "Logging you in ...", "Please wait a few seconds")
+    }
+  }, [loginStatus]);
 
   return (
     <View style={styles.container}>
@@ -124,7 +124,7 @@ export default function Login() {
         value={password}
         onChangeText={(text) => setPassword(text)}
       />
-      {loginStatus === "error" && showToast("error", "Login error", errMessage)}
+      {/* {loginStatus === "loading" && showToast("info", "Login error", errMessage)} */}
       {/* {loginStatus === "loading" && showToast("info", "Please wait a few seconds", "logging you in ...")} */}
       <Button onPress={onHandleLogin} color="#f57c00" title="Login" />
       <Button

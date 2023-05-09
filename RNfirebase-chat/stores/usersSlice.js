@@ -75,10 +75,9 @@ export const fetchUsersBySearch = createAsyncThunk(
           userid: userId,
         },
         params: {
-          search
+          search,
         },
       });
-      console.log(response.data, "<<< ini search users");
       return response.data;
     } catch (err) {
       if (err.response) {
@@ -104,7 +103,13 @@ export const userLogin = createAsyncThunk(
       // Login to firebase after success
       await signInWithEmailAndPassword(auth, email, password);
       await saveToAsyncStorage(response.data);
-      dispatch(loginSuccess(response.data._id))
+      dispatch(
+        loginSuccess({
+          userId: response.data._id,
+          email: response.data.email,
+          username: response.data.username,
+        })
+      );
       return true;
     } catch (err) {
       if (err.response) {
@@ -239,7 +244,7 @@ const usersSlice = createSlice({
       updateUserDetails: "idle",
       userSignUp: "idle",
       userLogin: "idle",
-      usersBySearch: "idle"
+      usersBySearch: "idle",
     },
   },
   reducers: {},

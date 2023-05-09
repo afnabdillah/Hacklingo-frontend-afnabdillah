@@ -7,14 +7,8 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
-import { collection, getDocs } from "firebase/firestore";
-import { database } from "../config/firebase";
-import { auth } from "../config/firebase";
-import { doc, getDoc } from "firebase/firestore";
 import AuthenticatedUserContext from "../helper/AuthenticatedUserContext";
 import { useDispatch, useSelector } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { fetchPostsBySearch } from "../stores/postsSlice";
 import { fetchUsersBySearch } from "../stores/usersSlice";
 
 function Contacts({ navigation }) {
@@ -22,39 +16,21 @@ function Contacts({ navigation }) {
   const { user } = useContext(AuthenticatedUserContext);
   const dispatch = useDispatch();
 
-  const users = useSelector(state => state.usersReducer.users)
+  const usersBySearch = useSelector(
+    (state) => state.usersReducer.usersBySearch
+  );
+  const userId = useSelector((state) => state.authReducer.userId);
 
-  async function getUsernameByEmail(email) {
-    const userDocRef = doc(database, "users", email);
-    const userDoc = await getDoc(userDocRef);
-    return userDoc.exists() ? userDoc.data().username : email;
-  }
+  const contactsList = usersBySearch.filter((user) => user._id !== userId);
 
   useEffect(() => {
-    async function fetchContacts() {
-      // const currentUserEmail = auth.currentUser.email;
-      // const usersSnapshot = await getDocs(collection(database, 'users'));
-      // const usersData = usersSnapshot.docs
-      //   .map(doc => ({
-      //     id: doc.id,
-      //     ...doc.data(),
-      //   }))
-      //   .filter(user => user.email !== currentUserEmail); // Filter out current user
-      // console.log(usersData, "<<< ini data users")
-      // setContacts(usersData);
-
-
-      const currentUserId = await AsyncStorage.getItem("userid");
-      dispatch(fetchUsersBySearch(""))
-    }
-
-    fetchContacts();
+    dispatch(fetchUsersBySearch(""));
   }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: "white", paddingTop: 10 }}>
       <FlatList
-        data={contacts}
+        data={contactsList}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => {
           return (
@@ -69,7 +45,9 @@ function Contacts({ navigation }) {
               }}
             >
               <Image
-                source={{ uri: item.profileImageUrl || "https://i.pravatar.cc/300" }}
+                source={{
+                  uri: item.profileImageUrl || "https://i.pravatar.cc/300",
+                }}
                 style={styles.image}
               />
               <View style={styles.content}>

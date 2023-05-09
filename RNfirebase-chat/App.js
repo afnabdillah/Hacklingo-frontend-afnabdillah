@@ -22,8 +22,6 @@ import Toast from 'react-native-toast-message';
 import toastConfig from "./config/toastConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Provider, useDispatch, useSelector } from 'react-redux';
-
-import { Provider } from 'react-redux';
 import DetailProfile from './screens/ProfileDetail';
 import { store } from './stores/mainReducer';
 import VideoChat from './screens/VideoChat';
@@ -51,7 +49,6 @@ function ChatTopTabNavigator() {
 function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <HeaderChat />
       <BottomTab.Navigator initialRouteName='Home'>
         <BottomTab.Screen name="Home" component={Home} />
         <BottomTab.Screen
@@ -118,8 +115,8 @@ function RootNavigator() {
   console.log(userId, "<<<< userData")
   useEffect(() => {
     const checkAsyncStorage = async () => {
-      const storedUserId = await AsyncStorage.getItem("userid");
-      dispatch(loginSuccess(storedUserId))
+      const userData = await AsyncStorage.multiGet(["userid", "email", "username"]);
+      dispatch(loginSuccess({userId: userData[0][1], email: userData[1][1], username: userData[2][1] }));
   
       const unsubscribeAuth = onAuthStateChanged(auth, (authenticatedUser) => {
         authenticatedUser ? setUser(authenticatedUser) : setUser(null);

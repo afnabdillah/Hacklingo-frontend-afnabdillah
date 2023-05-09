@@ -19,7 +19,7 @@ function Groups({ navigation }) {
                     ...doc.data(),
                 }));
 
-                const userEmail = auth.currentUser.email;
+                const userEmail = auth.currentUser?.email;
                 const joined = groupsData.filter((group) =>
                     group.users.includes(userEmail)
                 );
