@@ -28,6 +28,7 @@ import VideoChat from './screens/VideoChat';
 import Home from './screens/Home'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MyStack from './components/forum/stack';
+import { Ionicons } from '@expo/vector-icons';
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -49,10 +50,14 @@ function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <BottomTab.Navigator screenOptions={{headerShown: false}}>
-        <BottomTab.Screen name="Home" component={Home} />
+        <BottomTab.Screen name="Home" component={Home} options={{
+          tabBarIcon: () => {
+            return <Ionicons name="ios-home-outline" size={24} color="black" />
+          }
+        }} />
         <BottomTab.Screen
           name="Chats"
-          options={{ tabBarLabel: 'Chats' }}
+          options={{ tabBarLabel: 'Chats', tabBarIcon: () => <Ionicons name="ios-chatbubbles-outline" size={24} color="black" /> }}
           children={() => (
             <>
               <HeaderChat />
@@ -64,7 +69,9 @@ function ChatBottomTabNavigator() {
             </>
           )}
         />
-        <BottomTab.Screen name="Forum" component={MyStack} />
+        <BottomTab.Screen name="Forum" component={MyStack} options={{
+          tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="black" />
+        }}/>
       </BottomTab.Navigator>
     </SafeAreaView>
   );

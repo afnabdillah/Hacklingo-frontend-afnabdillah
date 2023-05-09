@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { Text, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import CardForum from '../../components/forum/card';
-
 export default function HomeScreen({ navigation }) {
   return (
     <>
@@ -18,6 +17,26 @@ export default function HomeScreen({ navigation }) {
       <ScrollView style={{ backgroundColor: "#F6F1F1", paddingTop: 20}}>
         <CardForum navigation={navigation}/>
       </ScrollView>
+      <TouchableOpacity
+        style={{
+          backgroundColor: '#1E90FF',
+          borderRadius: 25,
+          paddingHorizontal: 20,
+          paddingVertical: 10,
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'absolute',
+          bottom: 20,
+          right: 20,
+        }}
+        onPress={() => navigation.navigate("AddPost")}
+      >
+        <Text style={{
+          color: 'white',
+          fontWeight: 'bold',
+        }}
+        >{"Post"}</Text>
+      </TouchableOpacity>
     </>
   );
 }
