@@ -6,8 +6,7 @@ import { View, StyleSheet, Text, SafeAreaView, Modal, TouchableOpacity, Animated
 import { auth } from '../../config/firebase';
 import { signOut } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function PopMenu() {
     const navigation = useNavigation()
@@ -23,13 +22,22 @@ export function PopMenu() {
             easing: Easing.linear
         }).start(() => to === 0 && setVisible(false))
     }
-    const onSignOut = () => {
-        signOut(auth).catch(error => console.log('Error logging out: ', error));
+    const onSignOut = async () => {
+        try {
+            await signOut(auth);
+            await AsyncStorage.clear(); // Clear AsyncStorage
+            navigation.reset({ // Reset navigation stack
+                index: 0,
+                routes: [{ name: 'Login' }], // Navigate to the Login screen
+            });
+        } catch (error) {
+            console.log('Error logging out: ', error);
+        }
     };
     return (
         <>
             <TouchableOpacity onPress={() => resizeBox(1)}>
-                <FontAwesome name="user-circle" size={50} color="black" />
+                <FontAwesome name="user-circle" size={40} color="black" />
             </TouchableOpacity>
             <Modal transparent visible={visible}>
                 <SafeAreaView

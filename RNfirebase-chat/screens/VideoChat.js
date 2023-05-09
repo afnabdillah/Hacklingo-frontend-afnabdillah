@@ -1,30 +1,32 @@
 import React, { useState } from 'react';
 import AgoraUIKit from 'agora-rn-uikit';
 import { Button, View, TextInput, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const VideoChat = ({ route }) => {
     const [videoCall, setVideoCall] = useState(false);
-    const { channel, username } = route.params
-
+    const { roomId, username } = route.params
+    const navigation = useNavigation()
     /**
      * @type {import('agora-rn-uikit').ConnectionData}
      */
     const connectionData = {
         appId: 'ab2001a4b2014114a6d31426bfc7185b',
-        channel: channel,
+        channel: roomId,
         username: username
     }
 
     /**
      * @type {import('agora-rn-uikit').rtmCallbacks}
      */
-    const rtcCallbacks = {
+    const rtcCallbacks = (navigation) => ({
         EndCall: () => {
             setTimeout(() => {
-                setVideoCall(false)
+                setVideoCall(false);
+                navigation.goBack()
             }, 200);
         },
-    }
+    })
 
     /**
      * @type {import('agora-rn-uikit').Settings}
@@ -34,7 +36,7 @@ const VideoChat = ({ route }) => {
     }
     return (
         <View style={styles.container}>
-            <AgoraUIKit settings={settings} connectionData={connectionData} rtcCallbacks={rtcCallbacks} />
+            <AgoraUIKit settings={settings} connectionData={connectionData} rtcCallbacks={rtcCallbacks(navigation)} />
         </View>
     )
 };
