@@ -19,7 +19,7 @@ function Groups({ navigation }) {
                     ...doc.data(),
                 }));
 
-                const userEmail = auth.currentUser.email;
+                const userEmail = auth.currentUser?.email;
                 const joined = groupsData.filter((group) =>
                     group.users.includes(userEmail)
                 );
@@ -42,6 +42,7 @@ function Groups({ navigation }) {
         navigation.navigate('CreateGroupChat');
     };
     const renderGroupItem = ({ item }) => {
+        console.log(item, "<< group")
         return (
             <TouchableOpacity
                 style={{
