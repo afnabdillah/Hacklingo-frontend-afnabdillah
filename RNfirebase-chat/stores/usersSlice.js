@@ -60,11 +60,7 @@ export const userLogin = createAsyncThunk(
       // Login to firebase after success
       await signInWithEmailAndPassword(auth, email, password);
       await saveToAsyncStorage(response.data);
-      const navigateToHome = StackActions.replace({
-        routeName: 'Home',
-      });
-  
-      navigation.dispatch(navigateToHome);
+      return true;
     } catch (err) {
       if (err.response) {
         return rejectWithValue(err.response.data);

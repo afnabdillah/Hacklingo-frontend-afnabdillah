@@ -22,19 +22,20 @@ export default function Login() {
   const userDetails = useSelector((state) => state.usersReducer.userDetails);
   const forumDetails = useSelector((state) => state.forumsReducer.forumDetails);
   const forums = useSelector((state) => state.forumsReducer.forums);
-
-  // console.log(forumDetails, "<<<< ini forum details");
-  console.log(forums, "<<<< ini forum details");
-
   const onHandleLogin = () => {
     if (email !== "" && password !== "") {
-      dispatch(userLogin({ email, password, navigation }))
+      dispatch(userLogin({ email, password }))
         .unwrap()
+        .then(() => {
+          // Navigate to Home after successful login
+          navigation.navigate('ChatStack')
+        })
         .catch((err) => {
           setErrMessage(err.message);
         });
     }
   };
+
 
   return (
     <View style={styles.container}>
