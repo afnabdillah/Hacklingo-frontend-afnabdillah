@@ -8,8 +8,8 @@ export default function Login({ navigation }) {
   const [password, setPassword] = useState('');
 
   const onHandleLogin = () => {
-    if (email !== '' && password !== '') {
-     signInWithEmailAndPassword(auth, email, password)
+    if (email == '' && password == '') {
+     signInWithEmailAndPassword(auth, "raihan@baiqq.com", "Raihan1")
         .then(() => console.log('Login success'))
         .catch(err => console.log(`Login err: ${err}`));
     }

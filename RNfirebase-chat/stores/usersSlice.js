@@ -10,7 +10,7 @@ import { auth, database } from "../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
 
-const base_url = "https://8fad-114-10-115-11.ngrok-free.app";
+const base_url = "https://25da-139-228-111-126.ngrok-free.app";
 
 export const fetchUserDetails = createAsyncThunk(
   "usersSlice/fetchUserDetails", // this is the action name
