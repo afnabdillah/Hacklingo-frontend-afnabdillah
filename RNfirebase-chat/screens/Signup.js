@@ -1,67 +1,68 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, database } from '../config/firebase';
-import { addDoc, collection } from 'firebase/firestore';
+import React, { useState } from "react";
+import { StyleSheet, Text, View, Button, TextInput } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { userSignUp } from "../stores/usersSlice";
 
 export default function Signup({ navigation }) {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [username, setUsername] = useState('');
-
-    const onHandleSignup = () => {
-        if (email !== '' && password !== '' && username !== '') {
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    // Add the user's email and username to Firestore
-                    addDoc(collection(database, 'users'), {
-                        email: user.email,
-                        username: username
-                    });
-                    console.log('Signup success');
-                })
-                .catch(err => console.log(`Signup err: ${err}`));
-        }
-    };
-
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Create new account</Text>
-            <TextInput
-                style={styles.input}
-                placeholder='Enter username'
-                autoCapitalize='none'
-                textContentType='username'
-                value={username}
-                onChangeText={text => setUsername(text)}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder='Enter email'
-                autoCapitalize='none'
-                keyboardType='email-address'
-                textContentType='emailAddress'
-                value={email}
-                onChangeText={text => setEmail(text)}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder='Enter password'
-                autoCapitalize='none'
-                autoCorrect={false}
-                secureTextEntry={true}
-                textContentType='password'
-                value={password}
-                onChangeText={text => setPassword(text)}
-            />
-            <Button onPress={onHandleSignup} color='#f57c00' title='Signup' />
-            <Button
-                onPress={() => navigation.navigate('Login')}
-                title='Go to Login'
-            />
-        </View>
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [errMessage, setErrMessage] = useState("");
+  
+  const signUpStatus = useSelector(
+    (state) => state.usersReducer.status.userSignUp
     );
+  const dispatch = useDispatch();
+
+  const onHandleSignup = async () => {
+    if (email !== "" && password !== "" && username !== "") {
+      dispatch(userSignUp({ email, password, username }))
+        .unwrap()
+        .catch((err) => {
+          setErrMessage(err.message);
+        });
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Create new account</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter username"
+        autoCapitalize="none"
+        textContentType="username"
+        value={username}
+        onChangeText={(text) => setUsername(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Enter email"
+        autoCapitalize="none"
+        keyboardType="email-address"
+        textContentType="emailAddress"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Enter password"
+        autoCapitalize="none"
+        autoCorrect={false}
+        secureTextEntry={true}
+        textContentType="password"
+        value={password}
+        onChangeText={(text) => setPassword(text)}
+      />
+      {signUpStatus === "error" && <Text>{errMessage}</Text>}
+      {signUpStatus === "loading" && <Text>Signing you up ...</Text>}
+      <Button onPress={onHandleSignup} color="#f57c00" title="Signup" />
+      <Button
+        onPress={() => navigation.navigate("Login")}
+        title="Go to Login"
+      />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

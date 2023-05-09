@@ -109,12 +109,12 @@ export default function Chat({ route }) {
       console.error("User data not loaded yet. Please try again later.");
       return;
     }
-
     setMessages((previousMessages) =>
       GiftedChat.append(previousMessages, messages)
     );
 
     const roomId = generateRoomId(currentUser.email, recipientEmail);
+
 
     const roomDocRef = doc(database, "personalChats", roomId);
     const roomDocSnapshot = await getDoc(roomDocRef);
@@ -151,9 +151,10 @@ export default function Chat({ route }) {
       messages: arrayUnion(message),
     });
   }, [currentUserData]);
-
   const navigation = useNavigation()
-  console.log(recipientName, recipientEmail);
+  const goToVideoChat = () => {
+    navigation.navigate("Video Chat", { roomId: roomId, username: currentUserData.username })
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground source={bg} style={{ flex: 1 }}>
@@ -167,7 +168,7 @@ export default function Chat({ route }) {
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, }}>
             <TouchableOpacity>
-              <MaterialIcons name="video-call" size={36} color="black" />
+              <MaterialIcons onPress={goToVideoChat} name="video-call" size={36} color="black" />
             </TouchableOpacity>
             <PopChatMenu name={recipientName} email={recipientEmail}/>
           </View>
