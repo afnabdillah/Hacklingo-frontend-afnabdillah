@@ -29,6 +29,7 @@ import Home from './screens/Home'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { loginSuccess } from './stores/authSlice';
 import MyStack from './components/forum/stack';
+import RequestJoin from './screens/RequestJoin';
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -79,6 +80,7 @@ function ChatStack() {
         <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
         <Stack.Screen name="Group Chat" component={GroupChat} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
+        <Stack.Screen name="RequestJoin" component={RequestJoin} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="DetailProf" component={DetailProfile} options={{
           title: "Contact Info"
@@ -113,7 +115,6 @@ function RootNavigator() {
   const [isLoading, setIsLoading] = useState(true);
   const userId = useSelector(state => state.authReducer.userId)
   const dispatch = useDispatch()
-  console.log(userId, "<<<< userData")
   useEffect(() => {
     const checkAsyncStorage = async () => {
       const storedUserId = await AsyncStorage.getItem("userid");
@@ -128,7 +129,7 @@ function RootNavigator() {
     };
   
     checkAsyncStorage();
-  }, []);
+  }, [user]);
   
   if (isLoading) {
     return (
