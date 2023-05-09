@@ -9,12 +9,12 @@ import {
 import { auth, database } from "../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
-import { NavigationActions, StackActions } from 'react-navigation';
+import { NavigationActions, StackActions } from "react-navigation";
 import base_url from "./base_url";
 
 export const fetchUserDetails = createAsyncThunk(
   "usersSlice/fetchUserDetails", // this is the action name
-  async (_, {rejectWithValue}) => {
+  async (_, { rejectWithValue }) => {
     // this is the action
     try {
       const userId = await AsyncStorage.getItem("userid");
@@ -26,7 +26,7 @@ export const fetchUserDetails = createAsyncThunk(
         },
       });
       return response.data;
-    } catch(err) {
+    } catch (err) {
       if (err.response) {
         return rejectWithValue(err.response.data);
       } else {
@@ -38,27 +38,54 @@ export const fetchUserDetails = createAsyncThunk(
 
 export const fetchUsersByNativeLanguage = createAsyncThunk(
   "usersSlice/fetchUsersByNativeLanguage",
-  async (nativeLanguage) => {
+  async (nativeLanguage, { rejectWithValue }) => {
     try {
-    const userId = await AsyncStorage.getItem("userid");
-    const response = await axios({
-      method: "GET",
-      url: `${base_url}/users`,
-      headers: {
-        userid: userId,
-      },
-      params: {
-        nativeLanguage,
-      },
-    });
-    return response.data;
-  } catch(err) {
-    if (err.response) {
-      return rejectWithValue(err.response.data);
-    } else {
-      throw err;
+      const userId = await AsyncStorage.getItem("userid");
+      const response = await axios({
+        method: "GET",
+        url: `${base_url}/users`,
+        headers: {
+          userid: userId,
+        },
+        params: {
+          nativeLanguage,
+        },
+      });
+      return response.data;
+    } catch (err) {
+      if (err.response) {
+        return rejectWithValue(err.response.data);
+      } else {
+        throw err;
+      }
     }
   }
+);
+
+export const fetchUsersBySearch = createAsyncThunk(
+  "usersSlice/fetchUsersBySearch",
+  async (search, { rejectWithValue }) => {
+    try {
+      const userId = await AsyncStorage.getItem("userid");
+      const response = await axios({
+        method: "GET",
+        url: `${base_url}/users/usernames`,
+        headers: {
+          userid: userId,
+        },
+        params: {
+          search
+        },
+      });
+      console.log(response.data, "<<< ini search users");
+      return response.data;
+    } catch (err) {
+      if (err.response) {
+        return rejectWithValue(err.response.data);
+      } else {
+        throw err;
+      }
+    }
   }
 );
 
@@ -149,7 +176,6 @@ export const updateUserDetails = createAsyncThunk(
   "usersSlice/updateUserDetails",
   async (input, { rejectWithValue }) => {
     try {
-      // console.log(input, "<<<< ini input di axios");
       input.append("context", "image");
       const userId = await AsyncStorage.getItem("userid");
       const response = await axios({
@@ -157,7 +183,7 @@ export const updateUserDetails = createAsyncThunk(
         url: `${base_url}/users/${userId}`,
         headers: {
           userid: userId,
-          "Content-Type" : "multipart/form-data"
+          "Content-Type": "multipart/form-data",
         },
         data: input,
       });
@@ -185,7 +211,7 @@ export const deleteUser = createAsyncThunk(
         url: `${base_url}/users/${userId}`,
         headers: {
           userid: userId,
-        }
+        },
       });
       return response.data;
     } catch (err) {
@@ -204,12 +230,14 @@ const usersSlice = createSlice({
   initialState: {
     users: [],
     userDetails: {},
+    usersBySearch: [],
     status: {
       userDetails: "idle",
       users: "idle",
       updateUserDetails: "idle",
       userSignUp: "idle",
-      userLogin: "idle"
+      userLogin: "idle",
+      usersBySearch: "idle"
     },
   },
   reducers: {},
@@ -234,6 +262,16 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsersByNativeLanguage.rejected, (state, action) => {
         state.status.users = "error";
+      })
+      .addCase(fetchUsersBySearch.pending, (state, action) => {
+        state.status.usersBySearch = "loading";
+      })
+      .addCase(fetchUsersBySearch.fulfilled, (state, action) => {
+        state.status.usersBySearch = "idle";
+        state.usersBySearch = action.payload;
+      })
+      .addCase(fetchUsersBySearch.rejected, (state, action) => {
+        state.status.usersBySearch = "error";
       })
       .addCase(updateUserDetails.pending, (state, action) => {
         state.status.updateUserDetails = "loading";
