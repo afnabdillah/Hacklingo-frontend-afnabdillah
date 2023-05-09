@@ -20,11 +20,17 @@ import { onAuthStateChanged } from "@firebase/auth";
 import { auth } from "./config/firebase";
 import Toast from 'react-native-toast-message';
 import toastConfig from "./config/toastConfig";
-
-import { Provider } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import DetailProfile from './screens/ProfileDetail';
 import { store } from './stores/mainReducer';
 import VideoChat from './screens/VideoChat';
 import Home from './screens/Home'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { loginSuccess } from './stores/authSlice';
+import MyStack from './components/forum/stack';
+
+const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
@@ -33,11 +39,34 @@ function ChatTopTabNavigator() {
     <SafeAreaView style={{ flex: 1 }}>
       <HeaderChat />
       <TopTab.Navigator>
-        <TopTab.Screen name="Chat Lists" component={ChatList} />
         <TopTab.Screen name="Find Contacts" component={Contacts} />
         <TopTab.Screen name="Find Groups" component={Groups} />
-        <TopTab.Screen name="Home" component={Home} />
       </TopTab.Navigator>
+    </SafeAreaView>
+  );
+}
+
+function ChatBottomTabNavigator() {
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <BottomTab.Navigator initialRouteName='Home'>
+        <BottomTab.Screen name="Home" component={Home} />
+        <BottomTab.Screen
+          name="Chats"
+          options={{ tabBarLabel: 'Chats' }}
+          children={() => (
+            <>
+              <HeaderChat />
+              <TopTab.Navigator>
+                <TopTab.Screen name="Chat Lists" component={ChatList} />
+                <TopTab.Screen name="Find Contacts" component={Contacts} />
+                <TopTab.Screen name="Find Groups" component={Groups} />
+              </TopTab.Navigator>
+            </>
+          )}
+        />
+        <BottomTab.Screen name="Forum" component={MyStack} />
+      </BottomTab.Navigator>
     </SafeAreaView>
   );
 }
@@ -45,11 +74,14 @@ function ChatStack() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Stack.Navigator>
-        <Stack.Screen name="ChatList" component={ChatTopTabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="ChatList" component={ChatBottomTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
         <Stack.Screen name="Group Chat" component={GroupChat} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
         <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="DetailProf" component={DetailProfile} options={{
+          title: "Contact Info"
+        }}/>
         <Stack.Screen name="Video Chat" component={VideoChat} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </SafeAreaView>
@@ -78,21 +110,25 @@ const AuthenticatedUserProvider = ({ children }) => {
 function RootNavigator() {
   const { user, setUser } = useContext(AuthenticatedUserContext);
   const [isLoading, setIsLoading] = useState(true);
-
+  const userId = useSelector(state => state.authReducer.userId)
+  const dispatch = useDispatch()
+  console.log(userId, "<<<< userData")
   useEffect(() => {
-    // onAuthStateChanged returns an unsubscriber
-    const unsubscribeAuth = onAuthStateChanged(
-      auth,
-      async (authenticatedUser) => {
+    const checkAsyncStorage = async () => {
+      const userData = await AsyncStorage.multiGet(["userid", "email", "username"]);
+      dispatch(loginSuccess({userId: userData[0][1], email: userData[1][1], username: userData[2][1] }));
+  
+      const unsubscribeAuth = onAuthStateChanged(auth, (authenticatedUser) => {
         authenticatedUser ? setUser(authenticatedUser) : setUser(null);
         setIsLoading(false);
-      }
-    );
-
-    // unsubscribe auth listener on unmount
-    return unsubscribeAuth;
-  }, [user]);
-
+      });
+  
+      return unsubscribeAuth;
+    };
+  
+    checkAsyncStorage();
+  }, []);
+  
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -103,7 +139,13 @@ function RootNavigator() {
 
   return (
     <NavigationContainer>
-      {user ? <ChatStack /> : <AuthStack />}
+      {userId ? (
+        <Stack.Navigator>
+          <Stack.Screen name="ChatStack" component={ChatStack} options={{ headerShown: false }} />
+        </Stack.Navigator>
+      ) : (
+        <AuthStack />
+      )}
     </NavigationContainer>
   );
 }
