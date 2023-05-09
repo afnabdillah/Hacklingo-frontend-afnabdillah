@@ -22,8 +22,6 @@ import Toast from 'react-native-toast-message';
 import toastConfig from "./config/toastConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Provider, useDispatch, useSelector } from 'react-redux';
-
-import { Provider } from 'react-redux';
 import DetailProfile from './screens/ProfileDetail';
 import { store } from './stores/mainReducer';
 import VideoChat from './screens/VideoChat';
@@ -51,12 +49,12 @@ function ChatTopTabNavigator() {
 function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <HeaderChat />
-      <BottomTab.Navigator initialRouteName='Home'>
-        <BottomTab.Screen name="Home" component={Home} />
+      {/* <HeaderChat /> */}
+      <BottomTab.Navigator initialRouteName='Home' >
+        <BottomTab.Screen name="Home" component={Home} options={{ headerShown: false }}/>
         <BottomTab.Screen
           name="Chats"
-          options={{ tabBarLabel: 'Chats' }}
+          options={{ tabBarLabel: 'Chats', headerShown: false }}
           children={() => (
             <>
               <HeaderChat />
