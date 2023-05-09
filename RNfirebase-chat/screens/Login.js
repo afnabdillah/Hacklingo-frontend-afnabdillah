@@ -10,12 +10,13 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchForumDetails, fetchAllForums } from "../stores/forumsSlice";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errMessage, setErrMessage] = useState("");
-
+  const navigation = useNavigation()
   const dispatch = useDispatch();
   const users = useSelector((state) => state.usersReducer.users);
   const userDetails = useSelector((state) => state.usersReducer.userDetails);
@@ -27,7 +28,7 @@ export default function Login({ navigation }) {
 
   const onHandleLogin = () => {
     if (email !== "" && password !== "") {
-      dispatch(userLogin({ email, password }))
+      dispatch(userLogin({ email, password, navigation }))
         .unwrap()
         .catch((err) => {
           setErrMessage(err.message);
