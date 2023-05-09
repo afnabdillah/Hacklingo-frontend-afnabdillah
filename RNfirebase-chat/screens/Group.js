@@ -42,6 +42,7 @@ function Groups({ navigation }) {
         navigation.navigate('CreateGroupChat');
     };
     const renderGroupItem = ({ item }) => {
+        console.log(item, "<< group")
         return (
             <TouchableOpacity
                 style={{

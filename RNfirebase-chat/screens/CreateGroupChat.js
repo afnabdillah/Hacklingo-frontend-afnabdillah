@@ -90,7 +90,8 @@ function CreateGroupChat({ route, navigation }) {
             createdAt: new Date(),
             messages: [],
             admin: auth.currentUser.email,
-            isProGroup
+            isProGroup,
+            requestJoin : []
         };
 
         const groupChatsRef = collection(database, 'groupChats');
