@@ -24,6 +24,7 @@ import Profile from './components/Profile';
 import { Provider } from 'react-redux';
 import { store } from './stores/mainReducer';
 import VideoChat from './screens/VideoChat';
+import Home from './screens/Home'
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
@@ -35,6 +36,7 @@ function ChatTopTabNavigator() {
         <TopTab.Screen name="Chat Lists" component={ChatList} />
         <TopTab.Screen name="Find Contacts" component={Contacts} />
         <TopTab.Screen name="Find Groups" component={Groups} />
+        <TopTab.Screen name="Home" component={Home} />
       </TopTab.Navigator>
     </SafeAreaView>
   );

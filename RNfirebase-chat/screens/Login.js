@@ -36,88 +36,34 @@ export default function Login({ navigation }) {
     }
   };
 
-  useEffect(() => {
-    AsyncStorage.getItem("userid").then((userId) => {
-      // List to do: if userId exists directly navigate into chat screen
-      console.log(userId, "<<<< ini userid di async storage");
-    }
-    );
-  }, []);
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome back!</Text>
       <TextInput
         style={styles.input}
-        placeholder="Enter email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        textContentType="emailAddress"
+        placeholder='Enter email'
+        autoCapitalize='none'
+        keyboardType='email-address'
+        textContentType='emailAddress'
         autoFocus={true}
         value={email}
-        onChangeText={(text) => setEmail(text)}
+        onChangeText={text => setEmail(text)}
       />
       <TextInput
         style={styles.input}
-        placeholder="Enter password"
-        autoCapitalize="none"
+        placeholder='Enter password'
+        autoCapitalize='none'
         autoCorrect={false}
         secureTextEntry={true}
-        textContentType="password"
+        textContentType='password'
         value={password}
-        onChangeText={(text) => setPassword(text)}
+        onChangeText={text => setPassword(text)}
       />
-      <Button onPress={onHandleLogin} color="#f57c00" title="Login" />
+      <Button onPress={onHandleLogin} color='#f57c00' title='Login' />
       <Button
-        onPress={() => navigation.navigate("Signup")}
-        title="Go to Signup"
+        onPress={() => navigation.navigate('Signup')}
+        title='Go to Signup'
       />
-      <Button
-        onPress={() => {
-          dispatch(fetchUsersByNativeLanguage("Indonesian/Bahasa Indonesia"));
-        }}
-        title='fetch users by "Indonesia"'
-      />
-      <Button
-        onPress={() => {
-          dispatch(fetchUserDetails());
-        }}
-        title="fetch current user details"
-      />
-      <Button
-        onPress={() => {
-          dispatch(deleteUser());
-        }}
-        title="delete current user"
-      />
-      <Button
-        onPress={() => {
-          dispatch(fetchForumDetails("64582c32ee5092be8f155f5f")); // English forum id
-        }}
-        title="fetch forum 'english' details"
-      />
-      <Button
-        onPress={() => {
-          dispatch(fetchAllForums()); // English forum id
-        }}
-        title="fetch all forums"
-      />
-      <Button
-        onPress={() => {
-          const update = {
-            username: "test edit via hp 2",
-          };
-          dispatch(updateUserDetails(update))
-            .unwrap()
-            .then((response) =>
-              console.log(
-                `Update success for id ${response.userId} with new username ${response.username}`
-              )
-            ).catch(err => console.log(err.message));
-        }}
-        title="update username 'test edit via hp'"
-      />
-      {errMessage && <Text>{errMessage}</Text>}
     </View>
   );
 }
@@ -125,24 +71,24 @@ export default function Login({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     paddingTop: 50,
-    paddingHorizontal: 12,
+    paddingHorizontal: 12
   },
   title: {
     fontSize: 24,
-    fontWeight: "600",
-    color: "#444",
-    alignSelf: "center",
-    paddingBottom: 24,
+    fontWeight: '600',
+    color: '#444',
+    alignSelf: 'center',
+    paddingBottom: 24
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     marginBottom: 20,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: "#333",
+    borderColor: '#333',
     borderRadius: 8,
-    padding: 12,
-  },
+    padding: 12
+  }
 });
