@@ -26,7 +26,6 @@
     "expo-constants": "~14.2.1",
     "expo-document-picker": "~11.2.2",
     "expo-file-system": "~15.2.2",
-    "expo-image-picker": "~14.1.1",
     "expo-dev-client": "^2.2.1",
     "expo-status-bar": "~1.4.4",
     "firebase": "^9.21.0",
