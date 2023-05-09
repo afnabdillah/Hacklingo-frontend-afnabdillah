@@ -1,9 +1,25 @@
 import React, { useState } from 'react'
 import { EvilIcons,AntDesign } from '@expo/vector-icons';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert, SafeAreaView, Modal } from 'react-native'
-import { ModalPicker } from "./ModalPickerSignup/ModalPicker";
+import SelectDropdown from 'react-native-select-dropdown';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default SignUpView = () => {
+
+  const countries = [
+    'Egypt',
+    'Canada',
+    'Australia',
+    'Ireland',
+    'Brazil',
+    'England',
+    'Dubai',
+    'France',
+    'Germany',
+    'Saudi Arabia',
+    'Argentina',
+    'India',
+  ];
 
   const [fullName, setFullName] = useState()
   const [email, setEmail] = useState()
@@ -86,38 +102,58 @@ export default SignUpView = () => {
         />
       </View>
       <View style={styles.inputContainer}>
-      <Image
-          style={styles.inputIcon}
-          source={{ uri: 'https://img.icons8.com/ios-glyphs/512/flag.png' }}
-        />
-            <TouchableOpacity onPress={()=>changeModalVisibility(true)} style={styles.TouchableOpacity}>
-                <Text style={styles.text}>{chooseData}</Text>
-            </TouchableOpacity>
-            <Modal
-                transparent={true}
-                animationType="fade"
-                visible={isModalVisible}
-                nRequestClose={()=> changeModalVisibility(false)}
-            >
-                <ModalPicker
-                    changeModalVisibility={changeModalVisibility}
-                    setData={setData}
-                />
-            </Modal>
+      <SelectDropdown
+            data={countries}
+            // defaultValueByIndex={1}
+            // defaultValue={'Egypt'}
+            onSelect={(selectedItem, index) => {
+              console.log(selectedItem, index);
+            }}
+            defaultButtonText={'Select native Language'}
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem;
+            }}
+            rowTextForSelection={(item, index) => {
+              return item;
+            }}
+            buttonStyle={styles.dropdown1BtnStyle}
+            buttonTextStyle={styles.dropdown1BtnTxtStyle}
+            renderDropdownIcon={isOpened => {
+              return <FontAwesome name={isOpened ? 'chevron-up' : 'chevron-down'} color={'white'} size={18} />;
+            }}
+            dropdownIconPosition={'right'}
+            dropdownStyle={styles.dropdown1DropdownStyle}
+            rowStyle={styles.dropdown1RowStyle}
+            rowTextStyle={styles.dropdown1RowTxtStyle}
+          />
       </View>
       
       <View>
       {columns.map((column, index) => (
         <View key={index} style={styles.inputContainer}>
-          <Image
-          style={styles.inputIcon}
-          source={{ uri: 'https://img.icons8.com/ios-glyphs/512/language.png' }}
-        />
-          <TextInput
-            value={column}
-            placeholder='Target language'
-            onChangeText={(value) => handleColumnChange(value, index)}
-            style={styles.input}
+          <SelectDropdown
+            data={countries}
+            // defaultValueByIndex={1}
+            // defaultValue={'Egypt'}
+            onSelect={(selectedItem, index) => {
+              console.log(selectedItem, index);
+            }}
+            defaultButtonText={'Select Target Language'}
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem;
+            }}
+            rowTextForSelection={(item, index) => {
+              return item;
+            }}
+            buttonStyle={styles.dropdown1BtnStyle}
+            buttonTextStyle={styles.dropdown1BtnTxtStyle}
+            renderDropdownIcon={isOpened => {
+              return <FontAwesome name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#f8f8ff'} size={18} />;
+            }}
+            dropdownIconPosition={'right'}
+            dropdownStyle={styles.dropdown1DropdownStyle}
+            rowStyle={styles.dropdown1RowStyle}
+            rowTextStyle={styles.dropdown1RowTxtStyle}
           />
           {columns.length > 1 && (
             <TouchableOpacity onPress={() => removeColumn(index)}>
@@ -200,17 +236,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
-  removeText: {
-    marginLeft: 15,
-    color: 'red',
-  },
   addButton: {
     paddingVertical: 5,
     paddingHorizontal: 8,
     alignSelf: 'center',
   },
-  addText: {
-    color: 'white',
+  dropdown1BtnStyle: {
+    width: '80%',
+    height: 45,
+    backgroundColor: 'white',
+    borderRadius: 30,
+    // borderWidth: 1,
+    borderColor: '#444',
   },
-  
+  dropdown1BtnTxtStyle: {color: '#444', right: 30, fontSize: 13},
+  dropdown1RowStyle: { backgroundColor: '#EFEFEF', borderBottomColor: '#C5C5C5'},
+  dropdown1DropdownStyle: { backgroundColor: '#EFEFEF', borderRadius:30 ,width:250},
+  dropdown1RowTxtStyle: {color: '#444', alignSelf: 'center'},
 })
