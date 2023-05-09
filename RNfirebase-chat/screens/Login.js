@@ -61,7 +61,7 @@ export default function Login() {
 
   // console.log(updateUserStatus, "<<< ini status update user profile");
   // console.log(signUpStatus, "<<< ini status sign up");
-  // console.log(loginStatus, "<<< ini status login");
+  console.log(loginStatus, "<<< ini status login");
   // console.log(postDetails, "<<<< ini post details");
   // console.log(commentDetails, "<<<< ini comment details");
   // console.log(posts, "<<<< ini posts");
@@ -112,7 +112,7 @@ export default function Login() {
         onChangeText={(text) => setPassword(text)}
       />
       {loginStatus === "error" && showToast("error", "Login error", errMessage)}
-      {loginStatus === "loading" && showToast("info", "Please wait a few seconds", "logging you in ...")}
+      {/* {loginStatus === "loading" && showToast("info", "Please wait a few seconds", "logging you in ...")} */}
       <Button onPress={onHandleLogin} color="#f57c00" title="Login" />
       <Button
         onPress={() => navigation.navigate("Signup")}

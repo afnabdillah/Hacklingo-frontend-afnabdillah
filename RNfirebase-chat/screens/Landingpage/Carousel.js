@@ -20,7 +20,7 @@ function infiniteScroll(dataList){
             scrolled = 0
         }
 
-        this.flatList.scrollToOffset({ animated: true, offset: scrollValue})
+        this.flatList?.scrollToOffset({ animated: true, offset: scrollValue})
         
     }, 3000)
 }
