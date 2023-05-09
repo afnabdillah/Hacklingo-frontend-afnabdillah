@@ -27,6 +27,7 @@ import { store } from './stores/mainReducer';
 import VideoChat from './screens/VideoChat';
 import Home from './screens/Home'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import MyStack from './components/forum/stack';
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -47,20 +48,23 @@ function ChatTopTabNavigator() {
 function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <HeaderChat />
-      <BottomTab.Navigator>
+      <BottomTab.Navigator screenOptions={{headerShown: false}}>
         <BottomTab.Screen name="Home" component={Home} />
         <BottomTab.Screen
           name="Chats"
           options={{ tabBarLabel: 'Chats' }}
           children={() => (
-            <TopTab.Navigator>
-              <TopTab.Screen name="Chat Lists" component={ChatList} />
-              <TopTab.Screen name="Find Contacts" component={Contacts} />
-              <TopTab.Screen name="Find Groups" component={Groups} />
-            </TopTab.Navigator>
+            <>
+              <HeaderChat />
+              <TopTab.Navigator>
+                <TopTab.Screen name="Chat Lists" component={ChatList} />
+                <TopTab.Screen name="Find Contacts" component={Contacts} />
+                <TopTab.Screen name="Find Groups" component={Groups} />
+              </TopTab.Navigator>
+            </>
           )}
         />
+        <BottomTab.Screen name="Forum" component={MyStack} />
       </BottomTab.Navigator>
     </SafeAreaView>
   );

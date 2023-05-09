@@ -2,7 +2,7 @@ import * as React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import HomeScreen from '../../screens/forum/HomeScreen';
 import { FontAwesome } from '@expo/vector-icons';
-import HeaderForum from './components/Header';
+import HeaderForum from './Header';
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNav() {

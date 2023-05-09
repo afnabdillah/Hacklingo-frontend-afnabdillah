@@ -5,7 +5,7 @@ export default function DetailScreen() {
   return (
     <>
       <ScrollView>
-        <View style={{backgroundColor: "white", justifyContent: "space-between" }}>
+        <View style={{backgroundColor: "white", justifyContent: "space-between", width: "100%", height: "100%" }}>
           <View style={{marginLeft: 20, padding: 5, flexDirection: "row"}}>
             <FontAwesome name="user-circle-o" size={30} color="black" />
             <View>
@@ -21,8 +21,9 @@ export default function DetailScreen() {
               <Text style={{ fontWeight: "400" }}>Funny</Text>
             </View>
           </View>
-          <View style={{marginTop: 10}}>
+          <View style={{marginTop: 10, width: "100%", height: "100%"}}>
             <Image source={{ uri: "https://thumb.viva.co.id/media/frontend/thumbs3/2019/11/21/5dd64a2d921ea-5-makanan-penyebab-stroke-yang-jarang-diketahui_665_374.jpg"}} style={{height: "100%", width: "100%"}}/>
+            <Text>gvfd</Text>
           </View>
           <View style={{flexDirection: "row"}}>
             
