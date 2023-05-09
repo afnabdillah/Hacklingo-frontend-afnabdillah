@@ -28,12 +28,13 @@ import pickImage from "../helper/imagePicker";
 import axios from "axios";
 import pickAudio from "../helper/audioPicker";
 import showToast from "../helper/showToast";
+import { useNavigation } from "@react-navigation/native";
 
-export default function Login({ navigation }) {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errMessage, setErrMessage] = useState("");
-
+  const navigation = useNavigation()
   const dispatch = useDispatch();
   const users = useSelector((state) => state.usersReducer.users);
   const userDetails = useSelector((state) => state.usersReducer.userDetails);
@@ -73,7 +74,7 @@ export default function Login({ navigation }) {
 
   const onHandleLogin = () => {
     if (email !== "" && password !== "") {
-      dispatch(userLogin({ email, password }))
+      dispatch(userLogin({ email, password, navigation }))
         .unwrap()
         .catch((err) => {
           setErrMessage(err.message);
@@ -92,21 +93,21 @@ export default function Login({ navigation }) {
       <Text style={styles.title}>Welcome back!</Text>
       <TextInput
         style={styles.input}
-        placeholder="Enter email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        textContentType="emailAddress"
+        placeholder='Enter email'
+        autoCapitalize='none'
+        keyboardType='email-address'
+        textContentType='emailAddress'
         autoFocus={true}
         value={email}
-        onChangeText={(text) => setEmail(text)}
+        onChangeText={text => setEmail(text)}
       />
       <TextInput
         style={styles.input}
-        placeholder="Enter password"
-        autoCapitalize="none"
+        placeholder='Enter password'
+        autoCapitalize='none'
         autoCorrect={false}
         secureTextEntry={true}
-        textContentType="password"
+        textContentType='password'
         value={password}
         onChangeText={(text) => setPassword(text)}
       />
@@ -335,24 +336,24 @@ export default function Login({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     paddingTop: 50,
-    paddingHorizontal: 12,
+    paddingHorizontal: 12
   },
   title: {
     fontSize: 24,
-    fontWeight: "600",
-    color: "#444",
-    alignSelf: "center",
-    paddingBottom: 24,
+    fontWeight: '600',
+    color: '#444',
+    alignSelf: 'center',
+    paddingBottom: 24
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     marginBottom: 20,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: "#333",
+    borderColor: '#333',
     borderRadius: 8,
-    padding: 12,
-  },
+    padding: 12
+  }
 });

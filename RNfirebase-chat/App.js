@@ -1,3 +1,4 @@
+import 'expo-dev-client';
 import React, { useState, useContext, useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
@@ -22,6 +23,10 @@ import { auth } from "./config/firebase";
 import Toast from 'react-native-toast-message';
 import toastConfig from "./config/toastConfig";
 
+import { Provider } from 'react-redux';
+import { store } from './stores/mainReducer';
+import VideoChat from './screens/VideoChat';
+import Home from './screens/Home'
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
@@ -33,6 +38,7 @@ function ChatTopTabNavigator() {
         <TopTab.Screen name="Chat Lists" component={ChatList} />
         <TopTab.Screen name="Find Contacts" component={Contacts} />
         <TopTab.Screen name="Find Groups" component={Groups} />
+        <TopTab.Screen name="Home" component={Home} />
       </TopTab.Navigator>
     </SafeAreaView>
   );
@@ -46,6 +52,7 @@ function ChatStack() {
         <Stack.Screen name="Group Chat" component={GroupChat} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
         <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="Video Chat" component={VideoChat} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </SafeAreaView>
   );
