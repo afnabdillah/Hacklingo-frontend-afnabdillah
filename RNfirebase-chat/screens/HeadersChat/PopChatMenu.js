@@ -1,10 +1,12 @@
 import { MaterialIcons, FontAwesome, AntDesign, Feather, Entypo } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { useRef } from 'react';
 import { useState } from "react";
 import { Easing } from 'react-native';
 import { View, StyleSheet, Text, SafeAreaView, Modal, TouchableOpacity, Animated } from "react-native";
 
-export function PopChatMenu() {
+export function PopChatMenu({email, name}) {
+    const navigation = useNavigation()
     const [visible, setVisible] = useState(false)
     const scale = useRef(new Animated.Value(0)).current
 
@@ -28,7 +30,10 @@ export function PopChatMenu() {
                     onTouchStart={() => resizeBox(0)}
                 >
                     <Animated.View style={[styles.popup, { transform: [{ scale }] }]}>
-                        <TouchableOpacity style={styles.option}>
+                        <TouchableOpacity style={styles.option} onPress={() => {
+                            console.log("masuk");
+                            return navigation.navigate("DetailProf", {email, name})
+                            }}>
                             <Text>Cek Profile</Text>
                             <Feather name="user" size={26} color="black" style={{ marginLeft: 10 }} />
                         </TouchableOpacity>
