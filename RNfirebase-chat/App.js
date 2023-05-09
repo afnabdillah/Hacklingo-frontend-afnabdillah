@@ -1,3 +1,4 @@
+import 'expo-dev-client';
 import React, { useState, createContext, useContext, useEffect } from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -21,8 +22,10 @@ import GroupChat from './screens/GroupChat';
 import Groups from './screens/Group';
 import Profile from './components/Profile';
 import { Provider } from 'react-redux';
-import {store} from "./stores/mainReducer"
 import DetailProfile from './screens/ProfileDetail';
+import { store } from './stores/mainReducer';
+import VideoChat from './screens/VideoChat';
+import Home from './screens/Home'
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
@@ -34,6 +37,7 @@ function ChatTopTabNavigator() {
         <TopTab.Screen name="Chat Lists" component={ChatList} />
         <TopTab.Screen name="Find Contacts" component={Contacts} />
         <TopTab.Screen name="Find Groups" component={Groups} />
+        <TopTab.Screen name="Home" component={Home} />
       </TopTab.Navigator>
     </SafeAreaView>
   );
@@ -50,6 +54,7 @@ function ChatStack() {
         <Stack.Screen name="DetailProf" component={DetailProfile} options={{
           title: "Contact Info"
         }}/>
+        <Stack.Screen name="Video Chat" component={VideoChat} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </SafeAreaView>
   );
