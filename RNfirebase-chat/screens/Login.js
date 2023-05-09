@@ -48,8 +48,6 @@ export default function Login() {
   );
   const posts = useSelector((state) => state.postsReducer.posts);
   const forums = useSelector((state) => state.forumsReducer.forums);
-<<<<<<< HEAD
-=======
   const articles = useSelector((state) => state.articlesReducer.articles);
   const updateUserStatus = useSelector(
     (state) => state.usersReducer.status.updateUserDetails
@@ -74,7 +72,6 @@ export default function Login() {
   // console.log(articles, "<<<< ini articles");
   // console.log(articleDetails, "<<<< ini article details");
 
->>>>>>> 7855a450401c43b9681136964c1f7f8561baef93
   const onHandleLogin = () => {
     if (email !== "" && password !== "") {
       dispatch(userLogin({ email, password }))
@@ -89,14 +86,11 @@ export default function Login() {
     }
   };
 
-<<<<<<< HEAD
-=======
   useEffect(() => {
     AsyncStorage.getItem("username").then((username) => {
       console.log(username, "<<<< ini username di async storage");
     });
   }, []);
->>>>>>> 7855a450401c43b9681136964c1f7f8561baef93
 
   return (
     <View style={styles.container}>
