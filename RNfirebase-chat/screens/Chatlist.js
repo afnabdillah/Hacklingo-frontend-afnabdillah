@@ -20,7 +20,6 @@ function ChatList() {
   const username = useSelector((state) => state.authReducer.username);
 
   useEffect(() => {
-    console.log(userEmail, "<<< ini userEmail di use Effect")
     if (!userEmail) return;
     const personalChatsRef = collection(database, 'personalChats');
     const personalChatsQuery = query(personalChatsRef);
