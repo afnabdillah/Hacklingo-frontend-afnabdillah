@@ -1,14 +1,22 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Text, View, ScrollView, Image, TextInput } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { insertNewComment } from "../../stores/commentsSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
+import { fetchPostDetails } from "../../stores/postsSlice";
+import showToast from "../../helper/showToast";
+import { ActivityIndicator } from "react-native-paper";
 
-export default function DetailScreen({ navigation }) {
+export default function DetailScreen({ navigation, route }) {
+  const {id} = route.params;
+  console.log(id, "<<<< ini id post");
   const [commentText, setCommentText] = useState("");
   const dispatch = useDispatch();
+
+  const postDetails = useSelector(state => state.postsReducer.postDetails);
+  const postDetailsStatus = useSelector(state => state.postsReducer.status.postDetails);
 
   const handleAddComment = async () => {
     try {
@@ -19,6 +27,23 @@ export default function DetailScreen({ navigation }) {
       console.error(err);
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchPostDetails(id))
+      .unwrap()
+      .catch(err => showToast("error", "Error Fetching Post", err.message));
+    }, [id])
+  )
+
+  if (postDetailsStatus === "loading") {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -26,13 +51,13 @@ export default function DetailScreen({ navigation }) {
           <View style={{ marginLeft: 20, padding: 5, flexDirection: "row" }}>
             <Image source={{ uri: "https://i.pravatar.cc/300" }} style={{ height: 40, width: 40, borderRadius: 100 }} />
             <View>
-              <Text style={{ marginLeft: 20 }}>Hallo</Text>
-              <Text style={{ marginLeft: 20, color: "grey" }}>12 - 12 - 2012</Text>
+              <Text style={{ marginLeft: 20 }}>{postDetails.userId.username}</Text>
+              <Text style={{ marginLeft: 20, color: "grey" }}>{postDetails.createdAt}</Text>
             </View>
           </View>
           <View style={{ marginTop: 10 }}>
             <Text style={{ marginLeft: 20, fontSize: 20, fontWeight: "500" }}>
-              DISINI NAMA POST NYA
+              {postDetails.title}
             </Text>
             <View style={{ marginLeft: 20, borderColor: "#f29222", borderWidth: 2, marginTop: 10, width: 55, padding: 5, borderRadius: 15 }}>
               <Text style={{ fontWeight: "400" }}>Funny</Text>

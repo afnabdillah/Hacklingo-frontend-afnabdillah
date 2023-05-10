@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Text, TouchableOpacity, View, Pressable } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import CardForum from "../../components/forum/card";
-import { useRoute } from "@react-navigation/native";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchForumDetails } from "../../stores/forumsSlice";
 import showToast from "../../helper/showToast";
@@ -13,6 +13,7 @@ export default function HomeScreen({ navigation }) {
   const route = useRoute();
   const forumName = route.name;
   const forumId = route.params.forumId;
+  const [showFullText, setShowFullText] = useState(false);
   const forumDetails = useSelector((state) => state.forumsReducer.forumDetails);
   const fetchForumDetailsStatus = useSelector(
     (state) => state.forumsReducer.status.forumDetails
@@ -20,13 +21,15 @@ export default function HomeScreen({ navigation }) {
 
   const dispatch = useDispatch();
 
-  const showAllDesc = () => {};
+  console.log(forumId, "ini current forumId of", forumName);
 
-  useEffect(() => {
-    dispatch(fetchForumDetails(forumId))
-      .unwrap()
-      .catch((err) => showToast("error", "fetch data error", err.message));
-  }, [forumId]);
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchForumDetails(forumId))
+        .unwrap()
+        .catch((err) => showToast("error", "fetch data error", err.message));
+    }, [forumId])
+  );
 
   if (fetchForumDetailsStatus === "loading") {
     return (
@@ -40,12 +43,15 @@ export default function HomeScreen({ navigation }) {
     <>
       <View style={{ backgroundColor: "white", paddingBottom: 20 }}>
         <View style={{ marginLeft: 10, marginTop: 20 }}>
-          <Text style={{ fontSize: 40, fontWeight: "500", marginBottom: 5 }}>
+          <Text style={{ fontSize: 25, fontWeight: "500", marginBottom: 5 }}>
             {forumName}
           </Text>
-          <Pressable onPress={showAllDesc}>
+          <Pressable onPress={() => setShowFullText(!showFullText)}>
             <Text style={{ color: "grey", fontWeight: "300", fontSize: 15 }}>
-              {forumDetails.description?.split(".").slice(0, 2).join(".")}...
+              {showFullText
+                ? forumDetails.description
+                : forumDetails.description?.split(".").slice(0, 1).join(".") +
+                  "..."}
             </Text>
           </Pressable>
           <ScrollView horizontal={true}>
@@ -56,7 +62,7 @@ export default function HomeScreen({ navigation }) {
                 width: 70,
                 borderRadius: 20,
                 marginTop: 20,
-                marginRight:15
+                marginRight: 15,
               }}
             >
               <Text style={{ margin: 10, color: "#004aad" }}> Forum </Text>
@@ -68,7 +74,7 @@ export default function HomeScreen({ navigation }) {
                 width: 70,
                 borderRadius: 20,
                 marginTop: 20,
-                marginRight:15
+                marginRight: 15,
               }}
             >
               <Text style={{ margin: 10, color: "#004aad" }}> Forum </Text>
@@ -76,12 +82,16 @@ export default function HomeScreen({ navigation }) {
           </ScrollView>
         </View>
       </View>
-      <ScrollView style={{ backgroundColor: "#F6F1F1", paddingTop: 20 }}>
-        {forumDetails.posts?.map((post) => {
-          return (
+      <ScrollView style={{ backgroundColor: "#F6F1F1", paddingVertical: 12 }}>
+        {forumDetails.posts?.length > 0 ? (
+          forumDetails.posts.map((post) => (
             <CardForum key={post._id} navigation={navigation} post={post} />
-          );
-        })}
+          ))
+        ) : (
+          <Text style={{ textAlign: "center", marginTop: 20, color: "gray" }}>
+            No posts available yet. Be the first to post here!
+          </Text>
+        )}
       </ScrollView>
       <TouchableOpacity
         style={{
@@ -95,7 +105,7 @@ export default function HomeScreen({ navigation }) {
           bottom: 20,
           right: 20,
         }}
-        onPress={() => navigation.navigate("AddPost")}
+        onPress={() => navigation.navigate("AddPost", { forumId })}
       >
         <Text
           style={{
