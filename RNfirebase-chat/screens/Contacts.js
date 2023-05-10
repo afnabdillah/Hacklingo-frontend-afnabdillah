@@ -5,19 +5,33 @@ import { database } from '../config/firebase';
 import { auth } from '../config/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Contacts({ navigation }) {
   const [contacts, setContacts] = useState([]);
   const { user } = useContext(AuthenticatedUserContext);
-  async function getUsernameByEmail(email) {
-    const userDocRef = doc(database, 'users', email);
-    const userDoc = await getDoc(userDocRef);
-    return userDoc.exists() ? userDoc.data().username : email;
-  }
+
+  const [userEmail, setUserEmail] = useState(null);
+  const [username, setUsername] = useState(null);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const email = await AsyncStorage.getItem("email");
+      const username = await AsyncStorage.getItem("username");
+      setUserEmail(email);
+      setUsername(username);
+    };
+
+    fetchUserData();
+  }, []);
+  // async function getUsernameByEmail(email) {
+  //   const userDocRef = doc(database, 'users', email);
+  //   const userDoc = await getDoc(userDocRef);
+  //   return userDoc.exists() ? userDoc.data().username : email;
+  // }
 
   useEffect(() => {
     async function fetchContacts() {
-      const currentUserEmail = auth.currentUser.email;
+      const currentUserEmail = userEmail;
       const usersSnapshot = await getDocs(collection(database, 'users'));
       const usersData = usersSnapshot.docs
         .map(doc => ({
@@ -42,7 +56,6 @@ function Contacts({ navigation }) {
             <TouchableOpacity
               style={styles.container}
               onPress={async () => {
-                const recipientName = await getUsernameByEmail(item.id);
                 navigation.navigate('Chat', { recipientEmail: item.email, recipientName: item.username, senderEmail: user.email });
               }}
             >

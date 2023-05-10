@@ -57,18 +57,18 @@ export default function Chat({ route }) {
     fetchUserData();
   }, []);
 
-  async function getUserDataByEmail(email) {
-    const usersCollectionRef = collection(database, 'users');
-    const q = query(usersCollectionRef, where('email', '==', email));
-    const querySnapshot = await getDocs(q);
+  // async function getUserDataByEmail(email) {
+  //   const usersCollectionRef = collection(database, 'users');
+  //   const q = query(usersCollectionRef, where('email', '==', email));
+  //   const querySnapshot = await getDocs(q);
 
-    if (!querySnapshot.empty) {
-      const userDoc = querySnapshot.docs[0];
-      return userDoc.data();
-    } else {
-      return null;
-    }
-  }
+  //   if (!querySnapshot.empty) {
+  //     const userDoc = querySnapshot.docs[0];
+  //     return userDoc.data();
+  //   } else {
+  //     return null;
+  //   }
+  // }
 
   const mergeMessages = (oldMessages, newMessages) => {
     const allMessages = [...oldMessages, ...newMessages];
