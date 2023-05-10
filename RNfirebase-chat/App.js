@@ -55,15 +55,21 @@ function ChatTopTabNavigator() {
 function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <BottomTab.Navigator screenOptions={{headerShown: false}}>
+      <BottomTab.Navigator screenOptions={{ headerShown: false, tabBarStyle: {
+        backgroundColor: "#0097b2",
+      },
+      tabBarLabelStyle: {
+        color: "white"
+      }
+      }}>
         <BottomTab.Screen name="Home" component={Home} options={{
           tabBarIcon: () => {
-            return <Ionicons name="ios-home-outline" size={24} color="black" />
+            return <Ionicons name="ios-home-outline" size={24} color="white" />
           }
         }} />
         <BottomTab.Screen
           name="Chats"
-          options={{ tabBarLabel: 'Chats', tabBarIcon: () => <Ionicons name="ios-chatbubbles-outline" size={24} color="black" /> }}
+          options={{ tabBarLabel: 'Chats', tabBarIcon: () => <Ionicons name="ios-chatbubbles-outline" size={24} color="white" /> }}
           children={() => (
             <>
               <HeaderChat />
@@ -76,10 +82,10 @@ function ChatBottomTabNavigator() {
           )}
         />
         <BottomTab.Screen name="Forum" component={MyStack} options={{
-          tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="black" />
+          tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="white" />
         }}/>
         <BottomTab.Screen name="Grammar Check Screen" component={GrammarCheckScreen} options={{
-          tabBarIcon: () => <FontAwesome name="language" size={24} color="black" />,
+          tabBarIcon: () => <FontAwesome name="language" size={24} color="white" />,
           title: "Grammar"
         }}/>
       </BottomTab.Navigator>
