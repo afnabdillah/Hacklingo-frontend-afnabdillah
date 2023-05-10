@@ -36,7 +36,6 @@ function ChatList() {
     const personalChatsQuery = query(personalChatsRef);
     const personalChatsUnsubscribe = onSnapshot(personalChatsQuery, snapshot => {
       const personalChatsData = snapshot.docs.map(doc => ({ ...doc.data(), chatId: doc.id, isGroup: false }));
-      console.log(personalChatsData, "<<< personal chats")
       const userChats = personalChatsData.filter(chat => {
         return chat.users.some(userObj => userObj.email === userEmail);
       });
@@ -59,14 +58,12 @@ function ChatList() {
       .sort((a, b) => b.createdAt - a.createdAt);
     return mergedChats;
   };
-  console.log(chats)
   return (
     <View style={{ flex: 1, paddingTop: 10, backgroundColor: '#fff' }}>
       <FlatList
         data={chats}
         keyExtractor={item => item.chatId}
         renderItem={({ item }) => {
-          console.log(item, "<<<< item")
           const lastMessage = item.messages[item.messages.length - 1];
           const otherUser = item.users.find(u => u.email !== userEmail);
           return (

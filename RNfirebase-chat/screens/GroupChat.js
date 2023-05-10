@@ -23,7 +23,7 @@ import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import { auth, database } from '../config/firebase';
 import { getDocs } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialIcons, Entypo } from '@expo/vector-icons';
+import { MaterialIcons, Entypo, FontAwesome } from '@expo/vector-icons';
 import { StyleSheet } from 'react-native';
 
 
@@ -129,38 +129,48 @@ export default function GroupChat({ route, navigation }) {
         );
     };
     useLayoutEffect(() => {
-        if (userEmail && groupAdmin && userEmail === groupAdmin) {
-            navigation.setOptions({
-                headerRight: () => (
-                    <View style={{ flexDirection: 'row', marginRight: 10 }}>
-                        <TouchableOpacity
-                            onPress={() =>
-                                navigation.navigate('RequestJoin', { groupId })
-                            }
-                            style={{ marginRight: 10 }}
-                        >
-                            <Entypo name="add-user" size={24} color="#0D47A1" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() =>
-                                navigation.navigate('CreateGroupChat', {
-                                    groupId,
-                                    groupName,
-                                    groupLanguage,
-                                    groupMembers,
-                                    editMode: true,
-                                })
-                            }
-                        >
-                            <Text style={{ color: '#0D47A1', fontSize: 16 }}>Edit Group</Text>
-                        </TouchableOpacity>
-                    </View>
-                ),
-            });
-        } else {
-            navigation.setOptions({ headerRight: null });
-        }
+        navigation.setOptions({
+            headerRight: () => (
+                <View style={{ flexDirection: 'row', marginRight: 10 }}>
+                    <TouchableOpacity
+                        onPress={() =>
+                            navigation.navigate('Video Chat', { roomId: groupId, username: username })
+                        }
+                        style={{ marginRight: 10 }}
+                    >
+                        <MaterialIcons name="video-call" size={24} color="#0D47A1" />
+                    </TouchableOpacity>
+                    {userEmail && groupAdmin && userEmail === groupAdmin && (
+                        <>
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.navigate('RequestJoin', { groupId })
+                                }
+                                style={{ marginRight: 10 }}
+                            >
+                                <Entypo name="add-user" size={24} color="#0D47A1" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.navigate('CreateGroupChat', {
+                                        groupId,
+                                        groupName,
+                                        groupLanguage,
+                                        groupMembers,
+                                        editMode: true,
+                                    })
+                                }
+                            >
+                                <FontAwesome name="gear" size={24} color="#0D47A1" />
+                            </TouchableOpacity>
+                        </>
+                    )}
+                </View>
+            ),
+        });
     }, [navigation, groupId, groupName, groupLanguage, groupMembers, userEmail, groupAdmin]);
+
+
 
 
 
@@ -181,22 +191,8 @@ export default function GroupChat({ route, navigation }) {
             </View>
         );
     };
-    const renderHeader = () => {
-        const goToVideoChat = () => {
-            navigation.navigate("Video Chat", { roomId: groupId, username: username })
-        };
-
-        return (
-            <View style={styles.header}>
-                <TouchableOpacity>
-                    <MaterialIcons onPress={goToVideoChat} name="video-call" size={36} color="black" />
-                </TouchableOpacity>
-            </View>
-        );
-    };
     return (
         <View style={{ flex: 1 }}>
-            {renderHeader()}
             <GiftedChat
                 messages={messages}
                 showAvatarForEveryMessage={true}
