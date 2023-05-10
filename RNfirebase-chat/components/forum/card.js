@@ -4,7 +4,6 @@ import { FontAwesome } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 const CardForum = ({ navigation, post }) => {
-  console.log(post.title, "<<< ini post title");
 
   return (
     <TouchableOpacity

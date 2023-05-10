@@ -5,6 +5,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import HeaderForum from "./Header";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllForums } from "../../stores/forumsSlice";
+import { View, ActivityIndicator } from "react-native";
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNav() {
@@ -14,6 +15,14 @@ export default function DrawerNav() {
   useEffect(() => {
     dispatch(fetchAllForums());
   }, []);
+
+  if (!forums || forums.length === 0) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <Drawer.Navigator>
