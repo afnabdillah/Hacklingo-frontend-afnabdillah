@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import Constants from "expo-constants";
 import * as DocumentPicker from 'expo-document-picker'
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from 'expo-image-picker';
 import { fetchUserDetails, updateUserDetails } from "../stores/usersSlice";
@@ -21,17 +21,21 @@ import { log } from "react-native-reanimated";
 
 export default function Profile() {
     const [displayName, setDisplayName] = useState("");
+    const [displayLanguage, setDisplayLanguage] = useState("")
     const [selectedImage, setSelectedImage] = useState(null);
     const [selectedImageData, setSelectedImageData] = useState({})
     const dispatch = useDispatch()
     const userDetail = useSelector(state => state.usersReducer.userDetails)
     const navigation = useNavigation()
 
-    console.log(userDetail, "<<<<<<<<<");
+    console.log(userDetail, "<<<<<<<<<user detail");
+    // console.log(selectedImageData.uri, "<<<<<<<<<user image");
+    // console.log(selectedImage, "<<<<<<<<< selected");
     function handlePress() {
         const formData = new FormData();
         formData.append("file", selectedImageData);
         formData.append("username", displayName);
+        formData.append("nativeLanguage", displayLanguage)
         dispatch(updateUserDetails(formData));
         navigation.navigate('Home');
     }
@@ -41,6 +45,7 @@ export default function Profile() {
             .then((data) => {
                 setDisplayName(data.username)
                 setSelectedImage(data.profileImageUrl)
+                setDisplayLanguage(data.nativeLanguage)
             })
             .catch((err) => console.log(err))
     }, [])
@@ -53,6 +58,7 @@ export default function Profile() {
                     justifyContent: "center",
                     flex: 1,
                     padding: 20,
+                    margin: 'auto'
                 }}
             >
                 <Text style={{ fontSize: 22 }}>
@@ -77,7 +83,7 @@ export default function Profile() {
                 >
 
 
-                    {!userDetail.profileImageUrl ? (
+                    {!selectedImage ? (
                         <MaterialCommunityIcons
                             name="camera-plus"
                             color={'grey'}
@@ -85,7 +91,7 @@ export default function Profile() {
                         />
                     ) : (
                         <Image
-                            source={{ uri: selectedImage.uri }}
+                            source={{ uri: selectedImage }}
                             style={{ width: "100%", height: "100%", borderRadius: 120 }}
                         />
                     )}
@@ -93,22 +99,43 @@ export default function Profile() {
 
 
                 </TouchableOpacity>
-                <TextInput
-                    placeholder="Type your name"
-                    value={displayName}
-                    onChangeText={text => setDisplayName(text)}
-                    style={{
-                        borderBottomColor: 'red',
-                        marginTop: 40,
-                        borderBottomWidth: 2,
-                        width: "100%",
-                    }}
-                />
+                <View style={{ marginTop: 40, flexDirection: 'row', width: '100%', }}>
+                    <AntDesign name="user" size={24} color="black" />
+                    <View style={{ width: '80%', marginLeft: 20 }}>
+                        <Text style={{ fontStyle: 'italic', color: 'grey' }}>Name</Text>
+                        <TextInput
+                            placeholder="Type your name"
+                            value={displayName}
+                            onChangeText={text => setDisplayName(text)}
+                            style={[{
+                                borderBottomWidth: 2,
+                                width: "100%",
+                            }, { borderBottomColor: !displayName ? 'red' : 'grey' }]}
+                        />
+                    </View>
+                </View>
+                <View style={{ marginTop: 40, flexDirection: 'row', width: '100%' }}>
+                    <Ionicons name="language-outline" size={24} color="black" />
+                    <View style={{ width: '80%', marginLeft: 20 }}>
+                        <Text style={{ fontStyle: 'italic', color: 'grey' }}>Language</Text>
+                        <TextInput
+                            placeholder="Type your name"
+                            value={displayLanguage}
+                            onChangeText={text => setDisplayLanguage(text)}
+                            style={[{
+                                borderBottomWidth: 2,
+                                width: "100%",
+                            }, { borderBottomColor: !displayName ? 'red' : 'grey' }]}
+                        />
+                    </View>
+                </View>
                 <View style={{ marginTop: 50, width: 80 }}>
                     <Button
                         title="Update"
                         onPress={handlePress}
                         disabled={!displayName}
+                        color='#0097b2'
+
                     />
                 </View>
             </View>

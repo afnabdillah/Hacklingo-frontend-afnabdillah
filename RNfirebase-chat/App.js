@@ -98,7 +98,7 @@ function ChatStack() {
     <SafeAreaView style={{ flex: 1 }}>
       <Stack.Navigator>
         <Stack.Screen name="ChatList" component={ChatBottomTabNavigator} options={{ headerShown: false }} />
-        <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
+        <Stack.Screen name="Chat" component={Chat} options={{ headerShown: true }} />
         <Stack.Screen name="Group Chat" component={GroupChat} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} options={{
           headerTitle: "Create Group"
