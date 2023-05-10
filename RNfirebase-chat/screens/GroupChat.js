@@ -24,9 +24,8 @@ import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import { auth, database } from '../config/firebase';
 import { getDocs } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { MaterialIcons, Entypo, FontAwesome, AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AntDesign, Ionicons, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons';
 import { PopChatMenu } from './HeadersChat/PopChatMenu';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -169,22 +168,32 @@ export default function GroupChat({ route, navigation }) {
                     )}
                 </View>
             ),
+            headerTitle: () => (
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <TouchableOpacity onPress={() => navigation.navigate("ChatList")} style={{ paddingRight: 10 }}>
+                        <AntDesign name="arrowleft" size={30} color="black" />
+                    </TouchableOpacity>
+                    <Image source={{ uri: 'https://i.pravatar.cc/300' }} style={{ width: 45, height: 45, borderRadius: 30, }} />
+                    <Text style={{ fontWeight: 'bold', paddingLeft: 10, fontSize: 20 }}>{groupName}</Text>
+                </View>
+            ),
+            headerLeft: () => {
+                <View >
+                </View>
+            }
         });
     }, [navigation, groupId, groupName, groupLanguage, groupMembers, userEmail, groupAdmin]);
 
-
-
-
-
     const renderBubble = (props) => {
         const isCurrentUser = props.currentMessage.user._id === userEmail;
-        const bubbleBackgroundColor = isCurrentUser ? '#1f75fe  ' : '#fffff';
+        const bubbleBackgroundColor = isCurrentUser ? '#dcf8c6  ' : 'grey';
 
         return (
             <View>
                 {!isCurrentUser && renderUsername(props.currentMessage)}
                 <Bubble
                     {...props}
+                    textStyle={{ right: { color: "grey" } }}
                     wrapperStyle={{
                         left: { backgroundColor: bubbleBackgroundColor },
                         right: { backgroundColor: bubbleBackgroundColor },
@@ -193,64 +202,20 @@ export default function GroupChat({ route, navigation }) {
             </View>
         );
     };
-    const renderHeader = () => {
-        const goToVideoChat = () => {
-            navigation.navigate("Video Chat", { roomId: groupId, username: username })
-        };
-
-        const selectImage = async () => {
-            try {
-                let result = await ImagePicker.launchImageLibraryAsync({
-                    mediaTypes: ImagePicker.MediaTypeOptions.All,
-                    allowsEditing: true,
-                    quality: 1,
-                });
-                if (!result.canceled) {
-                    const formData = new FormData();
-                    formData.append('file', {
-                        uri: Platform.OS === 'ios' ? result.uri.replace('file://', '') : result.uri,
-                        type: 'image/jpeg',
-                        name: 'photo.jpg',
-                    });
-                    const response = await fetch('https://example.com/upload-image', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
-                    console.log(response);
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        return (
-            <SafeAreaView style={{ flex: 1 }}>
-                <ImageBackground source={bg} style={{ flex: 1 }}>
-                    <View style={styles.headers}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => navigation.navigate('ChatList')}>
-                                <AntDesign name="arrowleft" size={30} color="black" />
-                            </TouchableOpacity>
-                            <Image source={{ uri: 'https://i.pravatar.cc/300' }} style={styles.image} />
-                            <Text style={{ fontStyle: 'italic', fontSize: 25 }}>{groupName}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, paddingRight: 10 }}>
-                            <TouchableOpacity>
-                                <MaterialIcons onPress={goToVideoChat} name="video-call" size={36} color="black" />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+    return (
+        <SafeAreaView style={{ flex: 1 }}>
+            <ImageBackground source={bg} style={{ flex: 1 }}>
+                <View style={{ flex: 1 }}>
                     <GiftedChat
                         messages={messages}
                         showAvatarForEveryMessage={true}
                         onSend={messages => onSend(messages)}
                         user={{
-                            _id: currentUser.email,
-                            username: currentUser.username,
-                            avatar: currentUser.avatar || 'https://i.pravatar.cc/300'
+                            _id: userEmail,
+                            username: username,
+                            avatar: currentUser?.avatar || 'https://i.pravatar.cc/300',
                         }}
+                        renderBubble={renderBubble}
                         renderActions={(props) => (
                             <Actions
                                 {...props}
@@ -260,13 +225,11 @@ export default function GroupChat({ route, navigation }) {
                                     bottom: 5,
                                     zIndex: 9999,
                                 }}
-                                onPressActionButton={selectImage}
-                                icon={() => (
-                                    <Ionicons name="camera" size={30} color={'grey'} />
-                                )}
+                                // onPressActionButton={selectImage}
+                                icon={() => <Ionicons name="camera" size={30} color={"grey"} />}
                             />
                         )}
-                        timeTextStyle={{ right: { color: 'grey' } }}
+                        timeTextStyle={{ right: { color: "grey" } }}
                         renderSend={(props) => {
                             const { text, messageIdGenerator, user, onSend } = props;
                             return (
@@ -275,11 +238,11 @@ export default function GroupChat({ route, navigation }) {
                                         height: 40,
                                         width: 40,
                                         borderRadius: 40,
-                                        backgroundColor: 'primary',
+                                        backgroundColor: "primary",
                                         alignItems: "center",
                                         justifyContent: "center",
                                         marginBottom: 5,
-                                        paddingRight: 5
+                                        paddingRight: 5,
                                     }}
                                     onPress={() => {
                                         if (text && onSend) {
@@ -297,7 +260,7 @@ export default function GroupChat({ route, navigation }) {
                                     <MaterialCommunityIcons
                                         name={text && onSend ? "send" : "microphone"}
                                         size={23}
-                                        color={'black'}
+                                        color={"black"}
                                     />
                                 </TouchableOpacity>
                             );
@@ -314,103 +277,56 @@ export default function GroupChat({ route, navigation }) {
                                 }}
                             />
                         )}
-                        renderBubble={(props) => (
-                            <Bubble
-                                {...props}
-                                textStyle={{ right: { color: 'grey' } }}
-                                wrapperStyle={{
-                                    left: {
-                                        backgroundColor: 'white',
-                                    },
-                                    right: {
-                                        backgroundColor: '#dcf8c6',
-                                    },
-                                }}
-                            />
-                        )}
-                    // renderMessageImage={(props) => {
-                    //   console.log(props, "????????");
-                    //   return (
-                    //     <View style={{ borderRadius: 15, padding: 2 }}>
-                    //       <TouchableOpacity
-                    //         onPress={() => {
-                    //           setModalVisible(true);
-                    //           setSeletedImageView(props.currentMessage.image);
-                    //         }}
-                    //       >
-                    //         <Image
-                    //           resizeMode="contain"
-                    //           style={{
-                    //             width: 200,
-                    //             height: 200,
-                    //             padding: 6,
-                    //             borderRadius: 15,
-                    //             resizeMode: "cover",
-                    //           }}
-                    //           source={{ uri: props.currentMessage.image }}
-                    //         />
-                    //         {selectedImageView ? (
-                    //           <ImageView
-                    //             imageIndex={0}
-                    //             visible={modalVisible}
-                    //             onRequestClose={() => setModalVisible(false)}
-                    //             images={[{ uri: selectedImageView }]}
-                    //           />
-                    //         ) : null}
-                    //       </TouchableOpacity>
-                    //     </View>
-                    //   );
-                    // }}
                     />
-                </ImageBackground>
-            </SafeAreaView>
-        );
-    }
-
-    const styles = StyleSheet.create({
-        headers: {
-            flexDirection: 'row',
-            backgroundColor: '#fff',
-            height: 50,
-            alignItems: 'center',
-            paddingLeft: 10,
-            paddingRight: 10,
-            paddingBottom: 10,
-            paddingTop: 10,
-            flex: 0.06,
-            justifyContent: 'space-between'
-        },
-        container: {
-            flexDirection: 'row',
-            backgroundColor: 'whitesmoke',
-            padding: 5,
-            marginHorizontal: 10,
-            alignItems: 'center',
-            borderRadius: 20,
-        },
-        input: {
-            flex: 1,
-            backgroundColor: 'white',
-            padding: 5,
-            paddingHorizontal: 10,
-            marginHorizontal: 10,
-            borderRadius: 50,
-            borderColor: 'lightgray',
-            borderWidth: StyleSheet.hairlineWidth
-
-        },
-        send: {
-            backgroundColor: 'royalblue',
-            padding: 7,
-            borderRadius: 15,
-            overflow: 'hidden',
-        },
-        image: {
-            width: 45,
-            height: 45,
-            borderRadius: 30,
-            marginRight: 10,
-            marginLeft: 10
-        },
-    })
+                </View>
+            </ImageBackground>
+        </SafeAreaView>
+    );
 }
+
+const styles = StyleSheet.create({
+    headers: {
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        height: 50,
+        alignItems: 'center',
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingBottom: 10,
+        paddingTop: 10,
+        flex: 0.06,
+        justifyContent: 'space-between'
+    },
+    container: {
+        flexDirection: 'row',
+        backgroundColor: 'whitesmoke',
+        padding: 5,
+        marginHorizontal: 10,
+        alignItems: 'center',
+        borderRadius: 20,
+    },
+    input: {
+        flex: 1,
+        backgroundColor: 'white',
+        padding: 5,
+        paddingHorizontal: 10,
+        marginHorizontal: 10,
+        borderRadius: 50,
+        borderColor: 'lightgray',
+        borderWidth: StyleSheet.hairlineWidth
+
+    },
+    send: {
+        backgroundColor: 'royalblue',
+        padding: 7,
+        borderRadius: 15,
+        overflow: 'hidden',
+    },
+    image: {
+        width: 45,
+        height: 45,
+        borderRadius: 30,
+        marginRight: 10,
+        marginLeft: 10
+    },
+})
