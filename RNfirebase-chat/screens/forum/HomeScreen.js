@@ -45,7 +45,7 @@ export default function HomeScreen({ navigation }) {
           </Text>
           <Pressable onPress={showAllDesc}>
             <Text style={{ color: "grey", fontWeight: "300", fontSize: 15 }}>
-              {forumDetails.description.split(".").slice(0, 2).join(".")}...
+              {forumDetails.description?.split(".").slice(0, 2).join(".")}...
             </Text>
           </Pressable>
           <ScrollView horizontal={true}>
