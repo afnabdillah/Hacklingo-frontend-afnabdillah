@@ -9,28 +9,31 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { HeaderChat } from './HeadersChat/HeaderChat';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSelector } from 'react-redux';
 dayjs.extend(relativeTime);
 
 
 function ChatList() {
   const [chats, setChats] = useState([]);
   const navigation = useNavigation();
-  const [userEmail, setUserEmail] = useState(null);
+  // const [userEmail, setUserEmail] = useState(null);
   const [username, setUsername] = useState(null);
   const { user } = useContext(AuthenticatedUserContext);
+  const userEmail = useSelector((state) => state.authReducer.email);
+
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     const email = await AsyncStorage.getItem("email");
+  //     const username = await AsyncStorage.getItem("username");
+  //     setUserEmail(email);
+  //     setUsername(username);
+  //   };
+
+  //   fetchUserData();
+  // }, []);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const email = await AsyncStorage.getItem("email");
-      const username = await AsyncStorage.getItem("username");
-      setUserEmail(email);
-      setUsername(username);
-    };
-
-    fetchUserData();
-  }, []);
-
-  useEffect(() => {
+    console.log(userEmail, "<<< ini userEmail di use Effect")
     if (!userEmail) return;
     const personalChatsRef = collection(database, 'personalChats');
     const personalChatsQuery = query(personalChatsRef);
@@ -47,7 +50,9 @@ function ChatList() {
     return () => {
       personalChatsUnsubscribe();
     };
-  }, [user]);
+  }, [userEmail]);
+
+  console.log(chats, "<<< ini chats");
 
   const mergeChatLists = (prevChats, newChats, userEmail) => {
     const mergedChats = newChats
