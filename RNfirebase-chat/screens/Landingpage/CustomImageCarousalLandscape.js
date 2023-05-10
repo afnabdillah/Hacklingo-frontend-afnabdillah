@@ -1,5 +1,5 @@
-import {StyleSheet, View, Image, useWindowDimensions} from 'react-native';
-import React, {useState, useEffect, useRef} from 'react';
+import { StyleSheet, View, Image, useWindowDimensions, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
 import Animated, {
   useSharedValue,
   useAnimatedScrollHandler,
@@ -8,16 +8,16 @@ import Animated, {
   useAnimatedRef,
 } from 'react-native-reanimated';
 import Pagination from './pagination';
-const CustomImageCarousal = ({data, autoPlay, pagination}) => {
+const CustomImageCarousal = ({ data, autoPlay, pagination, navigateToGroups }) => {
   const scrollViewRef = useAnimatedRef(null);
   const interval = useRef();
   const [isAutoPlay, setIsAutoPlay] = useState(autoPlay);
   const [newData] = useState([
-    {key: 'spacer-left'},
+    { key: 'spacer-left' },
     ...data,
-    {key: 'spacer-right'},
+    { key: 'spacer-right' },
   ]);
-  const {width} = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const SIZE = width * 0.7;
   const SPACER = (width - SIZE) / 2;
   const x = useSharedValue(0);
@@ -27,6 +27,20 @@ const CustomImageCarousal = ({data, autoPlay, pagination}) => {
       x.value = event.contentOffset.x;
     },
   });
+  const getStyleForIndex = (index) => {
+    const style = useAnimatedStyle(() => {
+      const scale = interpolate(
+        x.value,
+        [(index - 2) * SIZE, (index - 1) * SIZE, index * SIZE],
+        [0.88, 1, 0.88]
+      );
+      return {
+        transform: [{ scale }],
+      };
+    });
+
+    return style;
+  };
 
   useEffect(() => {
     if (isAutoPlay === true) {
@@ -37,7 +51,7 @@ const CustomImageCarousal = ({data, autoPlay, pagination}) => {
         } else {
           _offSet = Math.floor(_offSet + SIZE);
         }
-        scrollViewRef.current.scrollTo({x: _offSet, y: 0});
+        scrollViewRef.current.scrollTo({ x: _offSet, y: 0 });
       }, 1000);
     } else {
       clearInterval(interval.current);
@@ -63,31 +77,26 @@ const CustomImageCarousal = ({data, autoPlay, pagination}) => {
         bounces={false}
         showsHorizontalScrollIndicator={false}>
         {newData.map((item, index) => {
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          const style = useAnimatedStyle(() => {
-            const scale = interpolate(
-              x.value,
-              [(index - 2) * SIZE, (index - 1) * SIZE, index * SIZE],
-              [0.88, 1, 0.88],
-            );
-            return {
-              transform: [{scale}],
-            };
-          });
+          // Call the function here instead
+          const style = getStyleForIndex(index);
           if (!item.image) {
-            return <View style={{width: SPACER}} key={index} />;
+            return <View style={{ width: SPACER }} key={index} />;
           }
           return (
-            <View style={{width: SIZE}} key={index}>
-              <Animated.View style={[styles.imageContainer, style]}>
-                <Image source={item.image} style={styles.image} />
-              </Animated.View>
-            </View>
+            <TouchableOpacity onPress={() => {
+              navigateToGroups(item.language)
+              }} key={item.language}>
+              <View style={{ width: SIZE }} key={index}>
+                <Animated.View style={[styles.imageContainer, style]}>
+                  <Image source={item.image} style={styles.image} />
+                </Animated.View>
+              </View>
+            </TouchableOpacity>
           );
         })}
       </Animated.ScrollView>
       {pagination && <Pagination data={data} x={x} size={SIZE} />}
-    </View>
+    </View >
   );
 };
 
