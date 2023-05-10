@@ -117,7 +117,7 @@ export default function Chat({ route }) {
   useEffect(() => {
     const createRoomId = generateRoomId(senderEmail, recipientEmail);
     const roomDocRef = doc(database, "personalChats", createRoomId);
-
+  
     const unsubscribe = onSnapshot(roomDocRef, (docSnapshot) => {
       if (docSnapshot.exists()) {
         const fetchedMessages = docSnapshot.data().messages.map((message) => ({
@@ -144,11 +144,10 @@ export default function Chat({ route }) {
     );
 
     const roomId = generateRoomId(senderEmail, recipientEmail);
-
-
+    
     const roomDocRef = doc(database, "personalChats", roomId);
     const roomDocSnapshot = await getDoc(roomDocRef);
-
+    
     if (!roomDocSnapshot.exists()) {
       await setDoc(roomDocRef, {
         users: [
@@ -176,11 +175,12 @@ export default function Chat({ route }) {
         avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
       },
     };
-
+    
     await updateDoc(roomDocRef, {
       messages: arrayUnion(message),
     });
   }, [currentUserUsername]);
+  
   const navigation = useNavigation()
   const goToVideoChat = () => {
     navigation.navigate("Video Chat", { roomId: roomId, username: currentUserUsername })

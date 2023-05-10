@@ -77,18 +77,6 @@ export default function Login() {
       console.log("masuk login");
       dispatch(userLogin({ email, password }))
         .unwrap()
-        .then(() => {
-          // Navigate to ChatList after successful login
-          navigation.navigate({
-            screen: "ChatStack",
-            params: {
-              screen: "ChatList",
-              params: {
-                screen: "Home",
-              },
-            },
-          });
-        })
         .catch((err) => {
           showToast("error", "Login error", err.message);
         });

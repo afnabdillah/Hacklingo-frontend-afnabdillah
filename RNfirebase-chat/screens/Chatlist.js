@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { database } from '../config/firebase';
@@ -15,20 +16,8 @@ dayjs.extend(relativeTime);
 function ChatList() {
   const [chats, setChats] = useState([]);
   const navigation = useNavigation();
-  const [userEmail, setUserEmail] = useState(null);
-  const [username, setUsername] = useState(null);
-  const { user } = useContext(AuthenticatedUserContext);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const email = await AsyncStorage.getItem("email");
-      const username = await AsyncStorage.getItem("username");
-      setUserEmail(email);
-      setUsername(username);
-    };
-
-    fetchUserData();
-  }, []);
+  const userEmail = useSelector((state) => state.authReducer.email);
+  const username = useSelector((state) => state.authReducer.username);
 
   useEffect(() => {
     if (!userEmail) return;
@@ -47,7 +36,7 @@ function ChatList() {
     return () => {
       personalChatsUnsubscribe();
     };
-  }, [user]);
+  }, [userEmail]);
 
   const mergeChatLists = (prevChats, newChats, userEmail) => {
     const mergedChats = newChats
@@ -68,7 +57,7 @@ function ChatList() {
           const otherUser = item.users.find(u => u.email !== userEmail);
           return (
             <TouchableOpacity style={styles.container} onPress={() => {
-              navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username });
+              navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username, senderEmail : userEmail });
             }}>
               <Image
                 source={{ uri: otherUser.avatar }}
