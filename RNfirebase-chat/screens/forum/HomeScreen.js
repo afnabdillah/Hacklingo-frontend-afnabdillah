@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchForumDetails } from "../../stores/forumsSlice";
 import showToast from "../../helper/showToast";
 import { ActivityIndicator } from "react-native-paper";
-
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function HomeScreen({ navigation }) {
   const route = useRoute();
@@ -40,40 +40,14 @@ export default function HomeScreen({ navigation }) {
     <>
       <View style={{ backgroundColor: "white", paddingBottom: 20 }}>
         <View style={{ marginLeft: 10, marginTop: 20 }}>
-          <Text style={{ fontSize: 40, fontWeight: "500", marginBottom: 5 }}>
+          <Text style={{ fontSize: 40, fontWeight: "500", marginBottom: 5, marginHorizontal: 10 }}>
             {forumName}
           </Text>
           <Pressable onPress={showAllDesc}>
-            <Text style={{ color: "grey", fontWeight: "300", fontSize: 15 }}>
+            <Text style={{ color: "grey", fontWeight: "300", fontSize: 15, lineHeight: 20, marginHorizontal: 10 }}>
               {forumDetails.description?.split(".").slice(0, 2).join(".")}...
             </Text>
           </Pressable>
-          <ScrollView horizontal={true}>
-            <View
-              style={{
-                borderColor: "#004aad",
-                borderWidth: 2,
-                width: 70,
-                borderRadius: 20,
-                marginTop: 20,
-                marginRight:15
-              }}
-            >
-              <Text style={{ margin: 10, color: "#004aad" }}> Forum </Text>
-            </View>
-            <View
-              style={{
-                borderColor: "#004aad",
-                borderWidth: 2,
-                width: 70,
-                borderRadius: 20,
-                marginTop: 20,
-                marginRight:15
-              }}
-            >
-              <Text style={{ margin: 10, color: "#004aad" }}> Forum </Text>
-            </View>
-          </ScrollView>
         </View>
       </View>
       <ScrollView style={{ backgroundColor: "#F6F1F1", paddingTop: 20 }}>
@@ -85,7 +59,7 @@ export default function HomeScreen({ navigation }) {
       </ScrollView>
       <TouchableOpacity
         style={{
-          backgroundColor: "#1E90FF",
+          backgroundColor: "#0097b2",
           borderRadius: 25,
           paddingHorizontal: 20,
           paddingVertical: 10,
@@ -97,14 +71,7 @@ export default function HomeScreen({ navigation }) {
         }}
         onPress={() => navigation.navigate("AddPost")}
       >
-        <Text
-          style={{
-            color: "white",
-            fontWeight: "bold",
-          }}
-        >
-          {"Post"}
-        </Text>
+        <MaterialIcons name="post-add" size={24} color="white" />
       </TouchableOpacity>
     </>
   );
