@@ -6,7 +6,7 @@ async function saveToAsyncStorage(data) {
       ["username", data.username],
       ["email", data.email],
       ["userid", data._id],
-      ["profileimageurl", data.profileImageUrl]
+      ["profileimageurl", data.profileImageUrl || ""]
     ] 
     await AsyncStorage.multiSet(storageItems);
   } catch(err) {

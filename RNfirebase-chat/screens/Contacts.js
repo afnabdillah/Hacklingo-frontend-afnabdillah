@@ -10,14 +10,7 @@ import {
 import AuthenticatedUserContext from "../helper/AuthenticatedUserContext";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersByNativeLanguage, fetchUsersBySearch } from "../stores/usersSlice";
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { collection, getDocs } from 'firebase/firestore';
-import { database } from '../config/firebase';
-import { auth } from '../config/firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 function Contacts({ navigation }) {
   const [contacts, setContacts] = useState([]);
@@ -32,13 +25,13 @@ function Contacts({ navigation }) {
   const userEmail = useSelector((state) => state.authReducer.email);
   const userProfileImageUrl = useSelector((state) => state.authReducer.profileImageUrl);
   const username = useSelector((state) => state.authReducer.username);
-
   const contactsList = usersBySearch.filter((user) => user._id !== userId);
 
   console.log(userId, "<<<< ini userId");
   console.log(userEmail, "<<<< ini userEmail");
   console.log(userProfileImageUrl, "<<<< ini userProfileImage");
   console.log(username, "<<<< ini username");
+  console.log(usersByNativeLanguage, "<<<< ini user native");
 
   useEffect(() => {
     dispatch(fetchUsersByNativeLanguage("Indonesian/Bahasa Indonesia"));

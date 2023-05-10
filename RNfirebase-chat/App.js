@@ -144,7 +144,7 @@ function RootNavigator() {
           userId: userData[0][1],
           email: userData[1][1],
           username: userData[2][1],
-          profileImageUrl: userData[3][1],
+          profileImageUrl: userData[3][1] || "",
         })
       );
 
