@@ -55,12 +55,13 @@ function ChatTopTabNavigator() {
 function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <BottomTab.Navigator screenOptions={{ headerShown: false, tabBarStyle: {
-        backgroundColor: "#0097b2",
-      },
-      tabBarLabelStyle: {
-        color: "white"
-      }
+      <BottomTab.Navigator screenOptions={{
+        headerShown: false, tabBarStyle: {
+          backgroundColor: "#0097b2",
+        },
+        tabBarLabelStyle: {
+          color: "white"
+        }
       }}>
         <BottomTab.Screen name="Home" component={Home} options={{
           tabBarIcon: () => {
@@ -74,7 +75,7 @@ function ChatBottomTabNavigator() {
             <>
               <HeaderChat />
               <TopTab.Navigator>
-                <TopTab.Screen name="Chat Lists" component={ChatList} options={{ }}/>
+                <TopTab.Screen name="Chat Lists" component={ChatList} options={{}} />
                 <TopTab.Screen name="Find Contacts" component={Contacts} />
                 <TopTab.Screen name="Find Groups" component={Groups} />
               </TopTab.Navigator>
@@ -83,11 +84,11 @@ function ChatBottomTabNavigator() {
         />
         <BottomTab.Screen name="Forum" component={MyStack} options={{
           tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="white" />
-        }}/>
+        }} />
         <BottomTab.Screen name="Grammar Check Screen" component={GrammarCheckScreen} options={{
           tabBarIcon: () => <FontAwesome name="language" size={24} color="white" />,
           title: "Grammar"
-        }}/>
+        }} />
       </BottomTab.Navigator>
     </SafeAreaView>
   );
@@ -101,7 +102,7 @@ function ChatStack() {
         <Stack.Screen name="Group Chat" component={GroupChat} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} options={{
           headerTitle: "Create Group"
-        }}/>
+        }} />
         <Stack.Screen name="RequestJoin" component={RequestJoin} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen

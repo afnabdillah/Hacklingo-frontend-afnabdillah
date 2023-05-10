@@ -17,6 +17,7 @@ import { fetchUserDetails, updateUserDetails } from "../stores/usersSlice";
 import { useDispatch, useSelector } from "react-redux";
 import pickImage from "../helper/imagePicker";
 import * as FileSystem from 'expo-file-system';
+import { log } from "react-native-reanimated";
 
 export default function Profile() {
     const [displayName, setDisplayName] = useState("");
@@ -26,6 +27,7 @@ export default function Profile() {
     const userDetail = useSelector(state => state.usersReducer.userDetails)
     const navigation = useNavigation()
 
+    console.log(userDetail, "<<<<<<<<<");
     function handlePress() {
         const formData = new FormData();
         formData.append("file", selectedImageData);
@@ -83,7 +85,7 @@ export default function Profile() {
                         />
                     ) : (
                         <Image
-                            source={{ uri: selectedImage }}
+                            source={{ uri: selectedImage.uri }}
                             style={{ width: "100%", height: "100%", borderRadius: 120 }}
                         />
                     )}
@@ -105,9 +107,8 @@ export default function Profile() {
                 <View style={{ marginTop: 50, width: 80 }}>
                     <Button
                         title="Update"
-                        // color={colors.secondary}
                         onPress={handlePress}
-                    // disabled={!displayName}
+                        disabled={!displayName}
                     />
                 </View>
             </View>

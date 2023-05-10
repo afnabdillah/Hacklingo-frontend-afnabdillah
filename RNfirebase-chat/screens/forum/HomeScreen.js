@@ -49,7 +49,7 @@ export default function HomeScreen({ navigation }) {
               {showFullText
                 ? forumDetails.description
                 : forumDetails.description?.split(".").slice(0, 1).join(".") +
-                  "..."}
+                "..."}
             </Text>
           </Pressable>
         </View>
