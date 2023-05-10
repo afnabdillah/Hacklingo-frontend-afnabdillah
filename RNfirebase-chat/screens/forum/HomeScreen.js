@@ -8,6 +8,7 @@ import { fetchForumDetails } from "../../stores/forumsSlice";
 import showToast from "../../helper/showToast";
 import { ActivityIndicator } from "react-native-paper";
 
+
 export default function HomeScreen({ navigation }) {
   const route = useRoute();
   const forumName = route.name;
