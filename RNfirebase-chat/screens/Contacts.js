@@ -27,12 +27,6 @@ function Contacts({ navigation }) {
   const username = useSelector((state) => state.authReducer.username);
   const contactsList = usersBySearch.filter((user) => user._id !== userId);
 
-  console.log(userId, "<<<< ini userId");
-  console.log(userEmail, "<<<< ini userEmail");
-  console.log(userProfileImageUrl, "<<<< ini userProfileImage");
-  console.log(username, "<<<< ini username");
-  console.log(usersByNativeLanguage, "<<<< ini user native");
-
   useEffect(() => {
     dispatch(fetchUsersByNativeLanguage("Indonesian/Bahasa Indonesia"));
     dispatch(fetchUsersBySearch(""));
