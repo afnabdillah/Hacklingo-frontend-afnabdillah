@@ -33,7 +33,7 @@ export default function Profile() {
         formData.append("file", selectedImageData);
         formData.append("username", displayName);
         dispatch(updateUserDetails(formData));
-        navigation.navigate('Home')
+        navigation.navigate('Home');
     }
     useEffect(() => {
         dispatch(fetchUserDetails())

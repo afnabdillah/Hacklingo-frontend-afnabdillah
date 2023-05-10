@@ -9,7 +9,7 @@ import ChatList from "./screens/Chatlist";
 import Contacts from "./screens/Contacts";
 import GroupChat from "./screens/GroupChat";
 import Groups from "./screens/Group";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { HeaderChat } from "./screens/HeadersChat/HeaderChat";
 import CreateGroupChat from "./screens/CreateGroupChat"; // Import the CreateGroupChat component
@@ -30,10 +30,11 @@ import MyStack from './components/forum/stack';
 import { Ionicons } from '@expo/vector-icons';
 import RequestJoin from './screens/RequestJoin';
 import { LogBox } from 'react-native';
-
+import { FontAwesome } from '@expo/vector-icons';
 LogBox.ignoreLogs(['new NativeEventEmitter']);
 import LoginView from "./screens/TemplateLogin";
 import SignUpView from "./screens/TemplateSignup";
+import GrammarCheckScreen from "./screens/GrammarCheck";
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -54,20 +55,27 @@ function ChatTopTabNavigator() {
 function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <BottomTab.Navigator screenOptions={{ headerShown: false }}>
+      <BottomTab.Navigator screenOptions={{
+        headerShown: false, tabBarStyle: {
+          backgroundColor: "#0097b2",
+        },
+        tabBarLabelStyle: {
+          color: "white"
+        }
+      }}>
         <BottomTab.Screen name="Home" component={Home} options={{
           tabBarIcon: () => {
-            return <Ionicons name="ios-home-outline" size={24} color="black" />
+            return <Ionicons name="ios-home-outline" size={24} color="white" />
           }
         }} />
         <BottomTab.Screen
           name="Chats"
-          options={{ tabBarLabel: 'Chats', tabBarIcon: () => <Ionicons name="ios-chatbubbles-outline" size={24} color="black" /> }}
+          options={{ tabBarLabel: 'Chats', tabBarIcon: () => <Ionicons name="ios-chatbubbles-outline" size={24} color="white" /> }}
           children={() => (
             <>
               <HeaderChat />
               <TopTab.Navigator>
-                <TopTab.Screen name="Chat Lists" component={ChatList} />
+                <TopTab.Screen name="Chat Lists" component={ChatList} options={{}} />
                 <TopTab.Screen name="Find Contacts" component={Contacts} />
                 <TopTab.Screen name="Find Groups" component={Groups} />
               </TopTab.Navigator>
@@ -75,7 +83,11 @@ function ChatBottomTabNavigator() {
           )}
         />
         <BottomTab.Screen name="Forum" component={MyStack} options={{
-          tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="black" />
+          tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="white" />
+        }} />
+        <BottomTab.Screen name="Grammar Check Screen" component={GrammarCheckScreen} options={{
+          tabBarIcon: () => <FontAwesome name="language" size={24} color="white" />,
+          title: "Grammar"
         }} />
       </BottomTab.Navigator>
     </SafeAreaView>
@@ -88,7 +100,9 @@ function ChatStack() {
         <Stack.Screen name="ChatList" component={ChatBottomTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
         <Stack.Screen name="Group Chat" component={GroupChat} />
-        <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
+        <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} options={{
+          headerTitle: "Create Group"
+        }} />
         <Stack.Screen name="RequestJoin" component={RequestJoin} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen

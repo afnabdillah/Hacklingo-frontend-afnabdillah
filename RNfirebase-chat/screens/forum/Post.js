@@ -1,61 +1,133 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useDispatch } from 'react-redux';
-import { unwrapResult } from '@reduxjs/toolkit';
-import { insertNewPost } from '../../stores/postsSlice';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { insertNewPost } from "../../stores/postsSlice";
+import pickImage from "../../helper/imagePicker";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import showToast from "../../helper/showToast";
+import { useNavigation } from "@react-navigation/native";
+import { ActivityIndicator } from "react-native-paper";
+import logo from "../../assets/HACKLINGO.png";
 
-export default function Post() {
+export default function Post({ route }) {
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-
+  const [content, setContent] = useState("");
+  const [selectedImage, setSelectedImage] = useState("");
+  const [selectedImageData, setSelectedImageData] = useState({});
+  const insertPostStatus = useSelector(
+    (state) => state.postsReducer.status.newPost
+  );
+  const { forumId } = route.params;
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
-  const onHandleCreate = async () => {
+  const onPickImage = async () => {
     try {
-      const resultAction = await dispatch(
-        insertNewPost({ title, description, imageUrl })
-      );
-      unwrapResult(resultAction);
-      setTitle('');
-      setDescription('');
-      setImageUrl('');
-      console.log('Post created successfully');
+      const imageData = await pickImage();
+      setSelectedImage(imageData.uri);
+      setSelectedImageData(imageData);
     } catch (err) {
-      console.error('Failed to create post:', err);
+      console.log(err, "<<< ini err pick image untuk post");
+    }
+  };
+
+  const onCreatePost = () => {
+    if (title !== "" && content !== "") {
+      const form = new FormData();
+      if (Object.keys(selectedImageData)[0]) {
+        form.append("file", selectedImageData);
+      }
+      form.append("title", title);
+      form.append("content", content);
+      form.append("forumId", forumId);
+      dispatch(insertNewPost(form))
+        .unwrap()
+        .then(() => {
+          showToast(
+            "success",
+            "Insert Post Success!",
+            "you have succesfully update your post!"
+          );
+          navigation.goBack();
+        })
+        .catch((err) => {
+          showToast("error", "Insert New Post Error", err.message);
+        });
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Title:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setTitle}
-        value={title}
-        placeholder="Enter post title"
-      />
+    <>
+      <View style={styles.container}>
+        <Text style={styles.label}>Title:</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={setTitle}
+          value={title}
+          placeholder="Enter post title"
+        />
 
-      <Text style={styles.label}>Description:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setDescription}
-        value={description}
-        placeholder="Enter post description"
-      />
+        <Text style={styles.label}>Content:</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={setContent}
+          value={content}
+          placeholder="Enter post content"
+        />
 
-      <Text style={styles.label}>Image Url:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setImageUrl}
-        value={imageUrl}
-        placeholder="Enter image url"
-      />
+        <View style={{ alignItems: "center", justifyContent: "center" }}>
+          <TouchableOpacity
+            onPress={onPickImage}
+            style={{
+              marginTop: 10,
+              marginBottom: 20,
+              borderRadius: 120,
+              width: 120,
+              height: 120,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {!selectedImage ? (
+              <MaterialCommunityIcons
+                name="camera-plus"
+                color={"grey"}
+                size={45}
+              />
+            ) : (
+              <Image
+                source={{ uri: selectedImage }}
+                style={{ width: "100%", height: "100%", borderRadius: 120 }}
+              />
+            )}
+          </TouchableOpacity>
+        </View>
 
-      <TouchableOpacity style={styles.button} onPress={onHandleCreate}>
-        <Text style={styles.buttonText}>Create Post</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.button} onPress={onCreatePost}>
+          <Text style={styles.buttonText}>Create Post</Text>
+        </TouchableOpacity>
+
+        {insertPostStatus === "loading" && (
+          <View
+            style={{
+              marginTop: 20,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ActivityIndicator size={20} />
+            <Text>Uploading your post ...</Text>
+          </View>
+        )}
+      </View>
+    </>
   );
 }
 

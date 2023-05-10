@@ -40,9 +40,9 @@ export const fetchPostsBySearch = createAsyncThunk(
         headers: {
           userid: userId,
         },
-        params : {
-          search : input
-        }
+        params: {
+          search: input,
+        },
       });
       console.log(response.data);
       return response.data;
@@ -61,14 +61,17 @@ export const insertNewPost = createAsyncThunk(
   async (input, { rejectWithValue }) => {
     // this is the action
     try {
+      input.append("context", "image");
+      console.log(input, "<<<< ini input ke insertNewPost");
       const userId = await AsyncStorage.getItem("userid");
       const response = await axios({
         method: "POST",
         url: `${base_url}/posts`,
         headers: {
           userid: userId,
+          "Content-Type" : "multipart/form-data"
         },
-        data: input
+        data: input,
       });
       return response.data;
     } catch (err) {
@@ -83,7 +86,7 @@ export const insertNewPost = createAsyncThunk(
 
 export const updatePostById = createAsyncThunk(
   "postsSlice/updatePostById", // this is the action name
-  async ({input, postId}, { rejectWithValue }) => {
+  async ({ input, postId }, { rejectWithValue }) => {
     // this is the action
     try {
       const userId = await AsyncStorage.getItem("userid");
@@ -93,7 +96,7 @@ export const updatePostById = createAsyncThunk(
         headers: {
           userid: userId,
         },
-        data: input
+        data: input,
       });
       return response.data;
     } catch (err) {
@@ -138,6 +141,7 @@ const postsSlice = createSlice({
     status: {
       posts: "idle",
       postDetails: "idle",
+      newPost: "idle",
     },
   },
   reducers: {},
@@ -162,6 +166,15 @@ const postsSlice = createSlice({
       })
       .addCase(fetchPostsBySearch.rejected, (state, action) => {
         state.status.posts = "error";
+      })
+      .addCase(insertNewPost.pending, (state, action) => {
+        state.status.newPost = "loading";
+      })
+      .addCase(insertNewPost.fulfilled, (state, action) => {
+        state.status.newPost = "idle";
+      })
+      .addCase(insertNewPost.rejected, (state, action) => {
+        state.status.newPost = "error";
       });
   },
 });

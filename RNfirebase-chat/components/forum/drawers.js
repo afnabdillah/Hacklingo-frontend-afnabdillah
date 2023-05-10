@@ -25,7 +25,7 @@ export default function DrawerNav() {
   }
 
   return (
-    <Drawer.Navigator>
+    <Drawer.Navigator screenOptions={{headerTintColor: "white"}}>
       {forums.map((el) => {
         return (
           <Drawer.Screen
@@ -46,7 +46,7 @@ export default function DrawerNav() {
                 color: "black",
               },
               headerStyle: {
-                backgroundColor: "white",
+                backgroundColor: "#0097b2",
               },
               headerTitleStyle: {
                 color: "black",
@@ -56,6 +56,9 @@ export default function DrawerNav() {
               },
               headerTitle: () => <></>,
               drawerType: "front",
+              drawerItemStyle: {
+                backgroundColor: "white"
+              },
             }}
           />
         );
