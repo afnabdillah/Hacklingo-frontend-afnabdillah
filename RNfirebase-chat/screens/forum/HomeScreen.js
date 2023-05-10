@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Text, TouchableOpacity, View, Pressable } from "react-native";
+import { Text, TouchableOpacity, View, Pressable, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import CardForum from "../../components/forum/card";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
@@ -18,6 +18,7 @@ export default function HomeScreen({ navigation }) {
   const fetchForumDetailsStatus = useSelector(
     (state) => state.forumsReducer.status.forumDetails
   );
+  console.log(forumDetails);
 
   const dispatch = useDispatch();
 
@@ -42,7 +43,7 @@ export default function HomeScreen({ navigation }) {
       <View style={{ backgroundColor: "white", paddingBottom: 20 }}>
         <View style={{ marginLeft: 10, marginTop: 20 }}>
           <Text style={{ fontSize: 25, fontWeight: "500", marginBottom: 5 }}>
-            {forumName}
+            {forumName} <Image source={{ uri: forumDetails.flagImage }} style={{width: 25, height: 25, borderRadius: 100}}/>
           </Text>
           <Pressable onPress={() => setShowFullText(!showFullText)}>
             <Text style={{ color: "grey", fontWeight: "300", fontSize: 15 }}>
