@@ -1,5 +1,5 @@
 import { MaterialIcons, FontAwesome, AntDesign, Feather } from '@expo/vector-icons';
-import { useRef } from 'react';
+import { useDebugValue, useRef } from 'react';
 import { useState } from "react";
 import { Easing } from 'react-native';
 import { View, StyleSheet, Text, SafeAreaView, Modal, TouchableOpacity, Animated } from "react-native";
@@ -7,12 +7,13 @@ import { auth } from '../../config/firebase';
 import { signOut } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useDispatch } from 'react-redux';
+import { logout } from '../../stores/authSlice';
 export function PopMenu() {
     const navigation = useNavigation()
     const [visible, setVisible] = useState(false)
     const scale = useRef(new Animated.Value(0)).current
-
+    const dispatch =  useDispatch()
     function resizeBox(to) {
         to === 1 && setVisible(true);
         Animated.timing(scale, {
@@ -26,10 +27,7 @@ export function PopMenu() {
         try {
             await signOut(auth);
             await AsyncStorage.clear(); // Clear AsyncStorage
-            navigation.reset({ // Reset navigation stack
-                index: 0,
-                routes: [{ name: 'Login' }], // Navigate to the Login screen
-            });
+            dispatch(logout())
         } catch (error) {
             console.log('Error logging out: ', error);
         }

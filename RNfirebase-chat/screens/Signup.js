@@ -54,8 +54,7 @@ export default function Signup({ navigation }) {
         value={password}
         onChangeText={(text) => setPassword(text)}
       />
-      {signUpStatus === "error" && <Text>{errMessage}</Text>}
-      {signUpStatus === "loading" && <Text>Signing you up ...</Text>}
+      
       <Button onPress={onHandleSignup} color="#f57c00" title="Signup" />
       <Button
         onPress={() => navigation.navigate("Login")}

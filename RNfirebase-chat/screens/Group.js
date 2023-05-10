@@ -1,25 +1,39 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import { collection, getDocs, onSnapshot } from 'firebase/firestore';
+import {
+    View,
+    Text,
+    FlatList,
+    TouchableOpacity,
+    StyleSheet,
+    Alert,
+} from 'react-native';
+import {
+    collection,
+    getDocs,
+    onSnapshot,
+    doc,
+    updateDoc,
+    arrayUnion,
+} from 'firebase/firestore';
 import { database, auth } from '../config/firebase';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Groups({ navigation }) {
     const [groups, setGroups] = useState([]);
     const [joinedGroups, setJoinedGroups] = useState([]);
     const [unjoinedGroups, setUnjoinedGroups] = useState([]);
-
     useEffect(() => {
-        const fetchGroups = () => {
-            const groupChatsRef = collection(database, "groupChats");
-
+        const fetchGroups = async () => {
+            const groupChatsRef = collection(database, 'groupChats');
+            const userEmail = await AsyncStorage.getItem('email');
             const unsubscribe = onSnapshot(groupChatsRef, (querySnapshot) => {
                 const groupsData = querySnapshot.docs.map((doc) => ({
                     id: doc.id,
                     ...doc.data(),
                 }));
 
-                const userEmail = auth.currentUser.email;
+                const userEmail = auth.currentUser?.email;
                 const joined = groupsData.filter((group) =>
                     group.users.includes(userEmail)
                 );
@@ -38,26 +52,62 @@ function Groups({ navigation }) {
 
         fetchGroups();
     }, []);
+
     const navigateToCreateGroupChat = () => {
         navigation.navigate('CreateGroupChat');
     };
-    const renderGroupItem = ({ item }) => {
+
+    const handleJoinRequest = async (item) => {
+        const groupDocRef = doc(database, 'groupChats', item.id);
+        const userEmail = await AsyncStorage.getItem('email');
+        const username = await AsyncStorage.getItem('username');
+        await updateDoc(groupDocRef, {
+            requestJoin: arrayUnion({ email: userEmail, username: username }),
+        });
+    };
+
+    const showJoinRequestAlert = (item) => {
+        Alert.alert(
+            'Join Group',
+            `Are you sure you want to join "${item.groupName}" group?`,
+            [
+                {
+                    text: 'Cancel',
+                    onPress: () => { },
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes',
+                    onPress: () => handleJoinRequest(item),
+                },
+            ],
+            { cancelable: false }
+        );
+    };
+
+    const handleGroupClick = (item, joinRequest) => {
+        if (joinRequest) {
+            showJoinRequestAlert(item);
+        } else {
+            navigation.navigate('Group Chat', {
+                groupId: item.id,
+                groupName: item.groupName,
+            });
+        }
+    };
+
+    const renderGroupItem = ({ item }, joinRequest) => {
         return (
             <TouchableOpacity
                 style={{
                     padding: 15,
-                    borderBottomColor: "#ccc",
+                    borderBottomColor: '#ccc',
                     borderBottomWidth: 1,
                 }}
-                onPress={() => {
-                    navigation.navigate("Group Chat", {
-                        groupId: item.id,
-                        groupName: item.groupName,
-                    });
-                }}
+                onPress={() => handleGroupClick(item, joinRequest)}
             >
-                <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.groupName}</Text>
-                <Text style={{ fontSize: 14, color: "#777" }}>
+                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.groupName}</Text>
+                <Text style={{ fontSize: 14, color: '#777' }}>
                     {item.users.length} members
                 </Text>
             </TouchableOpacity>
@@ -65,11 +115,11 @@ function Groups({ navigation }) {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: "white" }}>
+        <View style={{ flex: 1, backgroundColor: 'white' }}>
             <FlatList
                 data={joinedGroups}
                 keyExtractor={(item) => item.id}
-                renderItem={renderGroupItem}
+                renderItem={(item) => renderGroupItem(item, false)} // Joined groups
                 ListHeaderComponent={() => (
                     <View>
                         <Text style={styles.sectionTitle}>Joined Groups</Text>
@@ -81,7 +131,7 @@ function Groups({ navigation }) {
                         <FlatList
                             data={unjoinedGroups}
                             keyExtractor={(item) => item.id}
-                            renderItem={renderGroupItem}
+                            renderItem={(item) => renderGroupItem(item, true)} // Unjoined groups
                         />
                     </View>
                 )}
@@ -94,21 +144,20 @@ function Groups({ navigation }) {
             </TouchableOpacity>
         </View>
     );
-
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
     },
     chatRow: {
         padding: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#ccc'
+        borderBottomColor: '#ccc',
     },
     chatName: {
-        fontSize: 18
+        fontSize: 18,
     },
     buttonContainer: {
         paddingHorizontal: 16,
@@ -132,9 +181,10 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 20,
-        fontWeight: "bold",
+        fontWeight: 'bold',
         marginTop: 20,
         marginLeft: 15,
     },
 });
+
 export default Groups;
