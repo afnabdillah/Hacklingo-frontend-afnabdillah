@@ -20,15 +20,19 @@ import { onAuthStateChanged } from "@firebase/auth";
 import { auth } from "./config/firebase";
 import Toast from "react-native-toast-message";
 import toastConfig from "./config/toastConfig";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Provider, useDispatch, useSelector } from "react-redux";
-import DetailProfile from "./screens/ProfileDetail";
-import { store } from "./stores/mainReducer";
-import VideoChat from "./screens/VideoChat";
-import Home from "./screens/Home";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { loginSuccess } from "./stores/authSlice";
-import MyStack from "./components/forum/stack";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import DetailProfile from './screens/ProfileDetail';
+import { store } from './stores/mainReducer';
+import VideoChat from './screens/VideoChat';
+import Home from './screens/Home'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { loginSuccess } from './stores/authSlice';
+import MyStack from './components/forum/stack';
+import { Ionicons } from '@expo/vector-icons';
+import RequestJoin from './screens/RequestJoin';
+import LoginView from "./screens/TemplateLogin";
+import SignUpView from "./screens/TemplateSignup";
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -38,7 +42,7 @@ function ChatTopTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <HeaderChat />
-      <TopTab.Navigator>
+      <TopTab.Navigator screenOptions={{ headerShown: false }}>
         <TopTab.Screen name="Find Contacts" component={Contacts} />
         <TopTab.Screen name="Find Groups" component={Groups} />
       </TopTab.Navigator>
@@ -49,11 +53,15 @@ function ChatTopTabNavigator() {
 function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <BottomTab.Navigator initialRouteName="Home">
-        <BottomTab.Screen name="Home" component={Home} />
+      <BottomTab.Navigator screenOptions={{headerShown: false}}>
+        <BottomTab.Screen name="Home" component={Home} options={{
+          tabBarIcon: () => {
+            return <Ionicons name="ios-home-outline" size={24} color="black" />
+          }
+        }} />
         <BottomTab.Screen
           name="Chats"
-          options={{ tabBarLabel: "Chats" }}
+          options={{ tabBarLabel: 'Chats', tabBarIcon: () => <Ionicons name="ios-chatbubbles-outline" size={24} color="black" /> }}
           children={() => (
             <>
               <HeaderChat />
@@ -65,7 +73,9 @@ function ChatBottomTabNavigator() {
             </>
           )}
         />
-        <BottomTab.Screen name="Forum" component={MyStack} />
+        <BottomTab.Screen name="Forum" component={MyStack} options={{
+          tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="black" />
+        }}/>
       </BottomTab.Navigator>
     </SafeAreaView>
   );
@@ -74,18 +84,11 @@ function ChatStack() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Stack.Navigator>
-        <Stack.Screen
-          name="ChatList"
-          component={ChatBottomTabNavigator}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Chat"
-          component={Chat}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="Group Chat" component={GroupChat} />
+        <Stack.Screen name="ChatList" component={ChatBottomTabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
+        <Stack.Screen name="Group Chat" component={GroupChat} options={{ headerShown: false }} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
+        <Stack.Screen name="RequestJoin" component={RequestJoin} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen
           name="DetailProf"
@@ -107,8 +110,8 @@ function ChatStack() {
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Signup" component={Signup} />
+      <Stack.Screen name="Login" component={LoginView} />
+      <Stack.Screen name="Signup" component={SignUpView} />
     </Stack.Navigator>
   );
 }
@@ -141,7 +144,7 @@ function RootNavigator() {
           userId: userData[0][1],
           email: userData[1][1],
           username: userData[2][1],
-          profileImageUrl: userData[3][1],
+          profileImageUrl: userData[3][1] || "",
         })
       );
 

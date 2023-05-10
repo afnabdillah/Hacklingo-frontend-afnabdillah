@@ -5,8 +5,10 @@ import React, {
     useCallback,
     useContext,
 } from 'react';
-import { TouchableOpacity, Text, View } from 'react-native';
-import { GiftedChat, Bubble } from 'react-native-gifted-chat';
+import bg from '../assets/BG.png'
+
+import { TouchableOpacity, Text, View, ImageBackground, StyleSheet, Image } from 'react-native';
+import { GiftedChat, Bubble, InputToolbar, Actions } from 'react-native-gifted-chat';
 import {
     collection,
     addDoc,
@@ -22,8 +24,16 @@ import { signOut } from 'firebase/auth';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import { auth, database } from '../config/firebase';
 import { getDocs } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Entypo, FontAwesome } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { AntDesign, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { PopChatMenu } from './HeadersChat/PopChatMenu';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function GroupChat({ route, navigation }) {
+    const [userEmail, setUserEmail] = useState(null);
+    const [username, setUsername] = useState(null);
     const [messages, setMessages] = useState([]);
     const { groupId, groupName } = route.params;
     const { user: currentUser } = useContext(AuthenticatedUserContext);
@@ -32,27 +42,16 @@ export default function GroupChat({ route, navigation }) {
     const [groupMembers, setGroupMembers] = useState([]);
     const [groupAdmin, setGroupAdmin] = useState(null);
 
-
-    async function getUsernameByEmail(email) {
-        const usersCollectionRef = collection(database, 'users');
-        const q = query(usersCollectionRef, where('email', '==', email));
-        const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) {
-            return null;
-        } else {
-            const doc = querySnapshot.docs[0];
-            return doc.data().username;
-        }
-    }
-
     useEffect(() => {
-        async function fetchUsername() {
-            const getUsername = await getUsernameByEmail(currentUser.email);
-            return getUsername;
-        }
-        fetchUsername().then((username) => setCurrentUsername(username));
-    }, [currentUser]);
+        const fetchUserData = async () => {
+            const email = await AsyncStorage.getItem("email");
+            const username = await AsyncStorage.getItem("username");
+            setUserEmail(email);
+            setUsername(username);
+        };
 
+        fetchUserData();
+    }, []);
     const mergeMessages = (oldMessages, newMessages) => {
         const allMessages = [...oldMessages, ...newMessages];
         const uniqueMessages = allMessages.filter(
@@ -96,7 +95,7 @@ export default function GroupChat({ route, navigation }) {
 
     const onSend = useCallback(
         (messages = []) => {
-            if (!currentUser) {
+            if (!userEmail) {
                 console.error(
                     'User data not loaded yet. Please try again later.'
                 );
@@ -112,9 +111,9 @@ export default function GroupChat({ route, navigation }) {
                 createdAt,
                 text,
                 user: {
-                    _id: currentUser.email,
-                    username: currentUsername,
-                    avatar: currentUser.avatar || 'https://i.pravatar.cc/300',
+                    _id: userEmail,
+                    username: username,
+                    avatar: currentUser?.avatar || 'https://i.pravatar.cc/300',
                 },
             };
 
@@ -123,7 +122,7 @@ export default function GroupChat({ route, navigation }) {
                 messages: arrayUnion(messageObj),
             });
         },
-        [currentUser, groupId, currentUsername]
+        [userEmail, groupId, username]
     );
     const renderUsername = (currentMessage) => {
         return (
@@ -133,33 +132,53 @@ export default function GroupChat({ route, navigation }) {
         );
     };
     useLayoutEffect(() => {
-        if (currentUser && groupAdmin && currentUser.email === groupAdmin) {
-            navigation.setOptions({
-                headerRight: () => (
+        navigation.setOptions({
+            headerRight: () => (
+                <View style={{ flexDirection: 'row', marginRight: 10 }}>
                     <TouchableOpacity
                         onPress={() =>
-                            navigation.navigate('CreateGroupChat', {
-                                groupId,
-                                groupName,
-                                groupLanguage,
-                                groupMembers,
-                                editMode: true,
-                            })
+                            navigation.navigate('Video Chat', { roomId: groupId, username: username })
                         }
                         style={{ marginRight: 10 }}
                     >
-                        <Text style={{ color: '#0D47A1', fontSize: 16 }}>Edit Group</Text>
+                        <MaterialIcons name="video-call" size={24} color="#0D47A1" />
                     </TouchableOpacity>
-                ),
-            });
-        } else {
-            navigation.setOptions({ headerRight: null });
-        }
-    }, [navigation, groupId, groupName, groupLanguage, groupMembers, currentUser, groupAdmin]);
+                    {userEmail && groupAdmin && userEmail === groupAdmin && (
+                        <>
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.navigate('RequestJoin', { groupId })
+                                }
+                                style={{ marginRight: 10 }}
+                            >
+                                <Entypo name="add-user" size={24} color="#0D47A1" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.navigate('CreateGroupChat', {
+                                        groupId,
+                                        groupName,
+                                        groupLanguage,
+                                        groupMembers,
+                                        editMode: true,
+                                    })
+                                }
+                            >
+                                <FontAwesome name="gear" size={24} color="#0D47A1" />
+                            </TouchableOpacity>
+                        </>
+                    )}
+                </View>
+            ),
+        });
+    }, [navigation, groupId, groupName, groupLanguage, groupMembers, userEmail, groupAdmin]);
+
+
+
 
 
     const renderBubble = (props) => {
-        const isCurrentUser = props.currentMessage.user._id === currentUser.email;
+        const isCurrentUser = props.currentMessage.user._id === userEmail;
         const bubbleBackgroundColor = isCurrentUser ? '#1f75fe  ' : '#fffff';
 
         return (
@@ -175,18 +194,66 @@ export default function GroupChat({ route, navigation }) {
             </View>
         );
     };
-
     return (
-        <GiftedChat
-            messages={messages}
-            showAvatarForEveryMessage={true}
-            onSend={(messages) => onSend(messages)}
-            user={{
-                _id: currentUser.email,
-                username: currentUser.username,
-                avatar: currentUser.avatar || 'https://i.pravatar.cc/300',
-            }}
-            renderBubble={renderBubble}
-        />
+        <View style={{ flex: 1 }}>
+            <GiftedChat
+                messages={messages}
+                showAvatarForEveryMessage={true}
+                onSend={messages => onSend(messages)}
+                user={{
+                    _id: userEmail,
+                    username: username,
+                    avatar: currentUser?.avatar || 'https://i.pravatar.cc/300',
+                }}
+                renderBubble={renderBubble}
+            />
+        </View>
     );
 }
+
+    const styles = StyleSheet.create({
+        headers: {
+            flexDirection: 'row',
+            backgroundColor: '#fff',
+            height: 50,
+            alignItems: 'center',
+            paddingLeft: 10,
+            paddingRight: 10,
+            paddingBottom: 10,
+            paddingTop: 10,
+            flex: 0.06,
+            justifyContent: 'space-between'
+        },
+        container: {
+            flexDirection: 'row',
+            backgroundColor: 'whitesmoke',
+            padding: 5,
+            marginHorizontal: 10,
+            alignItems: 'center',
+            borderRadius: 20,
+        },
+        input: {
+            flex: 1,
+            backgroundColor: 'white',
+            padding: 5,
+            paddingHorizontal: 10,
+            marginHorizontal: 10,
+            borderRadius: 50,
+            borderColor: 'lightgray',
+            borderWidth: StyleSheet.hairlineWidth
+
+        },
+        send: {
+            backgroundColor: 'royalblue',
+            padding: 7,
+            borderRadius: 15,
+            overflow: 'hidden',
+        },
+        image: {
+            width: 45,
+            height: 45,
+            borderRadius: 30,
+            marginRight: 10,
+            marginLeft: 10
+        },
+    })

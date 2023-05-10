@@ -8,37 +8,56 @@ import { Image } from 'react-native';
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { HeaderChat } from './HeadersChat/HeaderChat';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSelector } from 'react-redux';
 dayjs.extend(relativeTime);
 
 
 function ChatList() {
   const [chats, setChats] = useState([]);
   const navigation = useNavigation();
+  // const [userEmail, setUserEmail] = useState(null);
+  const [username, setUsername] = useState(null);
   const { user } = useContext(AuthenticatedUserContext);
+  const userEmail = useSelector((state) => state.authReducer.email);
+
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     const email = await AsyncStorage.getItem("email");
+  //     const username = await AsyncStorage.getItem("username");
+  //     setUserEmail(email);
+  //     setUsername(username);
+  //   };
+
+  //   fetchUserData();
+  // }, []);
 
   useEffect(() => {
-    if (!user) return;
+    console.log(userEmail, "<<< ini userEmail di use Effect")
+    if (!userEmail) return;
     const personalChatsRef = collection(database, 'personalChats');
     const personalChatsQuery = query(personalChatsRef);
     const personalChatsUnsubscribe = onSnapshot(personalChatsQuery, snapshot => {
       const personalChatsData = snapshot.docs.map(doc => ({ ...doc.data(), chatId: doc.id, isGroup: false }));
       const userChats = personalChatsData.filter(chat => {
-        return chat.users.some(userObj => userObj.email === user.email);
+        return chat.users.some(userObj => userObj.email === userEmail);
       });
 
 
-      setChats(prevChats => mergeChatLists(prevChats, userChats, user.email));
+      setChats(prevChats => mergeChatLists(prevChats, userChats, userEmail));
     });
 
     return () => {
       personalChatsUnsubscribe();
     };
-  }, [user]);
+  }, [userEmail]);
 
-  const mergeChatLists = (prevChats, newChats, currentUserEmail) => {
+  console.log(chats, "<<< ini chats");
+
+  const mergeChatLists = (prevChats, newChats, userEmail) => {
     const mergedChats = newChats
       .map(chat => {
-        const recipient = chat.users.find(user => user !== currentUserEmail);
+        const recipient = chat.users.find(user => user !== userEmail);
         return { ...chat, recipient };
       })
       .sort((a, b) => b.createdAt - a.createdAt);
@@ -51,7 +70,7 @@ function ChatList() {
         keyExtractor={item => item.chatId}
         renderItem={({ item }) => {
           const lastMessage = item.messages[item.messages.length - 1];
-          const otherUser = item.users.find(u => u.email !== user.email);
+          const otherUser = item.users.find(u => u.email !== userEmail);
           return (
             <TouchableOpacity style={styles.container} onPress={() => {
               navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username });

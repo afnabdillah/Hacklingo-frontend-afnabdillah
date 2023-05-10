@@ -42,6 +42,8 @@ export const fetchUsersByNativeLanguage = createAsyncThunk(
   async (nativeLanguage, { rejectWithValue }) => {
     try {
       const userId = await AsyncStorage.getItem("userid");
+      console.log(userId, "<<< userId di function")
+      console.log(nativeLanguage,"<<< language di function")
       const response = await axios({
         method: "GET",
         url: `${base_url}/users`,
@@ -52,6 +54,7 @@ export const fetchUsersByNativeLanguage = createAsyncThunk(
           nativeLanguage,
         },
       });
+      console.log(response.data, "<<< response di function")
       return response.data;
     } catch (err) {
       if (err.response) {
@@ -101,6 +104,7 @@ export const userLogin = createAsyncThunk(
         data: input,
       });
       // Login to firebase after success
+      console.log(response.data, "<<< response login")
       await signInWithEmailAndPassword(auth, email, password);
       await saveToAsyncStorage(response.data);
       dispatch(
@@ -108,7 +112,7 @@ export const userLogin = createAsyncThunk(
           userId: response.data._id,
           email: response.data.email,
           username: response.data.username,
-          profileImageUrl: response.data.profileImageUrl,
+          profileImageUrl: response.data.profileImageUrl || "",
         })
       );
       return true;
@@ -124,7 +128,7 @@ export const userLogin = createAsyncThunk(
 
 export const userSignUp = createAsyncThunk(
   "usersSlice/userSignUp",
-  async (input, { rejectWithValue }) => {
+  async (input, { rejectWithValue, dispatch }) => {
     try {
       // these are temporary additionals
       const additionals = {
@@ -155,8 +159,15 @@ export const userSignUp = createAsyncThunk(
       });
       // Save it to async storage
       await saveToAsyncStorage(response.data);
-      const userId = await AsyncStorage.getItem("itemid");
-      return userId;
+      dispatch(
+        loginSuccess({
+          userId: response.data._id,
+          email: response.data.email,
+          username: response.data.username,
+          profileImageUrl: response.data.profileImageUrl || "",
+        })
+      );
+      return true;
     } catch (err) {
       // return err.response if it was an axios error with reject with value
       if (err.response) {

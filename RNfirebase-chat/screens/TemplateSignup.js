@@ -1,229 +1,282 @@
-import React, { useState } from 'react'
-import { EvilIcons,AntDesign } from '@expo/vector-icons';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert, SafeAreaView, Modal } from 'react-native'
-import SelectDropdown from 'react-native-select-dropdown';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import React, { useState, useEffect } from "react";
+import { EvilIcons, AntDesign } from "@expo/vector-icons";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Alert,
+  SafeAreaView,
+  Modal,
+} from "react-native";
+import SelectDropdown from "react-native-select-dropdown";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { useDispatch, useSelector } from "react-redux";
+import showToast from "../helper/showToast";
+import { userSignUp } from "../stores/usersSlice";
+import { ActivityIndicator } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 
 export default SignUpView = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [language, setLanguage] = useState("");
+  // const [columns, setColumns] = useState([""]);
+  const [columns, setColumns] = useState([{ id: 0, value: "" }]);
+  const signUpStatus = useSelector(
+    (state) => state.usersReducer.status.userSignUp
+  );
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const countries = [
-    'Egypt',
-    'Canada',
-    'Australia',
-    'Ireland',
-    'Brazil',
-    'England',
-    'Dubai',
-    'France',
-    'Germany',
-    'Saudi Arabia',
-    'Argentina',
-    'India',
+    "English",
+    "Indonesian/Bahasa Indonesia",
+    "Japanase/日本語",
+    "German/Deutsch",
+    "French/Français",
+    "Spanish/Español",
+    "Dutch/Nederlands",
   ];
 
-  const [fullName, setFullName] = useState()
-  const [email, setEmail] = useState()
-  const [password, setPassword] = useState()
-
-  showAlert = viewId => {
-    Alert.alert('Alert', 'Button pressed ' + viewId)
-  }
-  const [language, setLanguage] = useState("");
-  const [ chooseData, setchooseData] = useState('Select Native Language')
-  const [isModalVisible, setisModalVisible] = useState(false)
-    
-  const changeModalVisibility = (bool) => {
-      setisModalVisible(bool)
-  }
-
-  const setData = (option) => {
-      setchooseData(option)
-  }
-
-  const [columns, setColumns] = useState(['']);
+  const onHandleSignup = async () => {
+    if (
+      email !== "" &&
+      password !== "" &&
+      fullName !== "" &&
+      language !== "" &&
+      columns[0] !== ""
+    ) {
+      console.log("masuk sini");
+      dispatch(
+        userSignUp({
+          email,
+          password,
+          username: fullName,
+          nativeLanguage: language,
+          targetLanguage: columns,
+        })
+      )
+        .unwrap()
+        .catch((err) => {
+          showToast("error", "Sign Up Error", err.message);
+        });
+    }
+  };
 
   const addColumn = () => {
-    setColumns([...columns, '']);
+    const newId =
+      columns.length > 0
+        ? Math.max(...columns.map((column) => column.id)) + 1
+        : 0;
+    setColumns([...columns, { id: newId, value: "" }]);
   };
 
-  const removeColumn = (index) => {
-    const updatedColumns = [...columns];
-    updatedColumns.splice(index, 1);
+  const removeColumn = (id) => {
+    const updatedColumns = columns.filter((column) => column.id !== id);
     setColumns(updatedColumns);
   };
 
-  const handleColumnChange = (value, index) => {
-    const updatedColumns = [...columns];
-    updatedColumns[index] = value;
+  const handleColumnChange = (value, id) => {
+    const updatedColumns = columns.map((column) =>
+      column.id === id ? { ...column, value } : column
+    );
     setColumns(updatedColumns);
   };
-  
 
   return (
     <View style={styles.container}>
+      {signUpStatus === "loading" && <ActivityIndicator />}
       <View style={styles.inputContainer}>
         <Image
           style={styles.inputIcon}
-          source={{ uri: 'https://img.icons8.com/ios-glyphs/512/user-male-circle.png' }}
+          source={{
+            uri: "https://img.icons8.com/ios-glyphs/512/user-male-circle.png",
+          }}
         />
         <TextInput
           style={styles.inputs}
           placeholder="Full name"
           keyboardType="email-address"
           underlineColorAndroid="transparent"
-          onChangeText={fullName => setFullName({ fullName })}
+          onChangeText={(fullName) => setFullName(fullName)}
         />
       </View>
 
       <View style={styles.inputContainer}>
         <Image
           style={styles.inputIcon}
-          source={{ uri: 'https://img.icons8.com/ios-filled/512/circled-envelope.png' }}
+          source={{
+            uri: "https://img.icons8.com/ios-filled/512/circled-envelope.png",
+          }}
         />
         <TextInput
           style={styles.inputs}
           placeholder="Email"
           keyboardType="email-address"
           underlineColorAndroid="transparent"
-          onChangeText={email => setEmail({ email })}
+          onChangeText={(email) => setEmail(email)}
         />
       </View>
       <View style={styles.inputContainer}>
         <Image
           style={styles.inputIcon}
-          source={{ uri: 'https://img.icons8.com/ios-glyphs/512/key.png' }}
+          source={{ uri: "https://img.icons8.com/ios-glyphs/512/key.png" }}
         />
         <TextInput
           style={styles.inputs}
           placeholder="Password"
           secureTextEntry={true}
           underlineColorAndroid="transparent"
-          onChangeText={password => setPassword({ password })}
+          onChangeText={(password) => setPassword(password)}
         />
       </View>
       <View style={styles.inputContainer}>
-      <SelectDropdown
-            data={countries}
-            // defaultValueByIndex={1}
-            // defaultValue={'Egypt'}
-            onSelect={(selectedItem, index) => {
-              console.log(selectedItem, index);
-            }}
-            defaultButtonText={'Select native Language'}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              return item;
-            }}
-            buttonStyle={styles.dropdown1BtnStyle}
-            buttonTextStyle={styles.dropdown1BtnTxtStyle}
-            renderDropdownIcon={isOpened => {
-              return <FontAwesome name={isOpened ? 'chevron-up' : 'chevron-down'} color={'white'} size={18} />;
-            }}
-            dropdownIconPosition={'right'}
-            dropdownStyle={styles.dropdown1DropdownStyle}
-            rowStyle={styles.dropdown1RowStyle}
-            rowTextStyle={styles.dropdown1RowTxtStyle}
-          />
+        <SelectDropdown
+          data={countries}
+          // defaultValueByIndex={1}
+          // defaultValue={'Egypt'}
+          defaultButtonText={"Select Native Language"}
+          buttonTextAfterSelection={(selectedItem, index) => {
+            return selectedItem;
+          }}
+          rowTextForSelection={(item, index) => {
+            return item;
+          }}
+          buttonStyle={styles.dropdown1BtnStyle}
+          buttonTextStyle={styles.dropdown1BtnTxtStyle}
+          renderDropdownIcon={(isOpened) => {
+            return (
+              <FontAwesome
+                name={isOpened ? "chevron-up" : "chevron-down"}
+                color={"white"}
+                size={18}
+              />
+            );
+          }}
+          dropdownIconPosition={"right"}
+          dropdownStyle={styles.dropdown1DropdownStyle}
+          rowStyle={styles.dropdown1RowStyle}
+          rowTextStyle={styles.dropdown1RowTxtStyle}
+          onSelect={(item) => setLanguage(item)}
+        />
       </View>
-      
+
       <View>
-      {columns.map((column, index) => (
-        <View key={index} style={styles.inputContainer}>
-          <SelectDropdown
-            data={countries}
-            // defaultValueByIndex={1}
-            // defaultValue={'Egypt'}
-            onSelect={(selectedItem, index) => {
-              console.log(selectedItem, index);
-            }}
-            defaultButtonText={'Select Target Language'}
-            buttonTextAfterSelection={(selectedItem, index) => {
-              return selectedItem;
-            }}
-            rowTextForSelection={(item, index) => {
-              return item;
-            }}
-            buttonStyle={styles.dropdown1BtnStyle}
-            buttonTextStyle={styles.dropdown1BtnTxtStyle}
-            renderDropdownIcon={isOpened => {
-              return <FontAwesome name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#f8f8ff'} size={18} />;
-            }}
-            dropdownIconPosition={'right'}
-            dropdownStyle={styles.dropdown1DropdownStyle}
-            rowStyle={styles.dropdown1RowStyle}
-            rowTextStyle={styles.dropdown1RowTxtStyle}
-          />
-          {columns.length > 1 && (
-            <TouchableOpacity onPress={() => removeColumn(index)}>
-              <AntDesign name="delete" size={18} color="black" />
+        {columns.map((column, index) => (
+          <View key={column.id} style={styles.inputContainer}>
+            <SelectDropdown
+              data={countries}
+              defaultButtonText={"Select Target Language"}
+              buttonTextAfterSelection={(selectedItem, index) => {
+                return selectedItem;
+              }}
+              rowTextForSelection={(item, index) => {
+                return item;
+              }}
+              buttonStyle={styles.dropdown1BtnStyle}
+              buttonTextStyle={styles.dropdown1BtnTxtStyle}
+              renderDropdownIcon={(isOpened) => {
+                return (
+                  <FontAwesome
+                    name={isOpened ? "chevron-up" : "chevron-down"}
+                    color={"#f8f8ff"}
+                    size={18}
+                  />
+                );
+              }}
+              dropdownIconPosition={"right"}
+              dropdownStyle={styles.dropdown1DropdownStyle}
+              rowStyle={styles.dropdown1RowStyle}
+              rowTextStyle={styles.dropdown1RowTxtStyle}
+              onSelect={(value) => handleColumnChange(value, column.id)}
+            />
+            {columns.length > 1 && (
+              <TouchableOpacity onPress={() => removeColumn(column.id)}>
+                <AntDesign name="delete" size={18} color="black" />
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity onPress={addColumn} style={styles.addButton}>
+              <EvilIcons name="plus" size={24} color="black" />
             </TouchableOpacity>
-          )}
-      <TouchableOpacity onPress={addColumn} style={styles.addButton}>
-        <EvilIcons name="plus" size={24} color="black" />
-      </TouchableOpacity>
-        </View>
-      ))}
+          </View>
+        ))}
       </View>
       <TouchableOpacity
+        onPress={() => navigation.navigate("Login")}
+        style={styles.buttonContainer}
+      >
+        <Text
+          style={{
+            textDecorationLine: "underline",
+            color: "blue",
+            fontSize: 12,
+          }}
+        >
+          Already have an account? login here
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
         style={[styles.buttonContainer, styles.signupButton]}
-        onPress={() => showAlert('sign_up')}>
+        onPress={onHandleSignup}
+      >
         <Text style={styles.signUpText}>Sign up</Text>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#B0E0E6',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#B0E0E6",
   },
   inputContainer: {
-    borderBottomColor: '#F5FCFF',
-    backgroundColor: '#FFFFFF',
+    borderBottomColor: "#F5FCFF",
+    backgroundColor: "#FFFFFF",
     borderRadius: 30,
     borderBottomWidth: 1,
     width: 250,
     height: 45,
     marginBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    
+    flexDirection: "row",
+    alignItems: "center",
   },
   inputs: {
     height: 45,
     marginLeft: 16,
-    borderBottomColor: '#FFFFFF',
+    borderBottomColor: "#FFFFFF",
     flex: 1,
   },
   inputIcon: {
     width: 30,
     height: 30,
     marginLeft: 15,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   buttonContainer: {
     height: 45,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 20,
     width: 250,
     borderRadius: 30,
   },
   signupButton: {
-    backgroundColor: '#3498db',
+    backgroundColor: "#3498db",
   },
   signUpText: {
-    color: 'white',
+    color: "white",
   },
   TouchableOpacity: {
-    backgroundColor: 'white',
-    alignSelf: 'stretch',
+    backgroundColor: "white",
+    alignSelf: "stretch",
     paddingHorizontal: 20,
     marginHorizontal: 20,
   },
@@ -239,18 +292,25 @@ const styles = StyleSheet.create({
   addButton: {
     paddingVertical: 5,
     paddingHorizontal: 8,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   dropdown1BtnStyle: {
-    width: '80%',
+    width: "80%",
     height: 45,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 30,
     // borderWidth: 1,
-    borderColor: '#444',
+    borderColor: "#444",
   },
-  dropdown1BtnTxtStyle: {color: '#444', right: 30, fontSize: 13},
-  dropdown1RowStyle: { backgroundColor: '#EFEFEF', borderBottomColor: '#C5C5C5'},
-  dropdown1DropdownStyle: { backgroundColor: '#EFEFEF', borderRadius:30 ,width:250},
-  dropdown1RowTxtStyle: {color: '#444', alignSelf: 'center'},
-})
+  dropdown1BtnTxtStyle: { color: "#444", right: 30, fontSize: 13 },
+  dropdown1RowStyle: {
+    backgroundColor: "#EFEFEF",
+    borderBottomColor: "#C5C5C5",
+  },
+  dropdown1DropdownStyle: {
+    backgroundColor: "#EFEFEF",
+    borderRadius: 30,
+    width: 250,
+  },
+  dropdown1RowTxtStyle: { color: "#444", alignSelf: "center" },
+});

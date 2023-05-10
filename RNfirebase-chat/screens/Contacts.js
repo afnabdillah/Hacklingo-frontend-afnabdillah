@@ -11,6 +11,7 @@ import AuthenticatedUserContext from "../helper/AuthenticatedUserContext";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersByNativeLanguage, fetchUsersBySearch } from "../stores/usersSlice";
 
+
 function Contacts({ navigation }) {
   const [contacts, setContacts] = useState([]);
   const { user } = useContext(AuthenticatedUserContext);
@@ -24,13 +25,7 @@ function Contacts({ navigation }) {
   const userEmail = useSelector((state) => state.authReducer.email);
   const userProfileImageUrl = useSelector((state) => state.authReducer.profileImageUrl);
   const username = useSelector((state) => state.authReducer.username);
-
   const contactsList = usersBySearch.filter((user) => user._id !== userId);
-
-  console.log(userId, "<<<< ini userId");
-  console.log(userEmail, "<<<< ini userEmail");
-  console.log(userProfileImageUrl, "<<<< ini userProfileImage");
-  console.log(username, "<<<< ini username");
 
   useEffect(() => {
     dispatch(fetchUsersByNativeLanguage("Indonesian/Bahasa Indonesia"));
