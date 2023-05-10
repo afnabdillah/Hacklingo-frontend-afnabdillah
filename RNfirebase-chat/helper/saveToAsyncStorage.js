@@ -5,7 +5,8 @@ async function saveToAsyncStorage(data) {
     const storageItems = [
       ["username", data.username],
       ["email", data.email],
-      ["userid", data._id]
+      ["userid", data._id],
+      ["profileimageurl", data.profileImageUrl || ""]
     ] 
     await AsyncStorage.multiSet(storageItems);
   } catch(err) {

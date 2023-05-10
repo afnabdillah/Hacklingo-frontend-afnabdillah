@@ -1,4 +1,4 @@
-import 'expo-dev-client';
+import "expo-dev-client";
 import React, { useState, useContext, useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
@@ -11,14 +11,14 @@ import ChatList from "./screens/Chatlist";
 import Contacts from "./screens/Contacts";
 import GroupChat from "./screens/GroupChat";
 import Groups from "./screens/Group";
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { HeaderChat } from './screens/HeadersChat/HeaderChat';
-import CreateGroupChat from './screens/CreateGroupChat'; // Import the CreateGroupChat component
-import Profile from './components/Profile';
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { HeaderChat } from "./screens/HeadersChat/HeaderChat";
+import CreateGroupChat from "./screens/CreateGroupChat"; // Import the CreateGroupChat component
+import Profile from "./components/Profile";
 import { onAuthStateChanged } from "@firebase/auth";
 import { auth } from "./config/firebase";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
 import toastConfig from "./config/toastConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Provider, useDispatch, useSelector } from 'react-redux';
@@ -29,7 +29,7 @@ import Home from './screens/Home'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { loginSuccess } from './stores/authSlice';
 import MyStack from './components/forum/stack';
-// import RequestJoin from './screens/RequestJoin';
+import RequestJoin from './screens/RequestJoin';
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -54,7 +54,7 @@ function ChatBottomTabNavigator() {
         <BottomTab.Screen name="Home" component={Home} />
         <BottomTab.Screen
           name="Chats"
-          options={{ tabBarLabel: 'Chats' }}
+          options={{ tabBarLabel: 'Chats', headerShown: false }}
           children={() => (
             <>
               <HeaderChat />
@@ -79,11 +79,20 @@ function ChatStack() {
         <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
         <Stack.Screen name="Group Chat" component={GroupChat} options={{ headerShown: false }} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
+        <Stack.Screen name="RequestJoin" component={RequestJoin} />
         <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="DetailProf" component={DetailProfile} options={{
-          title: "Contact Info"
-        }} />
-        <Stack.Screen name="Video Chat" component={VideoChat} options={{ headerShown: false }} />
+        <Stack.Screen
+          name="DetailProf"
+          component={DetailProfile}
+          options={{
+            title: "Contact Info",
+          }}
+        />
+        <Stack.Screen
+          name="Video Chat"
+          component={VideoChat}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </SafeAreaView>
   );
@@ -111,13 +120,24 @@ const AuthenticatedUserProvider = ({ children }) => {
 function RootNavigator() {
   const { user, setUser } = useContext(AuthenticatedUserContext);
   const [isLoading, setIsLoading] = useState(true);
-  const userId = useSelector(state => state.authReducer.userId)
-  const dispatch = useDispatch()
-  console.log(userId, "<<<< userData")
+  const userId = useSelector((state) => state.authReducer.userId);
+  const dispatch = useDispatch();
   useEffect(() => {
     const checkAsyncStorage = async () => {
-      const userData = await AsyncStorage.multiGet(["userid", "email", "username"]);
-      dispatch(loginSuccess({ userId: userData[0][1], email: userData[1][1], username: userData[2][1] }));
+      const userData = await AsyncStorage.multiGet([
+        "userid",
+        "email",
+        "username",
+        "profileimageurl",
+      ]);
+      dispatch(
+        loginSuccess({
+          userId: userData[0][1],
+          email: userData[1][1],
+          username: userData[2][1],
+          profileImageUrl: userData[3][1] || "",
+        })
+      );
 
       const unsubscribeAuth = onAuthStateChanged(auth, (authenticatedUser) => {
         authenticatedUser ? setUser(authenticatedUser) : setUser(null);
@@ -142,7 +162,11 @@ function RootNavigator() {
     <NavigationContainer>
       {userId ? (
         <Stack.Navigator>
-          <Stack.Screen name="ChatStack" component={ChatStack} options={{ headerShown: false }} />
+          <Stack.Screen
+            name="ChatStack"
+            component={ChatStack}
+            options={{ headerShown: false }}
+          />
         </Stack.Navigator>
       ) : (
         <AuthStack />

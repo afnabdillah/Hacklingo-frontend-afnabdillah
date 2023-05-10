@@ -7,7 +7,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth, database } from "../config/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, updateDoc } from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
 import { NavigationActions, StackActions } from "react-navigation";
 import base_url from "./base_url";
@@ -42,6 +42,8 @@ export const fetchUsersByNativeLanguage = createAsyncThunk(
   async (nativeLanguage, { rejectWithValue }) => {
     try {
       const userId = await AsyncStorage.getItem("userid");
+      console.log(userId, "<<< userId di function")
+      console.log(nativeLanguage,"<<< language di function")
       const response = await axios({
         method: "GET",
         url: `${base_url}/users`,
@@ -52,6 +54,7 @@ export const fetchUsersByNativeLanguage = createAsyncThunk(
           nativeLanguage,
         },
       });
+      console.log(response.data, "<<< response di function")
       return response.data;
     } catch (err) {
       if (err.response) {
@@ -101,6 +104,7 @@ export const userLogin = createAsyncThunk(
         data: input,
       });
       // Login to firebase after success
+      console.log(response.data, "<<< response login")
       await signInWithEmailAndPassword(auth, email, password);
       await saveToAsyncStorage(response.data);
       dispatch(
@@ -108,6 +112,7 @@ export const userLogin = createAsyncThunk(
           userId: response.data._id,
           email: response.data.email,
           username: response.data.username,
+          profileImageUrl: response.data.profileImageUrl || "",
         })
       );
       return true;
@@ -194,7 +199,11 @@ export const updateUserDetails = createAsyncThunk(
         },
         data: input,
       });
-      console.log(response.data, "<<< ini hasil dari axios");
+      // Save it to firebase database
+      await updateDoc(collection(database, "users"), {
+        username: response.data.username,
+        profileImageUrl: response.data.profileImageUrl
+      });
       return response.data;
     } catch (err) {
       // return err.response if it was an axios error with reject with value

@@ -1,34 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import base_url from "./base_url";
-
-// export const fetchArticles = createAsyncThunk(
-//   "articlesSlice/fetchArticles", // this is the action name
-//   async (input, { rejectWithValue }) => {
-//     // this is the action
-//     try {
-//       const userId = await AsyncStorage.getItem("userid");
-//       const response = await axios({
-//         method: "GET",
-//         url: `${base_url}/articles`,
-//         headers: {
-//           userid: userId,
-//         },
-//         params : {
-//           search : input
-//         }
-//       });
-//       return response.data;
-//     } catch (err) {
-//       if (err.response) {
-//         return rejectWithValue(err.response.data);
-//       } else {
-//         throw err;
-//       }
-//     }
-//   }
-// );
+import { createSlice } from "@reduxjs/toolkit";
 
 const authSlice = createSlice({
     name: "authSlice",
@@ -42,11 +12,13 @@ const authSlice = createSlice({
             state.userId = action.payload.userId
             state.email = action.payload.email
             state.username = action.payload.username
+            state.profileImageUrl = action.payload.profileImageUrl
         },
         logout(state){
             state.userId = null
             state.email = null
             state.username = null
+            state.profileImageUrl = null
         }
     },
   });

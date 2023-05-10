@@ -23,8 +23,7 @@ import {
 } from 'firebase/firestore';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext'
 import { auth, database } from '../config/firebase';
-import { logoutUser } from '../stores/usersSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import bg from '../assets/BG.png'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View } from 'react-native';
@@ -35,6 +34,7 @@ import { PopChatMenu } from './HeadersChat/PopChatMenu';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Chat({ route }) {
 
@@ -78,37 +78,26 @@ export default function Chat({ route }) {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageView, setSeletedImageView] = useState("");
-
+  const [userEmail, setUserEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [messages, setMessages] = useState([]);
-  const { recipientEmail, recipientName } = route.params;
-  const { user: currentUser } = useContext(AuthenticatedUserContext);
+  const { recipientEmail, recipientName, senderEmail } = route.params;
+  // const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [roomId, setRoomId] = useState(null);
+  const currentUserUsername = useSelector(state => state.authReducer.username);
+  const currentUserProfileImageUrl = useSelector(state => state.authReducer.profileImageUrl);
 
   const dispatch = useDispatch();
 
-
-  async function getUserDataByEmail(email) {
-    const usersCollectionRef = collection(database, 'users');
-    const q = query(usersCollectionRef, where('email', '==', email));
-    const querySnapshot = await getDocs(q);
-
-    if (!querySnapshot.empty) {
-      const userDoc = querySnapshot.docs[0];
-      return userDoc.data();
-    } else {
-      return null;
-    }
-  }
-
   useEffect(() => {
-    async function fetchCurrentUserData() {
-      const userData = await getUserDataByEmail(currentUser.email);
-      setCurrentUserData(userData);
-    }
+    // async function fetchCurrentUserData() {
+    //   const userData = await getUserDataByEmail(senderEmail);
+    //   setCurrentUserData(userData);
+    // }
 
-    fetchCurrentUserData();
-  }, [currentUser]);
+    // fetchCurrentUserData();
+  }, [senderEmail]);
 
   const mergeMessages = (oldMessages, newMessages) => {
     const allMessages = [...oldMessages, ...newMessages];
@@ -126,7 +115,7 @@ export default function Chat({ route }) {
   };
 
   useEffect(() => {
-    const createRoomId = generateRoomId(currentUser.email, recipientEmail);
+    const createRoomId = generateRoomId(senderEmail, recipientEmail);
     const roomDocRef = doc(database, "personalChats", createRoomId);
 
     const unsubscribe = onSnapshot(roomDocRef, (docSnapshot) => {
@@ -144,9 +133,9 @@ export default function Chat({ route }) {
     return () => {
       unsubscribe();
     };
-  }, [recipientEmail, currentUser.email]);
+  }, [recipientEmail, senderEmail]);
   const onSend = useCallback(async (messages = []) => {
-    if (!currentUserData) {
+    if (!currentUserUsername) {
       console.error("User data not loaded yet. Please try again later.");
       return;
     }
@@ -154,7 +143,7 @@ export default function Chat({ route }) {
       GiftedChat.append(previousMessages, messages)
     );
 
-    const roomId = generateRoomId(currentUser.email, recipientEmail);
+    const roomId = generateRoomId(senderEmail, recipientEmail);
 
 
     const roomDocRef = doc(database, "personalChats", roomId);
@@ -164,9 +153,9 @@ export default function Chat({ route }) {
       await setDoc(roomDocRef, {
         users: [
           {
-            email: currentUser.email,
-            username: currentUserData.username,
-            avatar: currentUserData.avatar || "https://i.pravatar.cc/300",
+            email: senderEmail,
+            username: currentUserUsername,
+            avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
           },
           {
             email: recipientEmail,
@@ -182,19 +171,19 @@ export default function Chat({ route }) {
       createdAt: messages[0].createdAt,
       text: messages[0].text,
       user: {
-        _id: currentUser.email,
-        username: currentUserData.username,
-        avatar: currentUserData.avatar || "https://i.pravatar.cc/300",
+        _id: senderEmail,
+        username: currentUserUsername,
+        avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
       },
     };
 
     await updateDoc(roomDocRef, {
       messages: arrayUnion(message),
     });
-  }, [currentUserData]);
+  }, [currentUserUsername]);
   const navigation = useNavigation()
   const goToVideoChat = () => {
-    navigation.navigate("Video Chat", { roomId: roomId, username: currentUserData.username })
+    navigation.navigate("Video Chat", { roomId: roomId, username: currentUserUsername })
   }
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -219,9 +208,9 @@ export default function Chat({ route }) {
           showAvatarForEveryMessage={true}
           onSend={messages => onSend(messages)}
           user={{
-            _id: currentUser.email,
-            username: currentUser.username,
-            avatar: currentUser.avatar || 'https://i.pravatar.cc/300'
+            _id: senderEmail,
+            username: currentUserUsername,
+            avatar: currentUserProfileImageUrl || 'https://i.pravatar.cc/300'
           }}
           renderActions={(props) => (
             <Actions
