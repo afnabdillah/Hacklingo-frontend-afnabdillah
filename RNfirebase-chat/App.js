@@ -4,8 +4,6 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { View, ActivityIndicator } from "react-native";
 import AuthenticatedUserContext from "./helper/AuthenticatedUserContext";
-import Login from "./screens/Login";
-import Signup from "./screens/Signup";
 import Chat from "./screens/Chat";
 import ChatList from "./screens/Chatlist";
 import Contacts from "./screens/Contacts";
