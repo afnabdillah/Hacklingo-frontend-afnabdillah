@@ -4,7 +4,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet, Image,
+  StyleSheet,
   Image,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,7 +14,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import showToast from "../../helper/showToast";
 import { useNavigation } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
-import logo from "../../assets/HACKLINGO.png"
+import logo from "../../assets/HACKLINGO.png";
 
 export default function Post({ route }) {
   const [title, setTitle] = useState("");
@@ -48,14 +48,18 @@ export default function Post({ route }) {
       form.append("content", content);
       form.append("forumId", forumId);
       dispatch(insertNewPost(form))
-      .unwrap()
-      .then(() => {
-        showToast("success", "Insert Post Success!", "you have succesfully update your post!");
-        navigation.goBack();
-      })
-      .catch((err) => {
-        showToast("error", "Insert New Post Error", err.message)
-      });
+        .unwrap()
+        .then(() => {
+          showToast(
+            "success",
+            "Insert Post Success!",
+            "you have succesfully update your post!"
+          );
+          navigation.goBack();
+        })
+        .catch((err) => {
+          showToast("error", "Insert New Post Error", err.message);
+        });
     }
   };
 
@@ -70,55 +74,60 @@ export default function Post({ route }) {
           placeholder="Enter post title"
         />
 
-      <Text style={styles.label}>Content:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setContent}
-        value={content}
-        placeholder="Enter post content"
-      />
+        <Text style={styles.label}>Content:</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={setContent}
+          value={content}
+          placeholder="Enter post content"
+        />
 
-      <View style={{ alignItems: "center", justifyContent: "center" }}>
-        <TouchableOpacity
-          onPress={onPickImage}
-          style={{
-            marginTop: 10,
-            marginBottom: 20,
-            borderRadius: 120,
-            width: 120,
-            height: 120,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {!selectedImage ? (
-            <MaterialCommunityIcons
-              name="camera-plus"
-              color={"grey"}
-              size={45}
-            />
-          ) : (
-            <Image
-              source={{ uri: selectedImage }}
-              style={{ width: "100%", height: "100%", borderRadius: 120 }}
-            />
-          )}
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={styles.button} onPress={onCreatePost}>
-        <Text style={styles.buttonText}>Create Post</Text>
-      </TouchableOpacity>
-
-      {insertPostStatus === "loading" && (
-        <View
-          style={{marginTop:20, alignItems: "center", justifyContent: "center" }}
-        >
-          <ActivityIndicator size={20} />
-          <Text>Uploading your post ...</Text>
+        <View style={{ alignItems: "center", justifyContent: "center" }}>
+          <TouchableOpacity
+            onPress={onPickImage}
+            style={{
+              marginTop: 10,
+              marginBottom: 20,
+              borderRadius: 120,
+              width: 120,
+              height: 120,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {!selectedImage ? (
+              <MaterialCommunityIcons
+                name="camera-plus"
+                color={"grey"}
+                size={45}
+              />
+            ) : (
+              <Image
+                source={{ uri: selectedImage }}
+                style={{ width: "100%", height: "100%", borderRadius: 120 }}
+              />
+            )}
+          </TouchableOpacity>
         </View>
-      )}
-    </View>
+
+        <TouchableOpacity style={styles.button} onPress={onCreatePost}>
+          <Text style={styles.buttonText}>Create Post</Text>
+        </TouchableOpacity>
+
+        {insertPostStatus === "loading" && (
+          <View
+            style={{
+              marginTop: 20,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ActivityIndicator size={20} />
+            <Text>Uploading your post ...</Text>
+          </View>
+        )}
+      </View>
+    </>
   );
 }
 

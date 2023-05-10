@@ -51,7 +51,7 @@ export default function DetailScreen({ navigation, route }) {
           <View style={{ marginLeft: 20, padding: 5, flexDirection: "row" }}>
             <Image source={{ uri: "https://i.pravatar.cc/300" }} style={{ height: 40, width: 40, borderRadius: 100 }} />
             <View>
-              <Text style={{ marginLeft: 20 }}>{postDetails.userId.username}</Text>
+              <Text style={{ marginLeft: 20 }}>{postDetails.userId?.username}</Text>
               <Text style={{ marginLeft: 20, color: "grey" }}>{postDetails.createdAt}</Text>
             </View>
           </View>

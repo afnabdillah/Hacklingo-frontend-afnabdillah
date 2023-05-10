@@ -21,8 +21,6 @@ export default function HomeScreen({ navigation }) {
 
   const dispatch = useDispatch();
 
-  console.log(forumId, "ini current forumId of", forumName);
-
   useFocusEffect(
     useCallback(() => {
       dispatch(fetchForumDetails(forumId))
@@ -54,32 +52,6 @@ export default function HomeScreen({ navigation }) {
                   "..."}
             </Text>
           </Pressable>
-          <ScrollView horizontal={true}>
-            <View
-              style={{
-                borderColor: "#004aad",
-                borderWidth: 2,
-                width: 70,
-                borderRadius: 20,
-                marginTop: 20,
-                marginRight: 15,
-              }}
-            >
-              <Text style={{ margin: 10, color: "#004aad" }}> Forum </Text>
-            </View>
-            <View
-              style={{
-                borderColor: "#004aad",
-                borderWidth: 2,
-                width: 70,
-                borderRadius: 20,
-                marginTop: 20,
-                marginRight: 15,
-              }}
-            >
-              <Text style={{ margin: 10, color: "#004aad" }}> Forum </Text>
-            </View>
-          </ScrollView>
         </View>
       </View>
       <ScrollView style={{ backgroundColor: "#F6F1F1", paddingVertical: 12 }}>
