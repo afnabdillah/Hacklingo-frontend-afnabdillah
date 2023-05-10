@@ -13,7 +13,8 @@ import {
 import { database, auth } from '../config/firebase';
 import { collection, getDocs, addDoc, setDoc, doc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import BG from '../assets/HACKLINGO.png'
+import SelectDropdown from "react-native-select-dropdown";
+import FontAwesome from "react-native-vector-icons/FontAwesome"; import BG from '../assets/HACKLINGO.png'
 
 function CreateGroupChat({ route, navigation }) {
     const { groupId, groupName: initialGroupName, groupLanguage: initialGroupLanguage, groupMembers, editMode } = route.params || {};
@@ -22,16 +23,8 @@ function CreateGroupChat({ route, navigation }) {
     const [userEmail, setUserEmail] = useState(null);
     const [isProGroup, setIsProGroup] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState(new Set(groupMembers || []));
-    const [selectedLanguages, setSelectedLanguages] = useState(
-        new Set(
-            initialGroupLanguage
-                ? initialGroupLanguage.includes(', ')
-                    ? initialGroupLanguage.split(', ')
-                    : [initialGroupLanguage]
-                : []
-        )
-    );
-    const languages = ['English', 'German', 'Japanese', 'French', 'Russian'];
+    const [selectedLanguage, setSelectedLanguage] = useState("");
+    const languages = ['English', 'German', 'Japanese', 'French', 'Indonesian', 'Deutch', 'Spanish'];
     const CustomCheckBox = ({ isSelected, onPress }) => (
         <>
             <TouchableOpacity
@@ -86,22 +79,11 @@ function CreateGroupChat({ route, navigation }) {
         setSelectedUsers(newSelectedUsers);
     };
 
-
-    const toggleLanguageSelection = language => {
-        const newSelectedLanguages = new Set(selectedLanguages);
-        if (selectedLanguages.has(language)) {
-            newSelectedLanguages.delete(language);
-        } else {
-            newSelectedLanguages.add(language);
-        }
-        setSelectedLanguages(newSelectedLanguages);
-    };
-
     const onCreateGroupChat = async () => {
         const groupData = {
             groupName,
             users: Array.from(selectedUsers),
-            languages: Array.from(selectedLanguages),
+            languages: selectedLanguage,
             createdAt: new Date(),
             messages: [],
             admin: userEmail,
@@ -127,62 +109,69 @@ function CreateGroupChat({ route, navigation }) {
     }, [editMode, navigation]);
 
     return (
-        <ImageBackground source={BG} style={{ flex: 1, opacity: 0.7, height: '100%', }}>
-            <View style={styles.container}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Group Name"
-                    value={groupName}
-                    onChangeText={setGroupName}
-                />
-                <View style={styles.box}>
-                    <Text style={styles.sectionTitle}>Users</Text>
-                    <FlatList
-                        data={users}
-                        keyExtractor={item => item.email}
-                        renderItem={({ item }) => (
-                            <View style={styles.userRow}>
-                                <CustomCheckBox
-                                    isSelected={selectedUsers.has(item.email)}
-                                    onPress={() => toggleUserSelection(item.email)}
-                                />
-                                <Text style={styles.userName}>{item.username}</Text>
-                            </View>
-                        )}
-                    />
-                </View>
-                <View style={styles.box}>
-                    <Text style={styles.sectionTitle}>Languages</Text>
-                    <View style={styles.languagesContainer}>
-                        {languages.map(language => (
-                            <View style={styles.languageRow} key={language}>
-                                <CustomCheckBox
-                                    isSelected={selectedLanguages.has(language)}
-                                    onPress={() => toggleLanguageSelection(language)}
-                                />
-                                <Text style={styles.languageName}>{language}</Text>
-                            </View>
-                        ))}
+        <View style={styles.container}>
+            <TextInput
+                style={styles.input}
+                placeholder="Group Name"
+                value={groupName}
+                onChangeText={setGroupName}
+            />
+            <Text style={styles.sectionTitle}>Users</Text>
+            <FlatList
+                data={users}
+                keyExtractor={item => item.email}
+                renderItem={({ item }) => (
+                    <View style={styles.userRow}>
+                        <CustomCheckBox
+                            isSelected={selectedUsers.has(item.email)}
+                            onPress={() => toggleUserSelection(item.email)}
+                        />
+                        <Text style={styles.userName}>{item.username}</Text>
                     </View>
-                </View>
-                {/* <View style={styles.GroupPro}>
-                    <View style={styles.proGroupRow}>
-                        <Text style={styles.proGroupText}>Pro Group</Text>
-                        <View style={{ flex: 1 }}>
-                            <Switch
-                                value={isProGroup}
-                                onValueChange={setIsProGroup}
-                                trackColor={{ false: '#767577', true: '#81b0ff' }}
-                                thumbColor={isProGroup ? '#f5dd4b' : '#f4f3f4'}
+                )}
+            />
+            <Text style={styles.sectionTitle}>Languages</Text>
+            <View style={styles.languageSelectorContainer}>
+                <SelectDropdown
+                    data={languages}
+                    defaultButtonText={"Select Language"}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                        return selectedItem;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                        return item;
+                    }}
+                    buttonStyle={styles.dropdown1BtnStyle}
+                    buttonTextStyle={styles.dropdown1BtnTxtStyle}
+                    renderDropdownIcon={(isOpened) => {
+                        return (
+                            <FontAwesome
+                                name={isOpened ? "chevron-up" : "chevron-down"}
+                                color={"#f8f8ff"}
+                                size={18}
                             />
-                        </View>
-                    </View>
-                </View> */}
-                <TouchableOpacity style={styles.createButton} onPress={onCreateGroupChat}>
-                    <Text style={styles.buttonText}>Create Group Chat</Text>
-                </TouchableOpacity>
+                        );
+                    }}
+                    dropdownIconPosition={"right"}
+                    dropdownStyle={styles.dropdown1DropdownStyle}
+                    rowStyle={styles.dropdown1RowStyle}
+                    rowTextStyle={styles.dropdown1RowTxtStyle}
+                    onSelect={(item) => setSelectedLanguage(item)}
+                />
             </View>
-        </ImageBackground>
+            {/* <View style={styles.proGroupRow}>
+                <Text style={styles.proGroupText}>Pro Group</Text>
+                <Switch
+                    value={isProGroup}
+                    onValueChange={setIsProGroup}
+                    trackColor={{ false: '#767577', true: '#81b0ff' }}
+                    thumbColor={isProGroup ? '#f5dd4b' : '#f4f3f4'}
+                />
+            </View> */}
+            <TouchableOpacity style={styles.createButton} onPress={onCreateGroupChat}>
+                <Text style={styles.buttonText}>Create Group Chat</Text>
+            </TouchableOpacity>
+        </View>
     );
 }
 
@@ -277,6 +266,25 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 18,
     },
+    dropdown1BtnStyle: {
+        width: "80%",
+        height: 45,
+        backgroundColor: "white",
+        borderRadius: 30,
+        // borderWidth: 1,
+        borderColor: "#444",
+    },
+    dropdown1BtnTxtStyle: { color: "#444", right: 30, fontSize: 13 },
+    dropdown1RowStyle: {
+        backgroundColor: "#EFEFEF",
+        borderBottomColor: "#C5C5C5",
+    },
+    dropdown1DropdownStyle: {
+        backgroundColor: "#EFEFEF",
+        borderRadius: 30,
+        width: 250,
+    },
+    dropdown1RowTxtStyle: { color: "#444", alignSelf: "center" },
 });
 
 export default CreateGroupChat;

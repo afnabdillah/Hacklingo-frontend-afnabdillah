@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, FlatList, Animated } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, FlatList, Animated, onPress } from 'react-native';
 import CarouselItem from './CarouselItem';
 
 const { width, height } = Dimensions.get('window');
@@ -23,7 +23,7 @@ function infiniteScroll(dataList, flatListRef) {
   }, 3000);
 }
 
-const Carousel = ({ data }) => {
+const Carousel = ({ data, onPress }) => {
   const scrollX = new Animated.Value(0);
   let position = Animated.divide(scrollX, width);
   const [dataList, setDataList] = useState(data);
@@ -49,7 +49,7 @@ const Carousel = ({ data }) => {
           decelerationRate={"fast"}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => {
-            return <CarouselItem item={item} />;
+            return <CarouselItem item={item} onPress={() => onPress(item)} />
           }}
           onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })}
         />

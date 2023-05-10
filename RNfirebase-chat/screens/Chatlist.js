@@ -20,7 +20,6 @@ function ChatList() {
   const username = useSelector((state) => state.authReducer.username);
 
   useEffect(() => {
-    console.log(userEmail, "<<< ini userEmail di use Effect")
     if (!userEmail) return;
     const personalChatsRef = collection(database, 'personalChats');
     const personalChatsQuery = query(personalChatsRef);
@@ -38,9 +37,6 @@ function ChatList() {
       personalChatsUnsubscribe();
     };
   }, [userEmail]);
-
-  console.log(chats, "<<< ini chats");
-
   const mergeChatLists = (prevChats, newChats, userEmail) => {
     const mergedChats = newChats
       .map(chat => {
@@ -58,9 +54,11 @@ function ChatList() {
         renderItem={({ item }) => {
           const lastMessage = item.messages[item.messages.length - 1];
           const otherUser = item.users.find(u => u.email !== userEmail);
+          const lastMessageDate = new Date((lastMessage.seconds * 1000) + (lastMessage.nanoseconds / 1000));
+          console.log(lastMessageDate.toLocaleString(), "<<< item");
           return (
             <TouchableOpacity style={styles.container} onPress={() => {
-              navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username, senderEmail : userEmail });
+              navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username, senderEmail: userEmail });
             }}>
               <Image
                 source={{ uri: otherUser.avatar }}
