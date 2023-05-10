@@ -6,8 +6,12 @@ import {
     TouchableOpacity,
     StyleSheet,
     KeyboardAvoidingView,
+    Image,
 } from "react-native";
 import axios from "axios";
+import HeaderDefault from "../components/forum/HeaderDefault";
+import { ScrollView } from "react-native-gesture-handler";
+import logo from "../assets/HACKLINGO.png"
 
 
 const GrammarCheckScreen = () => {
@@ -45,30 +49,37 @@ const GrammarCheckScreen = () => {
     };
 
     return (
-        <KeyboardAvoidingView
-            style={styles.container}
-            behavior="padding"
-        >
-            <Text style={styles.title}>Grammar Check</Text>
-            <TextInput
-                style={styles.input}
-                multiline
-                numberOfLines={4}
-                onChangeText={setInputText}
-                value={inputText}
-                placeholder="Enter your text here"
-            />
-            <TouchableOpacity style={styles.button} onPress={handleGrammarCheck}>
-                <Text style={styles.buttonText}>Check Grammar</Text>
-            </TouchableOpacity>
-            <TextInput
-                style={styles.correctedText}
-                multiline
-                numberOfLines={4}
-                value={correctedText}
-                editable={false}
-            />
-        </KeyboardAvoidingView>
+        <>
+            <HeaderDefault />
+            <ScrollView style={{width: "100%", height: "100%", backgroundColor: "white"}}>
+                <KeyboardAvoidingView
+                    style={styles.container}
+                    behavior="padding"
+                >
+                    <Text style={styles.title}>Grammar Check</Text>
+                    <TextInput
+                        style={styles.input}
+                        multiline
+                        numberOfLines={4}
+                        onChangeText={setInputText}
+                        value={inputText}
+                        placeholder="Enter your text here"
+                    />
+                    <TouchableOpacity style={styles.button} onPress={handleGrammarCheck}>
+                        <Text style={styles.buttonText}>Check Grammar</Text>
+                    </TouchableOpacity>
+                    <TextInput
+                        style={styles.correctedText}
+                        multiline
+                        numberOfLines={4}
+                        value={correctedText}
+                        editable={false}
+                    />
+                </KeyboardAvoidingView>
+                <Image source={logo} style={{ height: 210, width: "60%", opacity: 0.3, position: "relative", marginTop: 10, alignSelf: "center" }} />
+
+            </ScrollView>
+        </>
     );
 };
 
@@ -77,6 +88,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         paddingHorizontal: 20,
+        marginTop: 30
     },
     title: {
         fontSize: 24,
@@ -91,6 +103,7 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 20,
         fontSize: 16,
+        backgroundColor: "#F6F1F1"
     },
     button: {
         backgroundColor: "#1E90FF",
@@ -110,7 +123,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#ccc",
         borderRadius: 4,
-        padding: 10,
+        padding: 20,
         fontSize: 16,
         backgroundColor: "#F6F1F1",
     },

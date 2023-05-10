@@ -4,14 +4,12 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { View, ActivityIndicator } from "react-native";
 import AuthenticatedUserContext from "./helper/AuthenticatedUserContext";
-import Login from "./screens/Login";
-import Signup from "./screens/Signup";
 import Chat from "./screens/Chat";
 import ChatList from "./screens/Chatlist";
 import Contacts from "./screens/Contacts";
 import GroupChat from "./screens/GroupChat";
 import Groups from "./screens/Group";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { HeaderChat } from "./screens/HeadersChat/HeaderChat";
 import CreateGroupChat from "./screens/CreateGroupChat"; // Import the CreateGroupChat component
@@ -32,7 +30,7 @@ import MyStack from './components/forum/stack';
 import { Ionicons } from '@expo/vector-icons';
 import RequestJoin from './screens/RequestJoin';
 import { LogBox } from 'react-native';
-
+import { FontAwesome } from '@expo/vector-icons';
 LogBox.ignoreLogs(['new NativeEventEmitter']);
 import LoginView from "./screens/TemplateLogin";
 import SignUpView from "./screens/TemplateSignup";
@@ -80,7 +78,10 @@ function ChatBottomTabNavigator() {
         <BottomTab.Screen name="Forum" component={MyStack} options={{
           tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="black" />
         }}/>
-        <BottomTab.Screen name="Grammar Check Screen" component={GrammarCheckScreen} />
+        <BottomTab.Screen name="Grammar Check Screen" component={GrammarCheckScreen} options={{
+          tabBarIcon: () => <FontAwesome name="language" size={24} color="black" />,
+          title: "Grammar"
+        }}/>
       </BottomTab.Navigator>
     </SafeAreaView>
   );

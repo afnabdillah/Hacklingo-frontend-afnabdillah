@@ -73,8 +73,6 @@ export default function Chat({ route }) {
     (state) => state.authReducer.profileImageUrl
   );
 
-  const dispatch = useDispatch();
-
   const mergeMessages = (oldMessages, newMessages) => {
     const allMessages = [...oldMessages, ...newMessages];
     const uniqueMessages = allMessages.filter(

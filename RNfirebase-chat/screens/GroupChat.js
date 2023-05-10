@@ -24,8 +24,9 @@ import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import { auth, database } from '../config/firebase';
 import { getDocs } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialIcons, Entypo, FontAwesome } from '@expo/vector-icons';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AntDesign, Ionicons, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons';
 import { PopChatMenu } from './HeadersChat/PopChatMenu';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -192,22 +193,179 @@ export default function GroupChat({ route, navigation }) {
             </View>
         );
     };
-    return (
-        <View style={{ flex: 1 }}>
-            <GiftedChat
-                messages={messages}
-                showAvatarForEveryMessage={true}
-                onSend={messages => onSend(messages)}
-                user={{
-                    _id: userEmail,
-                    username: username,
-                    avatar: currentUser?.avatar || 'https://i.pravatar.cc/300',
-                }}
-                renderBubble={renderBubble}
-            />
-        </View>
-    );
-}
+    const renderHeader = () => {
+        const goToVideoChat = () => {
+            navigation.navigate("Video Chat", { roomId: groupId, username: username })
+        };
+
+        const selectImage = async () => {
+            try {
+                let result = await ImagePicker.launchImageLibraryAsync({
+                    mediaTypes: ImagePicker.MediaTypeOptions.All,
+                    allowsEditing: true,
+                    quality: 1,
+                });
+                if (!result.canceled) {
+                    const formData = new FormData();
+                    formData.append('file', {
+                        uri: Platform.OS === 'ios' ? result.uri.replace('file://', '') : result.uri,
+                        type: 'image/jpeg',
+                        name: 'photo.jpg',
+                    });
+                    const response = await fetch('https://example.com/upload-image', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                    console.log(response);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        return (
+            <SafeAreaView style={{ flex: 1 }}>
+                <ImageBackground source={bg} style={{ flex: 1 }}>
+                    <View style={styles.headers}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => navigation.navigate('ChatList')}>
+                                <AntDesign name="arrowleft" size={30} color="black" />
+                            </TouchableOpacity>
+                            <Image source={{ uri: 'https://i.pravatar.cc/300' }} style={styles.image} />
+                            <Text style={{ fontStyle: 'italic', fontSize: 25 }}>{groupName}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, paddingRight: 10 }}>
+                            <TouchableOpacity>
+                                <MaterialIcons onPress={goToVideoChat} name="video-call" size={36} color="black" />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <GiftedChat
+                        messages={messages}
+                        showAvatarForEveryMessage={true}
+                        onSend={messages => onSend(messages)}
+                        user={{
+                            _id: currentUser.email,
+                            username: currentUser.username,
+                            avatar: currentUser.avatar || 'https://i.pravatar.cc/300'
+                        }}
+                        renderActions={(props) => (
+                            <Actions
+                                {...props}
+                                containerStyle={{
+                                    position: "absolute",
+                                    right: 50,
+                                    bottom: 5,
+                                    zIndex: 9999,
+                                }}
+                                onPressActionButton={selectImage}
+                                icon={() => (
+                                    <Ionicons name="camera" size={30} color={'grey'} />
+                                )}
+                            />
+                        )}
+                        timeTextStyle={{ right: { color: 'grey' } }}
+                        renderSend={(props) => {
+                            const { text, messageIdGenerator, user, onSend } = props;
+                            return (
+                                <TouchableOpacity
+                                    style={{
+                                        height: 40,
+                                        width: 40,
+                                        borderRadius: 40,
+                                        backgroundColor: 'primary',
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginBottom: 5,
+                                        paddingRight: 5
+                                    }}
+                                    onPress={() => {
+                                        if (text && onSend) {
+                                            onSend(
+                                                {
+                                                    text: text.trim(),
+                                                    user,
+                                                    _id: messageIdGenerator(),
+                                                },
+                                                true
+                                            );
+                                        }
+                                    }}
+                                >
+                                    <MaterialCommunityIcons
+                                        name={text && onSend ? "send" : "microphone"}
+                                        size={23}
+                                        color={'black'}
+                                    />
+                                </TouchableOpacity>
+                            );
+                        }}
+                        renderInputToolbar={(props) => (
+                            <InputToolbar
+                                {...props}
+                                containerStyle={{
+                                    marginLeft: 10,
+                                    marginRight: 10,
+                                    marginBottom: 2,
+                                    borderRadius: 20,
+                                    paddingTop: 5,
+                                }}
+                            />
+                        )}
+                        renderBubble={(props) => (
+                            <Bubble
+                                {...props}
+                                textStyle={{ right: { color: 'grey' } }}
+                                wrapperStyle={{
+                                    left: {
+                                        backgroundColor: 'white',
+                                    },
+                                    right: {
+                                        backgroundColor: '#dcf8c6',
+                                    },
+                                }}
+                            />
+                        )}
+                    // renderMessageImage={(props) => {
+                    //   console.log(props, "????????");
+                    //   return (
+                    //     <View style={{ borderRadius: 15, padding: 2 }}>
+                    //       <TouchableOpacity
+                    //         onPress={() => {
+                    //           setModalVisible(true);
+                    //           setSeletedImageView(props.currentMessage.image);
+                    //         }}
+                    //       >
+                    //         <Image
+                    //           resizeMode="contain"
+                    //           style={{
+                    //             width: 200,
+                    //             height: 200,
+                    //             padding: 6,
+                    //             borderRadius: 15,
+                    //             resizeMode: "cover",
+                    //           }}
+                    //           source={{ uri: props.currentMessage.image }}
+                    //         />
+                    //         {selectedImageView ? (
+                    //           <ImageView
+                    //             imageIndex={0}
+                    //             visible={modalVisible}
+                    //             onRequestClose={() => setModalVisible(false)}
+                    //             images={[{ uri: selectedImageView }]}
+                    //           />
+                    //         ) : null}
+                    //       </TouchableOpacity>
+                    //     </View>
+                    //   );
+                    // }}
+                    />
+                </ImageBackground>
+            </SafeAreaView>
+        );
+    }
 
     const styles = StyleSheet.create({
         headers: {
@@ -255,3 +413,4 @@ export default function GroupChat({ route, navigation }) {
             marginLeft: 10
         },
     })
+}
