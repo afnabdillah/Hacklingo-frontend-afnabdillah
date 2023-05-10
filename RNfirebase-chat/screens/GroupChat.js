@@ -26,7 +26,6 @@ import { getDocs } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons, Entypo, FontAwesome, AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AntDesign, Ionicons, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons';
 import { PopChatMenu } from './HeadersChat/PopChatMenu';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -184,10 +183,6 @@ export default function GroupChat({ route, navigation }) {
             }
         });
     }, [navigation, groupId, groupName, groupLanguage, groupMembers, userEmail, groupAdmin]);
-
-
-
-
 
     const renderBubble = (props) => {
         const isCurrentUser = props.currentMessage.user._id === userEmail;
