@@ -6,7 +6,6 @@ import React, {
     useContext,
 } from 'react';
 import bg from '../assets/BG.png'
-
 import { TouchableOpacity, Text, View, ImageBackground, StyleSheet, Image } from 'react-native';
 import { GiftedChat, Bubble, InputToolbar, Actions } from 'react-native-gifted-chat';
 import {
@@ -132,38 +131,48 @@ export default function GroupChat({ route, navigation }) {
         );
     };
     useLayoutEffect(() => {
-        if (userEmail && groupAdmin && userEmail === groupAdmin) {
-            navigation.setOptions({
-                headerRight: () => (
-                    <View style={{ flexDirection: 'row', marginRight: 10 }}>
-                        <TouchableOpacity
-                            onPress={() =>
-                                navigation.navigate('RequestJoin', { groupId })
-                            }
-                            style={{ marginRight: 10 }}
-                        >
-                            <Entypo name="add-user" size={24} color="#0D47A1" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() =>
-                                navigation.navigate('CreateGroupChat', {
-                                    groupId,
-                                    groupName,
-                                    groupLanguage,
-                                    groupMembers,
-                                    editMode: true,
-                                })
-                            }
-                        >
-                            <Text style={{ color: '#0D47A1', fontSize: 16 }}>Edit Group</Text>
-                        </TouchableOpacity>
-                    </View>
-                ),
-            });
-        } else {
-            navigation.setOptions({ headerRight: null });
-        }
+        navigation.setOptions({
+            headerRight: () => (
+                <View style={{ flexDirection: 'row', marginRight: 10 }}>
+                    <TouchableOpacity
+                        onPress={() =>
+                            navigation.navigate('Video Chat', { roomId: groupId, username: username })
+                        }
+                        style={{ marginRight: 10 }}
+                    >
+                        <MaterialIcons name="video-call" size={24} color="#0D47A1" />
+                    </TouchableOpacity>
+                    {userEmail && groupAdmin && userEmail === groupAdmin && (
+                        <>
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.navigate('RequestJoin', { groupId })
+                                }
+                                style={{ marginRight: 10 }}
+                            >
+                                <Entypo name="add-user" size={24} color="#0D47A1" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.navigate('CreateGroupChat', {
+                                        groupId,
+                                        groupName,
+                                        groupLanguage,
+                                        groupMembers,
+                                        editMode: true,
+                                    })
+                                }
+                            >
+                                <FontAwesome name="gear" size={24} color="#0D47A1" />
+                            </TouchableOpacity>
+                        </>
+                    )}
+                </View>
+            ),
+        });
     }, [navigation, groupId, groupName, groupLanguage, groupMembers, userEmail, groupAdmin]);
+
+
 
 
 
@@ -188,6 +197,7 @@ export default function GroupChat({ route, navigation }) {
         const goToVideoChat = () => {
             navigation.navigate("Video Chat", { roomId: groupId, username: username })
         };
+
         const selectImage = async () => {
             try {
                 let result = await ImagePicker.launchImageLibraryAsync({

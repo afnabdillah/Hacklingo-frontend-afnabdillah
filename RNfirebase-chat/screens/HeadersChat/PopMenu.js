@@ -25,11 +25,9 @@ export function PopMenu() {
     }
     const onSignOut = async () => {
         try {
-            console.log('logout')
             await signOut(auth);
             await AsyncStorage.clear(); // Clear AsyncStorage
             dispatch(logout())
-            navigation.navigate('Login');
         } catch (error) {
             console.log('Error logging out: ', error);
         }

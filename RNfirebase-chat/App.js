@@ -4,8 +4,6 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { View, ActivityIndicator } from "react-native";
 import AuthenticatedUserContext from "./helper/AuthenticatedUserContext";
-import Login from "./screens/Login";
-import Signup from "./screens/Signup";
 import Chat from "./screens/Chat";
 import ChatList from "./screens/Chatlist";
 import Contacts from "./screens/Contacts";
@@ -31,6 +29,11 @@ import { loginSuccess } from './stores/authSlice';
 import MyStack from './components/forum/stack';
 import { Ionicons } from '@expo/vector-icons';
 import RequestJoin from './screens/RequestJoin';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs(['new NativeEventEmitter']);
+import LoginView from "./screens/TemplateLogin";
+import SignUpView from "./screens/TemplateSignup";
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -84,7 +87,7 @@ function ChatStack() {
       <Stack.Navigator>
         <Stack.Screen name="ChatList" component={ChatBottomTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
-        <Stack.Screen name="Group Chat" component={GroupChat} options={{ headerShown: false }} />
+        <Stack.Screen name="Group Chat" component={GroupChat} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
         <Stack.Screen name="RequestJoin" component={RequestJoin} />
         <Stack.Screen name="Profile" component={Profile} />
@@ -108,8 +111,8 @@ function ChatStack() {
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Signup" component={Signup} />
+      <Stack.Screen name="Login" component={LoginView} />
+      <Stack.Screen name="Signup" component={SignUpView} />
     </Stack.Navigator>
   );
 }
