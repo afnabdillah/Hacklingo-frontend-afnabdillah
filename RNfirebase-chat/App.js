@@ -31,6 +31,9 @@ import { loginSuccess } from './stores/authSlice';
 import MyStack from './components/forum/stack';
 import { Ionicons } from '@expo/vector-icons';
 import RequestJoin from './screens/RequestJoin';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs(['new NativeEventEmitter']);
 import LoginView from "./screens/TemplateLogin";
 import SignUpView from "./screens/TemplateSignup";
 
@@ -86,7 +89,7 @@ function ChatStack() {
       <Stack.Navigator>
         <Stack.Screen name="ChatList" component={ChatBottomTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
-        <Stack.Screen name="Group Chat" component={GroupChat} options={{ headerShown: false }} />
+        <Stack.Screen name="Group Chat" component={GroupChat} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
         <Stack.Screen name="RequestJoin" component={RequestJoin} />
         <Stack.Screen name="Profile" component={Profile} />

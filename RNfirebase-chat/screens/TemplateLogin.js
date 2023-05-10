@@ -11,6 +11,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import showToast from "../helper/showToast";
 import { userLogin } from "../stores/usersSlice";
+import logo from '../assets/HACKLINGO.png'
 
 export default LoginView = () => {
   const [email, setEmail] = useState("");
@@ -46,6 +47,11 @@ export default LoginView = () => {
 
   return (
     <View style={styles.container}>
+      <Image
+        source={logo}
+        style={styles.logo}
+        resizeMode="contain"
+      />
       <View style={styles.inputContainer}>
         <Image
           style={[styles.icon, styles.inputIcon]}
@@ -107,6 +113,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#B0E0E6",
+  },
+  logo: {
+    width: 200,
+    height: 100,
+    marginBottom: 30,
   },
   inputContainer: {
     borderBottomColor: "#F5FCFF",

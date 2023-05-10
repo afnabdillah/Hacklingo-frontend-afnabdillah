@@ -47,6 +47,7 @@ const App = () => {
           data={data}
           autoPlay={true}
           pagination={true}
+          sliderHeight={180} // Add this line to set a custom height for the top carousel
         />
       </View>
       <View style={styles.carouselContainer}>
