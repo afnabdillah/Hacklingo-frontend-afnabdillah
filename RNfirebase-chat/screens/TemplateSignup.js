@@ -18,6 +18,7 @@ import showToast from "../helper/showToast";
 import { userSignUp } from "../stores/usersSlice";
 import { ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
+import logo from '../assets/HACKLINGO.png'
 
 export default SignUpView = () => {
   const [email, setEmail] = useState("");
@@ -90,6 +91,11 @@ export default SignUpView = () => {
   return (
     <View style={styles.container}>
       {signUpStatus === "loading" && <ActivityIndicator />}
+      <Image
+        source={logo}
+        style={styles.logo}
+        resizeMode="contain"
+      />
       <View style={styles.inputContainer}>
         <Image
           style={styles.inputIcon}
@@ -235,6 +241,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#B0E0E6",
+  },
+  logo: {
+    width: 200,
+    height: 100,
+    marginBottom: 30,
   },
   inputContainer: {
     borderBottomColor: "#F5FCFF",

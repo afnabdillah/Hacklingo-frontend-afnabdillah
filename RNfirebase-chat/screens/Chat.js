@@ -91,7 +91,7 @@ export default function Chat({ route }) {
   useEffect(() => {
     const createRoomId = generateRoomId(senderEmail, recipientEmail);
     const roomDocRef = doc(database, "personalChats", createRoomId);
-
+  
     const unsubscribe = onSnapshot(roomDocRef, (docSnapshot) => {
       if (docSnapshot.exists()) {
         const fetchedMessages = docSnapshot.data().messages.map((message) => ({
@@ -118,51 +118,45 @@ export default function Chat({ route }) {
         GiftedChat.append(previousMessages, messages)
       );
 
-      const roomId = generateRoomId(senderEmail, recipientEmail);
-
-      const roomDocRef = doc(database, "personalChats", roomId);
-      const roomDocSnapshot = await getDoc(roomDocRef);
-
-      if (!roomDocSnapshot.exists()) {
-        console.log({
-          senderEmail,
-          currentUserUsername,
-          currentUserProfileImageUrl,
-        });
-        await setDoc(roomDocRef, {
-          users: [
-            {
-              email: senderEmail,
-              username: currentUserUsername,
-              avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
-            },
-            {
-              email: recipientEmail,
-              username: recipientName,
-              avatar: "https://i.pravatar.cc/300", // Set the recipient avatar if available
-            },
-          ],
-          messages: [],
-        });
-      }
-      const message = {
-        _id: messages[0]._id,
-        createdAt: messages[0].createdAt,
-        text: messages[0].text,
-        user: {
-          _id: senderEmail,
-          username: currentUserUsername,
-          avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
-        },
-      };
-
-      await updateDoc(roomDocRef, {
-        messages: arrayUnion(message),
+    const roomId = generateRoomId(senderEmail, recipientEmail);
+    
+    const roomDocRef = doc(database, "personalChats", roomId);
+    const roomDocSnapshot = await getDoc(roomDocRef);
+    
+    if (!roomDocSnapshot.exists()) {
+      await setDoc(roomDocRef, {
+        users: [
+          {
+            email: senderEmail,
+            username: currentUserUsername,
+            avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
+          },
+          {
+            email: recipientEmail,
+            username: recipientName,
+            avatar: "https://i.pravatar.cc/300", // Set the recipient avatar if available
+          },
+        ],
+        messages: [],
       });
-    },
-    [currentUserUsername]
-  );
-  const navigation = useNavigation();
+    }
+    const message = {
+      _id: messages[0]._id,
+      createdAt: messages[0].createdAt,
+      text: messages[0].text,
+      user: {
+        _id: senderEmail,
+        username: currentUserUsername,
+        avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
+      },
+    };
+    
+    await updateDoc(roomDocRef, {
+      messages: arrayUnion(message),
+    });
+  }, [currentUserUsername]);
+  
+  const navigation = useNavigation()
   const goToVideoChat = () => {
     navigation.navigate("Video Chat", {
       roomId: roomId,
@@ -215,7 +209,7 @@ export default function Chat({ route }) {
                 bottom: 5,
                 zIndex: 9999,
               }}
-              onPressActionButton={selectImage}
+              // onPressActionButton={selectImage}
               icon={() => <Ionicons name="camera" size={30} color={"grey"} />}
             />
           )}

@@ -6,7 +6,6 @@ import React, {
     useContext,
 } from 'react';
 import bg from '../assets/BG.png'
-
 import { TouchableOpacity, Text, View, ImageBackground, StyleSheet, Image } from 'react-native';
 import { GiftedChat, Bubble, InputToolbar, Actions } from 'react-native-gifted-chat';
 import {
@@ -25,9 +24,8 @@ import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import { auth, database } from '../config/firebase';
 import { getDocs } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Entypo, FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons, Entypo, FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AntDesign, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { PopChatMenu } from './HeadersChat/PopChatMenu';
 import * as ImagePicker from 'expo-image-picker';
 

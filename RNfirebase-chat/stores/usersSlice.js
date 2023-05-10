@@ -104,7 +104,6 @@ export const userLogin = createAsyncThunk(
         data: input,
       });
       // Login to firebase after success
-      console.log(response.data, "<<< response login")
       await signInWithEmailAndPassword(auth, email, password);
       await saveToAsyncStorage(response.data);
       dispatch(
