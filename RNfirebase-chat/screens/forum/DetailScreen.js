@@ -8,15 +8,17 @@ import { useFocusEffect } from "@react-navigation/native";
 import { fetchPostDetails } from "../../stores/postsSlice";
 import showToast from "../../helper/showToast";
 import { ActivityIndicator } from "react-native-paper";
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function DetailScreen({ navigation, route }) {
   const {id} = route.params;
-  console.log(id, "<<<< ini id post");
   const [commentText, setCommentText] = useState("");
   const dispatch = useDispatch();
 
   const postDetails = useSelector(state => state.postsReducer.postDetails);
   const postDetailsStatus = useSelector(state => state.postsReducer.status.postDetails);
+
+  console.log(postDetails);
 
   const handleAddComment = async () => {
     try {
@@ -52,7 +54,7 @@ export default function DetailScreen({ navigation, route }) {
             <Image source={{ uri: "https://i.pravatar.cc/300" }} style={{ height: 40, width: 40, borderRadius: 100 }} />
             <View>
               <Text style={{ marginLeft: 20 }}>{postDetails.userId?.username}</Text>
-              <Text style={{ marginLeft: 20, color: "grey" }}>{postDetails.createdAt}</Text>
+              <Text style={{ marginLeft: 20, color: "grey" }}>{postDetails.createdAt?.split("T")[0]}</Text>
             </View>
           </View>
           <View style={{ marginTop: 10 }}>
@@ -61,8 +63,13 @@ export default function DetailScreen({ navigation, route }) {
             </Text>
           </View>
           <View style={{ marginTop: 10, width: "100%", height: 200 }}>
-            <Image source={{ uri: "https://thumb.viva.co.id/media/frontend/thumbs3/2019/11/21/5dd64a2d921ea-5-makanan-penyebab-stroke-yang-jarang-diketahui_665_374.jpg" }} style={{ height: "100%", width: "100%" }} />
-          </View>
+            {postDetails.postImageUrl && (
+              <Image
+                source={{ uri: postDetails.postImageUrl }}
+                style={{ height: "100%", width: "100%" }}
+              />
+            )}
+          </View> 
           <View style={{ justifyContent: "flex-start" }}>
             <View style={{ flexDirection: "row", padding: 10, alignItems: "center", marginLeft: 10, borderBottomWidth: 5, borderColor: "#F6F1F1", justifyContent: "flex-end", flex:1 }}>
               <Ionicons name="ios-chatbox-outline" size={20} color="black" style={{ marginLeft: 20 }} />
@@ -83,32 +90,28 @@ export default function DetailScreen({ navigation, route }) {
         </View>
       </ScrollView>
       <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: 20 }}>
-        <TextInput
-          style={{
-            backgroundColor: 'white',
-            borderRadius: 25,
-            paddingHorizontal: 20,
-            paddingVertical: 10,
-            flex: 1,
-            marginRight: 10,
-          }}
-          placeholder="Add Comment"
-          onChangeText={text => setCommentText(text)}
-          value={commentText}
-        />
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#0097b2',
-            borderRadius: 25,
-            paddingHorizontal: 20,
-            paddingVertical: 10,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onPress={handleAddComment}
+        <View style={{
+          backgroundColor: 'white',
+          borderRadius: 25,
+          paddingHorizontal: 20,
+          paddingVertical: 10,
+          flex: 1,
+          marginRight: 10,
+          flexDirection: "row",
+          justifyContent: 'space-between'
+        }}
         >
-          <Ionicons name="ios-paper-plane-outline" size={24} color="white" />
-        </TouchableOpacity>
+          <TextInput
+            placeholder="Add Comment"
+            onChangeText={text => setCommentText(text)}
+            value={commentText}
+          />
+          <TouchableOpacity
+            onPress={handleAddComment}
+          >
+            <Ionicons name="ios-paper-plane-outline" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   )
