@@ -7,7 +7,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth, database } from "../config/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, updateDoc } from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
 import { NavigationActions, StackActions } from "react-navigation";
 import base_url from "./base_url";
@@ -108,6 +108,7 @@ export const userLogin = createAsyncThunk(
           userId: response.data._id,
           email: response.data.email,
           username: response.data.username,
+          profileImageUrl: response.data.profileImageUrl,
         })
       );
       return true;
@@ -194,7 +195,11 @@ export const updateUserDetails = createAsyncThunk(
         },
         data: input,
       });
-      console.log(response.data, "<<< ini hasil dari axios");
+      // Save it to firebase database
+      await updateDoc(collection(database, "users"), {
+        username: response.data.username,
+        profileImageUrl: response.data.profileImageUrl
+      });
       return response.data;
     } catch (err) {
       // return err.response if it was an axios error with reject with value
