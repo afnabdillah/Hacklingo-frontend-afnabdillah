@@ -34,7 +34,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errMessage, setErrMessage] = useState("");
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const dispatch = useDispatch();
   const users = useSelector((state) => state.usersReducer.users);
   const userDetails = useSelector((state) => state.usersReducer.userDetails);
@@ -74,48 +74,57 @@ export default function Login() {
 
   const onHandleLogin = () => {
     if (email !== "" && password !== "") {
+      console.log("masuk login");
       dispatch(userLogin({ email, password }))
         .unwrap()
         .then(() => {
-          // Navigate to Home after successful login
-          navigation.navigate('ChatStack')
+          // Navigate to ChatList after successful login
+          navigation.navigate({
+            screen: "ChatStack",
+            params: {
+              screen: "ChatList",
+              params: {
+                screen: "Home",
+              },
+            },
+          });
         })
         .catch((err) => {
-          setErrMessage(err.message);
+          showToast("error", "Login error", err.message);
         });
     }
   };
 
   useEffect(() => {
-    AsyncStorage.getItem("username").then((username) => {
-      console.log(username, "<<<< ini username di async storage");
-    });
-  }, []);
+    if (loginStatus === "loading") {
+      showToast("info", "Logging you in ...", "Please wait a few seconds")
+    }
+  }, [loginStatus]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome back!</Text>
       <TextInput
         style={styles.input}
-        placeholder='Enter email'
-        autoCapitalize='none'
-        keyboardType='email-address'
-        textContentType='emailAddress'
+        placeholder="Enter email"
+        autoCapitalize="none"
+        keyboardType="email-address"
+        textContentType="emailAddress"
         autoFocus={true}
         value={email}
-        onChangeText={text => setEmail(text)}
+        onChangeText={(text) => setEmail(text)}
       />
       <TextInput
         style={styles.input}
-        placeholder='Enter password'
-        autoCapitalize='none'
+        placeholder="Enter password"
+        autoCapitalize="none"
         autoCorrect={false}
         secureTextEntry={true}
-        textContentType='password'
+        textContentType="password"
         value={password}
         onChangeText={(text) => setPassword(text)}
       />
-      {loginStatus === "error" && showToast("error", "Login error", errMessage)}
+      {/* {loginStatus === "loading" && showToast("info", "Login error", errMessage)} */}
       {/* {loginStatus === "loading" && showToast("info", "Please wait a few seconds", "logging you in ...")} */}
       <Button onPress={onHandleLogin} color="#f57c00" title="Login" />
       <Button
@@ -185,16 +194,19 @@ export default function Login() {
         title="fetch article details"
       />
       <Button
-        onPress={() => {
-          const input = {
-            username: "test edit username via image",
-          };
-          pickImage().then((imageData) => {
+        onPress={async () => {
+          try {
+            const input = {
+              username: "test edit username via image",
+            };
+            const imageData = await pickImage();
             const formData = new FormData();
             formData.append("file", imageData);
             formData.append("username", input.username);
-            return dispatch(updateUserDetails(formData));
-          });
+            const result = await dispatch(updateUserDetails(formData)).unwrap();
+          } catch (err) {
+            console.log(err);
+          }
         }}
         title="edit image user profile"
       />
@@ -340,24 +352,24 @@ export default function Login() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingTop: 50,
-    paddingHorizontal: 12
+    paddingHorizontal: 12,
   },
   title: {
     fontSize: 24,
-    fontWeight: '600',
-    color: '#444',
-    alignSelf: 'center',
-    paddingBottom: 24
+    fontWeight: "600",
+    color: "#444",
+    alignSelf: "center",
+    paddingBottom: 24,
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     marginBottom: 20,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: "#333",
     borderRadius: 8,
-    padding: 12
-  }
+    padding: 12,
+  },
 });

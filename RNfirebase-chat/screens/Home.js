@@ -9,6 +9,8 @@ import {
 import React from 'react';
 import CustomImageCarousalLandscape from './Landingpage/CustomImageCarousalLandscape';
 import Carousel from './Landingpage/Carousel'
+import HeaderPost from '../components/forum/HeaderPost';
+import HeaderDefault from '../components/forum/HeaderDefault';
 import { HeaderChat } from './HeadersChat/HeaderChat';
 
 const App = () => {
@@ -39,27 +41,23 @@ const App = () => {
     }
   ];
   return (
-    <>
-
-      <HeaderChat />
-      <SafeAreaView style={styles.container}>
-        <View style={styles.carouselContainer}>
-          <Carousel
-            data={data}
-            autoPlay={true}
-            pagination={true}
-          />
-        </View>
-        <View style={styles.carouselContainer}>
-          <Text style={styles.text}>SELECT LANGUAGE</Text>
-          <CustomImageCarousalLandscape
-            data={data2}
-            autoPlay={false}
-            pagination={true}
-          />
-        </View>
-      </SafeAreaView>
-    </>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.carouselContainer}>
+        <Carousel
+          data={data}
+          autoPlay={true}
+          pagination={true}
+        />
+      </View>
+      <View style={styles.carouselContainer}>
+        <Text style={styles.text}>SELECT LANGUAGE</Text>
+        <CustomImageCarousalLandscape
+          data={data2}
+          autoPlay={false}
+          pagination={true}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 

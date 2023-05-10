@@ -125,7 +125,6 @@ export default function Chat({ route }) {
       : `${email2}_${email1}`;
   };
 
-
   useEffect(() => {
     const createRoomId = generateRoomId(currentUser.email, recipientEmail);
     const roomDocRef = doc(database, "personalChats", createRoomId);
@@ -212,7 +211,7 @@ export default function Chat({ route }) {
             <TouchableOpacity>
               <MaterialIcons onPress={goToVideoChat} name="video-call" size={36} color="black" />
             </TouchableOpacity>
-            <PopChatMenu />
+            <PopChatMenu name={recipientName} email={recipientEmail} />
           </View>
         </View>
         <GiftedChat
