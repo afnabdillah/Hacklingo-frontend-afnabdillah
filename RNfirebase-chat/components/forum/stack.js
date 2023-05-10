@@ -10,31 +10,37 @@ const Stack = createNativeStackNavigator();
 
 export default function MyStack() {
   return (
-    <Stack.Navigator option={{}}>
+    <Stack.Navigator screenOptions={{ headerTintColor: "white" }}>
       <Stack.Screen name="Forum" component={DrawerNav} options={{headerShown: false}}/>
       <Stack.Screen name="Post" component={DetailScreen} options={{
         headerRight: () => {
           return <HeaderPost />
         },
-        headerTitle: () => { return <FontAwesome name="comments-o" size={30} color="black" /> },
+        headerTitle: () => { return <FontAwesome name="comments-o" size={30} color="white" /> },
         headerStyle: {
           backgroundColor: "#0097b2"
         },
+        headerBackTitleStyle: {
+          color: "white"
+        }
       }} />
       <Stack.Screen name='AddPost' component={Post} options={{
         headerRight: () => {
           return <HeaderPost />
         },
-        headerTitle: () => { return <FontAwesome name="comments-o" size={30} color="black" /> },
+        headerTitle: () => { return <FontAwesome name="comments-o" size={30} color="white" /> },
         headerStyle: {
           backgroundColor: "#0097b2"
         },
+        headerBackTitleStyle: {
+          color: "white"
+        }
       }}/>
       <Stack.Screen name='Comment' component={Comments} options={{
         headerRight: () => {
           return <HeaderPost />
         },
-        headerTitle: () => { return <FontAwesome name="comments-o" size={30} color="black" /> },
+        headerTitle: () => { return <FontAwesome name="comments-o" size={30} color="white" /> },
         headerStyle: {
           backgroundColor: "#0097b2"
         },

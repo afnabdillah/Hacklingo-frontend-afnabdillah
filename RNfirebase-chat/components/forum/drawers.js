@@ -25,7 +25,7 @@ export default function DrawerNav() {
   }
 
   return (
-    <Drawer.Navigator>
+    <Drawer.Navigator screenOptions={{headerTintColor: "white"}}>
       {forums.map((el) => {
         return (
           <Drawer.Screen
