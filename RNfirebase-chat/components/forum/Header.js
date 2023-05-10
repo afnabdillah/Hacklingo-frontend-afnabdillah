@@ -8,7 +8,7 @@ export default function HeaderForum() {
   const onChangeSearch = query => setSearchQuery(query);
   const width = Dimensions.get("window").width
   return (
-    <View style={{ flexDirection: "row", backgroundColor: "white" }}>
+    <View style={{ flexDirection: "row", backgroundColor: "#0097b2" }}>
       <Searchbar
         placeholder="Search"
         style={{ backgroundColor: "#F6F1F1", width: width * 0.7, marginRight: 10, height: 50 }}

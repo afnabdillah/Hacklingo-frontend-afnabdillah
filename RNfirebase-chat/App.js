@@ -56,20 +56,27 @@ function ChatTopTabNavigator() {
 function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <BottomTab.Navigator screenOptions={{headerShown: false}}>
+      <BottomTab.Navigator screenOptions={{
+        headerShown: false, tabBarStyle: {
+          backgroundColor: "#0097b2",
+        },
+        tabBarLabelStyle: {
+          color: "white"
+        }
+      }}>
         <BottomTab.Screen name="Home" component={Home} options={{
           tabBarIcon: () => {
-            return <Ionicons name="ios-home-outline" size={24} color="black" />
+            return <Ionicons name="ios-home-outline" size={24} color="white" />
           }
         }} />
         <BottomTab.Screen
           name="Chats"
-          options={{ tabBarLabel: 'Chats', tabBarIcon: () => <Ionicons name="ios-chatbubbles-outline" size={24} color="black" /> }}
+          options={{ tabBarLabel: 'Chats', tabBarIcon: () => <Ionicons name="ios-chatbubbles-outline" size={24} color="white" /> }}
           children={() => (
             <>
               <HeaderChat />
               <TopTab.Navigator>
-                <TopTab.Screen name="Chat Lists" component={ChatList} />
+                <TopTab.Screen name="Chat Lists" component={ChatList} options={{}} />
                 <TopTab.Screen name="Find Contacts" component={Contacts} />
                 <TopTab.Screen name="Find Groups" component={Groups} />
               </TopTab.Navigator>
@@ -77,12 +84,12 @@ function ChatBottomTabNavigator() {
           )}
         />
         <BottomTab.Screen name="Forum" component={MyStack} options={{
-          tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="black" />
-        }}/>
+          tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="white" />
+        }} />
         <BottomTab.Screen name="Grammar Check Screen" component={GrammarCheckScreen} options={{
-          tabBarIcon: () => <FontAwesome name="language" size={24} color="black" />,
+          tabBarIcon: () => <FontAwesome name="language" size={24} color="white" />,
           title: "Grammar"
-        }}/>
+        }} />
       </BottomTab.Navigator>
     </SafeAreaView>
   );
@@ -92,7 +99,7 @@ function ChatStack() {
     <SafeAreaView style={{ flex: 1 }}>
       <Stack.Navigator>
         <Stack.Screen name="ChatList" component={ChatBottomTabNavigator} options={{ headerShown: false }} />
-        <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
+        <Stack.Screen name="Chat" component={Chat} options={{ headerShown: true }} />
         <Stack.Screen name="Group Chat" component={GroupChat} />
         <Stack.Screen name="Article" component={Article} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />

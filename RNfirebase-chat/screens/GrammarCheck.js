@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 1,
-        borderColor: "#ccc",
+        borderColor: "#0097b2",
         borderRadius: 4,
         padding: 10,
         marginBottom: 20,
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#F6F1F1"
     },
     button: {
-        backgroundColor: "#1E90FF",
+        backgroundColor: "#0097b2",
         borderRadius: 4,
         paddingHorizontal: 20,
         paddingVertical: 10,
@@ -121,11 +121,13 @@ const styles = StyleSheet.create({
     },
     correctedText: {
         borderWidth: 1,
-        borderColor: "#ccc",
+        borderColor: "#0097b2",
         borderRadius: 4,
         padding: 20,
         fontSize: 16,
         backgroundColor: "#F6F1F1",
+        fontWeight: "800",
+        color: "black"
     },
 });
 

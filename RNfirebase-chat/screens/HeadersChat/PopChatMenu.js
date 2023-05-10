@@ -31,7 +31,6 @@ export function PopChatMenu({email, name}) {
                 >
                     <Animated.View style={[styles.popup, { transform: [{ scale }] }]}>
                         <TouchableOpacity style={styles.option} onPress={() => {
-                            console.log("masuk");
                             return navigation.navigate("DetailProf", {email, name})
                             }}>
                             <Text>Cek Profile</Text>
