@@ -53,7 +53,7 @@ export default function Post({ route }) {
           showToast(
             "success",
             "Insert Post Success!",
-            "you have succesfully update your post!"
+            "you have succesfully create your post!"
           );
           navigation.goBack();
         })

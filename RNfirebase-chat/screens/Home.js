@@ -30,8 +30,8 @@ const App = () => {
 
   const data = articles.map((article) => ({
     title: article.title,
-    url: 'https://via.placeholder.com/150', // Replace with the actual image URL from your data if available
-    description: '', // Add a description if available in your data
+    url: article.articleImageUrl, // Replace with the actual image URL from your data if available
+    description: "", // Add a description if available in your data
     id: article._id,
   }));
 
@@ -66,7 +66,7 @@ const App = () => {
     },
   ];
   const handleArticlePress = (article) => {
-    navigation.navigate('Article', { article }); // Navigate to DetailScreen with article data
+    navigation.navigate('Article', { articleId : article.id }); // Navigate to DetailScreen with article data
   };
   const navigateToGroups = (language) => {
     navigation.navigate("Chats", { screen: "Find Groups", params : { language } });

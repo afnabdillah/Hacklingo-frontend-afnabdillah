@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Text, TouchableOpacity, View, Pressable, Image } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import CardForum from "../../components/forum/card";
@@ -7,7 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchForumDetails } from "../../stores/forumsSlice";
 import showToast from "../../helper/showToast";
 import { ActivityIndicator } from "react-native-paper";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
+import { fetchPostsBySearch } from "../../stores/postsSlice";
 
 export default function HomeScreen({ navigation }) {
   const route = useRoute();
@@ -18,7 +19,10 @@ export default function HomeScreen({ navigation }) {
   const fetchForumDetailsStatus = useSelector(
     (state) => state.forumsReducer.status.forumDetails
   );
-  console.log(forumDetails);
+  const fetchPostsBySearchStatus = useSelector(
+    (state) => state.postsReducer.status.posts
+  );
+  const posts = useSelector((state) => state.postsReducer.posts);
 
   const dispatch = useDispatch();
 
@@ -26,11 +30,22 @@ export default function HomeScreen({ navigation }) {
     useCallback(() => {
       dispatch(fetchForumDetails(forumId))
         .unwrap()
-        .catch((err) => showToast("error", "fetch data error", err.message));
+        .catch((err) => showToast("error", "Fetch Data Error", err.message));
     }, [forumId])
   );
 
-  if (fetchForumDetailsStatus === "loading") {
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchPostsBySearch({ search: "", forumId }))
+        .unwrap()
+        .catch((err) => showToast("error", "Fetch Data Error", err.message));
+    }, [])
+  );
+
+  if (
+    fetchForumDetailsStatus === "loading" ||
+    fetchPostsBySearchStatus === "loading"
+  ) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" />
@@ -43,26 +58,30 @@ export default function HomeScreen({ navigation }) {
       <View style={{ backgroundColor: "white", paddingBottom: 20 }}>
         <View style={{ marginLeft: 10, marginTop: 20 }}>
           <Text style={{ fontSize: 25, fontWeight: "500", marginBottom: 5 }}>
-            {forumName} <Image source={{ uri: forumDetails.flagImage }} style={{width: 25, height: 25, borderRadius: 100}}/>
+            {forumName}{" "}
+            <Image
+              source={{ uri: forumDetails.flagImage }}
+              style={{ width: 25, height: 25, borderRadius: 100 }}
+            />
           </Text>
           <Pressable onPress={() => setShowFullText(!showFullText)}>
             <Text style={{ color: "grey", fontWeight: "300", fontSize: 15 }}>
               {showFullText
                 ? forumDetails.description
                 : forumDetails.description?.split(".").slice(0, 1).join(".") +
-                "..."}
+                  "..."}
             </Text>
           </Pressable>
         </View>
       </View>
       <ScrollView style={{ backgroundColor: "#F6F1F1", paddingVertical: 12 }}>
-        {forumDetails.posts?.length > 0 ? (
-          forumDetails.posts.map((post) => (
+        {posts?.length > 0 ? (
+          posts.map((post) => (
             <CardForum key={post._id} navigation={navigation} post={post} />
           ))
         ) : (
           <Text style={{ textAlign: "center", marginTop: 20, color: "gray" }}>
-            No posts available yet. Be the first to post here!
+            No posts found.
           </Text>
         )}
       </ScrollView>
