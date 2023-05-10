@@ -17,25 +17,24 @@ export function HeaderChat() {
     return (
         <>
             <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', backgroundColor: "white" }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', backgroundColor: 'white' }}>
-                    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={{ justifyContent: 'center', marginRight: 10, marginLeft: 10 }}>
-                            <PopMenu />
-                        </View>
-                        <View style={{ flex: 1, marginRight: 10, marginTop: 5, marginBottom: 5, flexDirection: 'row', alignItems: 'center' }}>
-                            <SearchChat />
-                        </View>
-                        <Image source={logo} style={styles.image} />
+                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ justifyContent: 'center', marginRight: 10, marginLeft: 10 }}>
+                        <PopMenu />
                     </View>
+                    <View style={{ flex: 1, marginRight: 10, marginTop: 5, marginBottom: 5, flexDirection: 'row' }}>
+                        <SearchChat />
+                    </View>
+                    <Image source={logo} style={styles.image} />
                 </View>
-            </>
-            )
+            </View>
+        </>
+    )
 }
 
-            const styles = StyleSheet.create({
-                image: {
-                width: 50,
-            height: 50,
-            marginRight: 10
+const styles = StyleSheet.create({
+    image: {
+        width: 50,
+        height: 50,
+        marginRight: 10
     }
 })

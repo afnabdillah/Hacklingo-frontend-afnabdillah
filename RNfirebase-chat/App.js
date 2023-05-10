@@ -1,5 +1,16 @@
 import 'expo-dev-client';
-import React, { useState, createContext, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { View, ActivityIndicator } from "react-native";
+import AuthenticatedUserContext from "./helper/AuthenticatedUserContext";
+import Login from "./screens/Login";
+import Signup from "./screens/Signup";
+import Chat from "./screens/Chat";
+import ChatList from "./screens/Chatlist";
+import Contacts from "./screens/Contacts";
+import GroupChat from "./screens/GroupChat";
+import Groups from "./screens/Group";
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeaderChat } from './screens/HeadersChat/HeaderChat';
@@ -18,6 +29,7 @@ import Home from './screens/Home'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { loginSuccess } from './stores/authSlice';
 import MyStack from './components/forum/stack';
+// import RequestJoin from './screens/RequestJoin';
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
