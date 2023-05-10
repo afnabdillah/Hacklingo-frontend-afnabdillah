@@ -19,7 +19,7 @@ export default function HomeScreen({ navigation }) {
 
   const dispatch = useDispatch();
 
-  const showAllDesc = () => {};
+  const showAllDesc = () => { };
 
   useEffect(() => {
     dispatch(fetchForumDetails(forumId))
@@ -44,7 +44,7 @@ export default function HomeScreen({ navigation }) {
           </Text>
           <Pressable onPress={showAllDesc}>
             <Text style={{ color: "grey", fontWeight: "300", fontSize: 15 }}>
-              {forumDetails.description.split(".").slice(0, 2).join(".")}...
+              {forumDetails.description?.split(".").slice(0, 2).join(".")}...
             </Text>
           </Pressable>
           <ScrollView horizontal={true}>
@@ -55,7 +55,7 @@ export default function HomeScreen({ navigation }) {
                 width: 70,
                 borderRadius: 20,
                 marginTop: 20,
-                marginRight:15
+                marginRight: 15
               }}
             >
               <Text style={{ margin: 10, color: "#004aad" }}> Forum </Text>
@@ -67,7 +67,7 @@ export default function HomeScreen({ navigation }) {
                 width: 70,
                 borderRadius: 20,
                 marginTop: 20,
-                marginRight:15
+                marginRight: 15
               }}
             >
               <Text style={{ margin: 10, color: "#004aad" }}> Forum </Text>
