@@ -35,6 +35,7 @@ LogBox.ignoreLogs(['new NativeEventEmitter']);
 import LoginView from "./screens/TemplateLogin";
 import SignUpView from "./screens/TemplateSignup";
 import GrammarCheckScreen from "./screens/GrammarCheck";
+import Article from "./screens/forum/Article";
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -99,9 +100,8 @@ function ChatStack() {
         <Stack.Screen name="ChatList" component={ChatBottomTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
         <Stack.Screen name="Group Chat" component={GroupChat} />
-        <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} options={{
-          headerTitle: "Create Group"
-        }}/>
+        <Stack.Screen name="Article" component={Article} />
+        <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
         <Stack.Screen name="RequestJoin" component={RequestJoin} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen

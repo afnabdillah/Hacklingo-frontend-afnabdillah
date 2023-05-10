@@ -1,17 +1,20 @@
 import React from 'react';
 import { ScrollView, Text, StyleSheet, Image } from 'react-native';
-
+import { useRoute } from '@react-navigation/native'
 const Article = () => {
-    return (
-    <ScrollView> 
+  const route = useRoute();
+  const { article } = route.params;
+  console.log(article, "<<< article")
+  return (
+    <ScrollView>
       <Text style={styles.title}>Highly Motivated and Detail-Oriented Software Developer</Text>
       <Text style={styles.subtitle}>Published on May 10, 2023</Text>
       <Text style={styles.author}>By Admin</Text>
-        <Image
-            style={{height: 200,width:'100%'}}
-            source={{ uri: "https://contenthub-static.grammarly.com/blog/wp-content/uploads/2022/08/BMD-3398.png"}}
-        />
-      <Text style={[styles.content,{marginTop:10}]}>
+      <Image
+        style={{ height: 200, width: '100%' }}
+        source={{ uri: "https://contenthub-static.grammarly.com/blog/wp-content/uploads/2022/08/BMD-3398.png" }}
+      />
+      <Text style={[styles.content, { marginTop: 10 }]}>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vestibulum risus non ullamcorper auctor.
         Nulla facilisi. Nam et massa massa. Aenean lacinia dolor non lectus auctor, vitae bibendum ex dapibus.
         Curabitur euismod malesuada lacus, id sollicitudin lorem commodo in. Nulla facilisi. Proin in dolor id
@@ -32,7 +35,7 @@ const Article = () => {
         a. Donec nec lacinia mauris. Aliquam malesuada interdum odio, in lobortis urna mattis a. Morbi efficitur
         ultricies magna, at tincidunt lectus fringilla sed. Quisque pulvinar purus ut justo elementum dapibus.
       </Text>
-    </ScrollView>   
+    </ScrollView>
   );
 };
 
@@ -59,7 +62,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   content: {
-    fontStyle:'italic',
+    fontStyle: 'italic',
     fontSize: 16,
     lineHeight: 20,
     marginBottom: 10,

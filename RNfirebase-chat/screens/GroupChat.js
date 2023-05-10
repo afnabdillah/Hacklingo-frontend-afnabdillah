@@ -24,7 +24,7 @@ import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import { auth, database } from '../config/firebase';
 import { getDocs } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AntDesign, Ionicons, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons';
 import { PopChatMenu } from './HeadersChat/PopChatMenu';
