@@ -5,8 +5,10 @@ import React, {
     useCallback,
     useContext,
 } from 'react';
-import { TouchableOpacity, Text, View } from 'react-native';
-import { GiftedChat, Bubble } from 'react-native-gifted-chat';
+import bg from '../assets/BG.png'
+
+import { TouchableOpacity, Text, View, ImageBackground, StyleSheet, Image } from 'react-native';
+import { GiftedChat, Bubble, InputToolbar, Actions } from 'react-native-gifted-chat';
 import {
     collection,
     addDoc,
@@ -23,10 +25,14 @@ import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import { auth, database } from '../config/firebase';
 import { getDocs } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialIcons, Entypo } from '@expo/vector-icons';
+import { MaterialIcons, Entypo, FontAwesome } from '@expo/vector-icons';
 import { StyleSheet } from 'react-native';
 
 
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { AntDesign, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { PopChatMenu } from './HeadersChat/PopChatMenu';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function GroupChat({ route, navigation }) {
     const [userEmail, setUserEmail] = useState(null);
@@ -129,38 +135,48 @@ export default function GroupChat({ route, navigation }) {
         );
     };
     useLayoutEffect(() => {
-        if (userEmail && groupAdmin && userEmail === groupAdmin) {
-            navigation.setOptions({
-                headerRight: () => (
-                    <View style={{ flexDirection: 'row', marginRight: 10 }}>
-                        <TouchableOpacity
-                            onPress={() =>
-                                navigation.navigate('RequestJoin', { groupId })
-                            }
-                            style={{ marginRight: 10 }}
-                        >
-                            <Entypo name="add-user" size={24} color="#0D47A1" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() =>
-                                navigation.navigate('CreateGroupChat', {
-                                    groupId,
-                                    groupName,
-                                    groupLanguage,
-                                    groupMembers,
-                                    editMode: true,
-                                })
-                            }
-                        >
-                            <Text style={{ color: '#0D47A1', fontSize: 16 }}>Edit Group</Text>
-                        </TouchableOpacity>
-                    </View>
-                ),
-            });
-        } else {
-            navigation.setOptions({ headerRight: null });
-        }
+        navigation.setOptions({
+            headerRight: () => (
+                <View style={{ flexDirection: 'row', marginRight: 10 }}>
+                    <TouchableOpacity
+                        onPress={() =>
+                            navigation.navigate('Video Chat', { roomId: groupId, username: username })
+                        }
+                        style={{ marginRight: 10 }}
+                    >
+                        <MaterialIcons name="video-call" size={24} color="#0D47A1" />
+                    </TouchableOpacity>
+                    {userEmail && groupAdmin && userEmail === groupAdmin && (
+                        <>
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.navigate('RequestJoin', { groupId })
+                                }
+                                style={{ marginRight: 10 }}
+                            >
+                                <Entypo name="add-user" size={24} color="#0D47A1" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.navigate('CreateGroupChat', {
+                                        groupId,
+                                        groupName,
+                                        groupLanguage,
+                                        groupMembers,
+                                        editMode: true,
+                                    })
+                                }
+                            >
+                                <FontAwesome name="gear" size={24} color="#0D47A1" />
+                            </TouchableOpacity>
+                        </>
+                    )}
+                </View>
+            ),
+        });
     }, [navigation, groupId, groupName, groupLanguage, groupMembers, userEmail, groupAdmin]);
+
+
 
 
 
@@ -181,22 +197,8 @@ export default function GroupChat({ route, navigation }) {
             </View>
         );
     };
-    const renderHeader = () => {
-        const goToVideoChat = () => {
-            navigation.navigate("Video Chat", { roomId: groupId, username: username })
-        };
-
-        return (
-            <View style={styles.header}>
-                <TouchableOpacity>
-                    <MaterialIcons onPress={goToVideoChat} name="video-call" size={36} color="black" />
-                </TouchableOpacity>
-            </View>
-        );
-    };
     return (
         <View style={{ flex: 1 }}>
-            {renderHeader()}
             <GiftedChat
                 messages={messages}
                 showAvatarForEveryMessage={true}
@@ -212,15 +214,49 @@ export default function GroupChat({ route, navigation }) {
     );
 }
 
+    const styles = StyleSheet.create({
+        headers: {
+            flexDirection: 'row',
+            backgroundColor: '#fff',
+            height: 50,
+            alignItems: 'center',
+            paddingLeft: 10,
+            paddingRight: 10,
+            paddingBottom: 10,
+            paddingTop: 10,
+            flex: 0.06,
+            justifyContent: 'space-between'
+        },
+        container: {
+            flexDirection: 'row',
+            backgroundColor: 'whitesmoke',
+            padding: 5,
+            marginHorizontal: 10,
+            alignItems: 'center',
+            borderRadius: 20,
+        },
+        input: {
+            flex: 1,
+            backgroundColor: 'white',
+            padding: 5,
+            paddingHorizontal: 10,
+            marginHorizontal: 10,
+            borderRadius: 50,
+            borderColor: 'lightgray',
+            borderWidth: StyleSheet.hairlineWidth
 
-const styles = StyleSheet.create({
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-    }
-});
+        },
+        send: {
+            backgroundColor: 'royalblue',
+            padding: 7,
+            borderRadius: 15,
+            overflow: 'hidden',
+        },
+        image: {
+            width: 45,
+            height: 45,
+            borderRadius: 30,
+            marginRight: 10,
+            marginLeft: 10
+        },
+    })

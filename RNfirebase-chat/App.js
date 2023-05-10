@@ -29,6 +29,7 @@ import Home from './screens/Home'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { loginSuccess } from './stores/authSlice';
 import MyStack from './components/forum/stack';
+import { Ionicons } from '@expo/vector-icons';
 import RequestJoin from './screens/RequestJoin';
 import LoginView from "./screens/TemplateLogin";
 import SignUpView from "./screens/TemplateSignup";
@@ -41,7 +42,7 @@ function ChatTopTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <HeaderChat />
-      <TopTab.Navigator>
+      <TopTab.Navigator screenOptions={{ headerShown: false }}>
         <TopTab.Screen name="Find Contacts" component={Contacts} />
         <TopTab.Screen name="Find Groups" component={Groups} />
       </TopTab.Navigator>
@@ -52,12 +53,15 @@ function ChatTopTabNavigator() {
 function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {/* <HeaderChat /> */}
-      <BottomTab.Navigator initialRouteName='Home' >
-        <BottomTab.Screen name="Home" component={Home} options={{ headerShown: false }}/>
+      <BottomTab.Navigator screenOptions={{headerShown: false}}>
+        <BottomTab.Screen name="Home" component={Home} options={{
+          tabBarIcon: () => {
+            return <Ionicons name="ios-home-outline" size={24} color="black" />
+          }
+        }} />
         <BottomTab.Screen
           name="Chats"
-          options={{ tabBarLabel: 'Chats', headerShown: false }}
+          options={{ tabBarLabel: 'Chats', tabBarIcon: () => <Ionicons name="ios-chatbubbles-outline" size={24} color="black" /> }}
           children={() => (
             <>
               <HeaderChat />
@@ -69,7 +73,9 @@ function ChatBottomTabNavigator() {
             </>
           )}
         />
-        <BottomTab.Screen name="Forum" component={MyStack} options={{ headerShown: false }}/>
+        <BottomTab.Screen name="Forum" component={MyStack} options={{
+          tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="black" />
+        }}/>
       </BottomTab.Navigator>
     </SafeAreaView>
   );
@@ -78,17 +84,9 @@ function ChatStack() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Stack.Navigator>
-        <Stack.Screen
-          name="ChatList"
-          component={ChatBottomTabNavigator}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Chat"
-          component={Chat}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="Group Chat" component={GroupChat} />
+        <Stack.Screen name="ChatList" component={ChatBottomTabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
+        <Stack.Screen name="Group Chat" component={GroupChat} options={{ headerShown: false }} />
         <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
         <Stack.Screen name="RequestJoin" component={RequestJoin} />
         <Stack.Screen name="Profile" component={Profile} />

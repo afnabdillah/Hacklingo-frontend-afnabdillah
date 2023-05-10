@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { database } from '../config/firebase';
 import { useNavigation } from '@react-navigation/native';
@@ -55,10 +55,22 @@ const RequestJoin = ({ route }) => {
     }, [groupId, requestedUsers]);
 
     return (
-        <View>
-            {requestedUsers.map((user, index) => (
-                <UserCard key={index} user={user} groupId={groupId} />
-            ))}
+        <View style={styles.container}>
+            {requestedUsers.length === 0 ? (
+                <>
+                    <Image
+                        source={{
+                            uri: 'https://cdn2.iconfinder.com/data/icons/delivery-and-logistic/64/Not_found_the_recipient-no_found-person-user-search-searching-4-512.png',
+                        }}
+                        style={styles.noUserImage}
+                    />
+                    <Text style={styles.noUserText}>No user applied to your group</Text>
+                </>
+            ) : (
+                requestedUsers.map((user, index) => (
+                    <UserCard key={index} user={user} groupId={groupId} />
+                ))
+            )}
         </View>
     );
 };
@@ -77,6 +89,7 @@ const styles = StyleSheet.create({
     },
     userInfo: {
         fontSize: 16,
+        marginRight : 10
     },
     buttonsContainer: {
         flexDirection: 'row',
@@ -97,6 +110,22 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: '#fff',
+    },
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    noUserImage: {
+        width: 100,
+        height: 100,
+        resizeMode: 'contain',
+    },
+    noUserText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginTop: 20,
     },
 });
 

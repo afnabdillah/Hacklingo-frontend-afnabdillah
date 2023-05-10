@@ -1,13 +1,14 @@
 import { Text, View, ScrollView, Image } from "react-native";
-import { FontAwesome } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity } from "react-native-gesture-handler";
 
-export default function DetailScreen() {
+export default function DetailScreen({navigation}) {
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <ScrollView>
         <View style={{backgroundColor: "white", justifyContent: "space-between", width: "100%", height: "100%" }}>
           <View style={{marginLeft: 20, padding: 5, flexDirection: "row"}}>
-            <FontAwesome name="user-circle-o" size={30} color="black" />
+            <Image source={{ uri: "https://i.pravatar.cc/300" }} style={{ height: 40, width: 40, borderRadius: 100 }} />
             <View>
               <Text style={{marginLeft: 20}}>Hallo</Text>
               <Text style={{marginLeft: 20, color: "grey"}}>12 - 12 - 2012</Text>
@@ -21,15 +22,52 @@ export default function DetailScreen() {
               <Text style={{ fontWeight: "400" }}>Funny</Text>
             </View>
           </View>
-          <View style={{marginTop: 10, width: "100%", height: "100%"}}>
+          <View style={{marginTop: 10, width: "100%", height: 200}}>
             <Image source={{ uri: "https://thumb.viva.co.id/media/frontend/thumbs3/2019/11/21/5dd64a2d921ea-5-makanan-penyebab-stroke-yang-jarang-diketahui_665_374.jpg"}} style={{height: "100%", width: "100%"}}/>
-            <Text>gvfd</Text>
           </View>
-          <View style={{flexDirection: "row"}}>
-            
+          <View style={{ justifyContent: "flex-start"}}>
+            <View style={{ flexDirection: "row", padding: 10, alignItems: "center", marginLeft: 10, borderBottomWidth: 5, borderColor: "#F6F1F1" }}>
+              <Ionicons name="ios-arrow-up-circle-outline" size={20} color="grey" />
+              <Text style={{fontSize: 12, color: "grey"}}> 23,7k </Text>
+              <Ionicons name="ios-arrow-down-circle-outline" size={20} color="grey" />
+              <Ionicons name="ios-chatbox-outline" size={20} color="black" style={{marginLeft: 20}}/>
+              <Text style={{ fontSize: 12, color: "grey", marginLeft: 5 }}> 1000 </Text>
+              <Ionicons name="ios-arrow-redo-outline" size={20} color="black" style={{ marginLeft: 20 }} />
+              <Text style={{ fontSize: 12, color: "grey", marginLeft: 5 }}> Share </Text>
+            </View>
+            {/* comment di forum */}
+            <View style={{ flexDirection: "row", padding: 10, alignItems: "center", marginLeft: 10 }}>
+              <Image source={{ uri: "https://i.pravatar.cc/300"}} style={{height: 30  , width: 30 , borderRadius: 100}}/>
+              <Text style={{color: "grey", fontSize: 12, marginLeft: 5, fontWeight: "500"}}>nama</Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center", marginLeft: 15 }}>
+              <Text style={{ fontSize: 12, marginLeft: 5, fontWeight: "400" }}>
+                The dude said he "unknowingly hit a girl" {"\n"}
+                HE CHOOSE TO FUCKING SHOOT AT CHILDREN!
+              </Text>
+            </View>
           </View>
         </View>
       </ScrollView>
-    </>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: 20 }}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#1E90FF',
+            borderRadius: 25,
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onPress={() => navigation.navigate("Comment")}
+        >
+          <Text style={{
+            color: 'white',
+            fontWeight: 'bold',
+          }}
+          >{"Add Comment"}</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   )
 }

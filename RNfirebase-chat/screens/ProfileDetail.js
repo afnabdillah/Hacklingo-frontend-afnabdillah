@@ -2,6 +2,7 @@ import { Image, ScrollView, Text, View } from "react-native";
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function DetailProfile({route}) {
   const { name, email } = route.params;
@@ -50,6 +51,7 @@ export default function DetailProfile({route}) {
                 <Text style={{ marginLeft: 137, fontSize: 14, color: "grey" }}>None <AntDesign name="right" size={16} color="grey" /></Text>
               </View>
             </View>
+
             <View style={{ backgroundColor: "white", width: "95%", borderRadius: 10, marginBottom: 20 }}>
               <View style={{ padding: 10, flexDirection: "row" }}>
                 <View style={{ marginLeft: 10, backgroundColor: "#35c759", padding: 4, borderRadius: 4 }}>
@@ -71,6 +73,44 @@ export default function DetailProfile({route}) {
                 </View>
                 <Text style={{ marginLeft: 10, fontSize: 14 }}>Save to Camera Roll</Text>
                 <Text style={{ marginLeft: 125, fontSize: 14, color: "grey" }}>Default</Text>
+              </View>
+            </View>
+
+            <View style={{ backgroundColor: "white", width: "95%", borderRadius: 10, marginBottom: 20 }}>
+              <View style={{ padding: 10, flexDirection: "row" }}>
+                <View style={{ marginLeft: 10, backgroundColor: "#077eff", padding: 4, borderRadius: 4 }}>
+                  <FontAwesome5 name="lock" size={16} color="white" />
+                </View>
+                <Text style={{ marginLeft: 10, fontSize: 14 }}>Encryption</Text>
+                <Text style={{ marginLeft: 224, fontSize: 14, color: "grey" }}><AntDesign name="right" size={16} color="grey" /></Text>
+              </View>
+              <View style={{ padding: 10, flexDirection: "row", borderTopWidth: 1, borderTopColor: "#F6F1F1" }}>
+                <View style={{ marginLeft: 10, backgroundColor: "#077eff", padding: 4, borderRadius: 4 }}>
+                  <MaterialCommunityIcons name="progress-clock" size={16} color="white" />
+                </View>
+                <Text style={{ marginLeft: 10, fontSize: 14 }}>Disappearing Messages</Text>
+                <Text style={{ marginLeft: 113, fontSize: 14, color: "grey" }}>Off <AntDesign name="right" size={16} color="grey" /></Text>
+              </View>
+            </View>
+
+            <View style={{ backgroundColor: "white", width: "95%", borderRadius: 10, marginBottom: 20 }}>
+              <View style={{ padding: 10, flexDirection: "row" }}>
+                <Text style={{ marginLeft: 10, fontSize: 14, color: "#077eff" }}>Share Contact</Text>
+              </View>
+              <View style={{ padding: 10, flexDirection: "row", borderTopWidth: 1, borderTopColor: "#F6F1F1" }}>
+                <Text style={{ marginLeft: 10, fontSize: 14, color: "#077eff" }}>Export Chat</Text>
+              </View>
+              <View style={{ padding: 10, flexDirection: "row", borderTopWidth: 1, borderTopColor: "#F6F1F1" }}>
+                <Text style={{ marginLeft: 10, fontSize: 14, color: "#fe3c30" }}>Clear Chat</Text>
+              </View>
+            </View>
+
+            <View style={{ backgroundColor: "white", width: "95%", borderRadius: 10, marginBottom: 30 }}>
+              <View style={{ padding: 10, flexDirection: "row", borderTopWidth: 1, borderTopColor: "#F6F1F1" }}>
+                <Text style={{ marginLeft: 10, fontSize: 14, color: "#fe3c30" }}>Block {name}</Text>
+              </View>
+              <View style={{ padding: 10, flexDirection: "row", borderTopWidth: 1, borderTopColor: "#F6F1F1" }}>
+                <Text style={{ marginLeft: 10, fontSize: 14, color: "#fe3c30" }}>Report {name}</Text>
               </View>
             </View>
           </View>

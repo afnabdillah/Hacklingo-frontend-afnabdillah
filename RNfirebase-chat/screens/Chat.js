@@ -5,7 +5,7 @@ import React, {
   useContext,
   useLayoutEffect
 } from 'react';
-import { TouchableOpacity, Text, ImageBackground, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, ImageBackground, StyleSheet, Button, Platform } from 'react-native';
 import { Actions, Bubble, GiftedChat, InputToolbar } from 'react-native-gifted-chat';
 import {
   collection,
@@ -31,9 +31,50 @@ import { AntDesign, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@exp
 import { Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { PopChatMenu } from './HeadersChat/PopChatMenu';
+import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Chat({ route }) {
+
+  const selectDoc = async () => {
+    try {
+      const picker = await DocumentPicker.getDocumentAsync()
+      console.log(picker, "<<<<<>");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const selectImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        quality: 1,
+      });
+      if (!result.canceled) {
+        const formData = new FormData();
+        formData.append('file', {
+          uri: Platform.OS === 'ios' ? result.uri.replace('file://', '') : result.uri,
+          type: 'image/jpeg',
+          name: 'photo.jpg',
+        });
+        const response = await fetch('https://example.com/upload-image', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        console.log(response);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageView, setSeletedImageView] = useState("");
@@ -148,9 +189,9 @@ export default function Chat({ route }) {
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground source={bg} style={{ flex: 1 }}>
         <View style={styles.headers}>
-          <View style={{ flexDirection: 'row' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity onPress={() => navigation.navigate('ChatList')}>
-              <AntDesign name="arrowleft" size={36} color="black" />
+              <AntDesign name="arrowleft" size={30} color="black" />
             </TouchableOpacity>
             <Image source={{ uri: 'https://i.pravatar.cc/300' }} style={styles.image} />
             <Text style={{ fontStyle: 'italic', fontSize: 25 }}>{recipientName}</Text>
@@ -180,7 +221,7 @@ export default function Chat({ route }) {
                 bottom: 5,
                 zIndex: 9999,
               }}
-
+              onPressActionButton={selectImage}
               icon={() => (
                 <Ionicons name="camera" size={30} color={'grey'} />
               )}
