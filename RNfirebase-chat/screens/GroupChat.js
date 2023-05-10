@@ -22,8 +22,15 @@ import { signOut } from 'firebase/auth';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import { auth, database } from '../config/firebase';
 import { getDocs } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MaterialIcons, Entypo } from '@expo/vector-icons';
+import { StyleSheet } from 'react-native';
+
+
 
 export default function GroupChat({ route, navigation }) {
+    const [userEmail, setUserEmail] = useState(null);
+    const [username, setUsername] = useState(null);
     const [messages, setMessages] = useState([]);
     const { groupId, groupName } = route.params;
     const { user: currentUser } = useContext(AuthenticatedUserContext);
@@ -32,27 +39,16 @@ export default function GroupChat({ route, navigation }) {
     const [groupMembers, setGroupMembers] = useState([]);
     const [groupAdmin, setGroupAdmin] = useState(null);
 
-
-    async function getUsernameByEmail(email) {
-        const usersCollectionRef = collection(database, 'users');
-        const q = query(usersCollectionRef, where('email', '==', email));
-        const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) {
-            return null;
-        } else {
-            const doc = querySnapshot.docs[0];
-            return doc.data().username;
-        }
-    }
-
     useEffect(() => {
-        async function fetchUsername() {
-            const getUsername = await getUsernameByEmail(currentUser.email);
-            return getUsername;
-        }
-        fetchUsername().then((username) => setCurrentUsername(username));
-    }, [currentUser]);
+        const fetchUserData = async () => {
+            const email = await AsyncStorage.getItem("email");
+            const username = await AsyncStorage.getItem("username");
+            setUserEmail(email);
+            setUsername(username);
+        };
 
+        fetchUserData();
+    }, []);
     const mergeMessages = (oldMessages, newMessages) => {
         const allMessages = [...oldMessages, ...newMessages];
         const uniqueMessages = allMessages.filter(
@@ -96,7 +92,7 @@ export default function GroupChat({ route, navigation }) {
 
     const onSend = useCallback(
         (messages = []) => {
-            if (!currentUser) {
+            if (!userEmail) {
                 console.error(
                     'User data not loaded yet. Please try again later.'
                 );
@@ -112,9 +108,9 @@ export default function GroupChat({ route, navigation }) {
                 createdAt,
                 text,
                 user: {
-                    _id: currentUser.email,
-                    username: currentUsername,
-                    avatar: currentUser.avatar || 'https://i.pravatar.cc/300',
+                    _id: userEmail,
+                    username: username,
+                    avatar: currentUser?.avatar || 'https://i.pravatar.cc/300',
                 },
             };
 
@@ -123,7 +119,7 @@ export default function GroupChat({ route, navigation }) {
                 messages: arrayUnion(messageObj),
             });
         },
-        [currentUser, groupId, currentUsername]
+        [userEmail, groupId, username]
     );
     const renderUsername = (currentMessage) => {
         return (
@@ -133,33 +129,43 @@ export default function GroupChat({ route, navigation }) {
         );
     };
     useLayoutEffect(() => {
-        if (currentUser && groupAdmin && currentUser.email === groupAdmin) {
+        if (userEmail && groupAdmin && userEmail === groupAdmin) {
             navigation.setOptions({
                 headerRight: () => (
-                    <TouchableOpacity
-                        onPress={() =>
-                            navigation.navigate('CreateGroupChat', {
-                                groupId,
-                                groupName,
-                                groupLanguage,
-                                groupMembers,
-                                editMode: true,
-                            })
-                        }
-                        style={{ marginRight: 10 }}
-                    >
-                        <Text style={{ color: '#0D47A1', fontSize: 16 }}>Edit Group</Text>
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', marginRight: 10 }}>
+                        <TouchableOpacity
+                            onPress={() =>
+                                navigation.navigate('RequestJoin', { groupId })
+                            }
+                            style={{ marginRight: 10 }}
+                        >
+                            <Entypo name="add-user" size={24} color="#0D47A1" />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() =>
+                                navigation.navigate('CreateGroupChat', {
+                                    groupId,
+                                    groupName,
+                                    groupLanguage,
+                                    groupMembers,
+                                    editMode: true,
+                                })
+                            }
+                        >
+                            <Text style={{ color: '#0D47A1', fontSize: 16 }}>Edit Group</Text>
+                        </TouchableOpacity>
+                    </View>
                 ),
             });
         } else {
             navigation.setOptions({ headerRight: null });
         }
-    }, [navigation, groupId, groupName, groupLanguage, groupMembers, currentUser, groupAdmin]);
+    }, [navigation, groupId, groupName, groupLanguage, groupMembers, userEmail, groupAdmin]);
+
 
 
     const renderBubble = (props) => {
-        const isCurrentUser = props.currentMessage.user._id === currentUser.email;
+        const isCurrentUser = props.currentMessage.user._id === userEmail;
         const bubbleBackgroundColor = isCurrentUser ? '#1f75fe  ' : '#fffff';
 
         return (
@@ -175,18 +181,46 @@ export default function GroupChat({ route, navigation }) {
             </View>
         );
     };
+    const renderHeader = () => {
+        const goToVideoChat = () => {
+            navigation.navigate("Video Chat", { roomId: groupId, username: username })
+        };
 
+        return (
+            <View style={styles.header}>
+                <TouchableOpacity>
+                    <MaterialIcons onPress={goToVideoChat} name="video-call" size={36} color="black" />
+                </TouchableOpacity>
+            </View>
+        );
+    };
     return (
-        <GiftedChat
-            messages={messages}
-            showAvatarForEveryMessage={true}
-            onSend={(messages) => onSend(messages)}
-            user={{
-                _id: currentUser.email,
-                username: currentUser.username,
-                avatar: currentUser.avatar || 'https://i.pravatar.cc/300',
-            }}
-            renderBubble={renderBubble}
-        />
+        <View style={{ flex: 1 }}>
+            {renderHeader()}
+            <GiftedChat
+                messages={messages}
+                showAvatarForEveryMessage={true}
+                onSend={messages => onSend(messages)}
+                user={{
+                    _id: userEmail,
+                    username: username,
+                    avatar: currentUser?.avatar || 'https://i.pravatar.cc/300',
+                }}
+                renderBubble={renderBubble}
+            />
+        </View>
     );
 }
+
+
+const styles = StyleSheet.create({
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+    }
+});

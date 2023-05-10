@@ -11,11 +11,13 @@ import {
 } from 'react-native';
 import { database, auth } from '../config/firebase';
 import { collection, getDocs, addDoc, setDoc, doc } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function CreateGroupChat({ route, navigation }) {
     const { groupId, groupName: initialGroupName, groupLanguage: initialGroupLanguage, groupMembers, editMode } = route.params || {};
     const [groupName, setGroupName] = useState(initialGroupName || '');
     const [users, setUsers] = useState([]);
+    const [userEmail, setUserEmail] = useState(null);
     const [isProGroup, setIsProGroup] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState(new Set(groupMembers || []));
     const [selectedLanguages, setSelectedLanguages] = useState(
@@ -27,7 +29,6 @@ function CreateGroupChat({ route, navigation }) {
                 : []
         )
     );
-
     const languages = ['English', 'German', 'Japanese', 'French', 'Russian'];
     const CustomCheckBox = ({ isSelected, onPress }) => (
         <TouchableOpacity
@@ -40,6 +41,15 @@ function CreateGroupChat({ route, navigation }) {
     );
 
     useEffect(() => {
+        const fetchEmail = async () => {
+          const email = await AsyncStorage.getItem("email");
+          setUserEmail(email);
+        };
+      
+        fetchEmail();
+      }, []);
+
+    useEffect(() => {
         async function fetchUsers() {
             const usersCollectionRef = collection(database, 'users');
             const querySnapshot = await getDocs(usersCollectionRef);
@@ -49,7 +59,7 @@ function CreateGroupChat({ route, navigation }) {
             }));
             setUsers(fetchedUsers);
         }
-
+        
         fetchUsers();
     }, []);
 
@@ -89,13 +99,13 @@ function CreateGroupChat({ route, navigation }) {
             languages: Array.from(selectedLanguages),
             createdAt: new Date(),
             messages: [],
-            admin: auth.currentUser.email,
+            admin: userEmail,
             isProGroup,
             requestJoin : []
         };
 
         const groupChatsRef = collection(database, 'groupChats');
-
+        console.log(`Group Chat ${groupName} created`)
         if (editMode) {
             const groupDocRef = doc(database, 'groupChats', groupId);
             await setDoc(groupDocRef, groupData);

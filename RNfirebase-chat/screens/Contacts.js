@@ -10,6 +10,14 @@ import {
 import AuthenticatedUserContext from "../helper/AuthenticatedUserContext";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersByNativeLanguage, fetchUsersBySearch } from "../stores/usersSlice";
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { collection, getDocs } from 'firebase/firestore';
+import { database } from '../config/firebase';
+import { auth } from '../config/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Contacts({ navigation }) {
   const [contacts, setContacts] = useState([]);

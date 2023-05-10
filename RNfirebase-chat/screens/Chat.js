@@ -31,12 +31,14 @@ import { AntDesign, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@exp
 import { Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { PopChatMenu } from './HeadersChat/PopChatMenu';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Chat({ route }) {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageView, setSeletedImageView] = useState("");
-
+  const [userEmail, setUserEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [messages, setMessages] = useState([]);
   const { recipientEmail, recipientName, senderEmail } = route.params;
   // const { user: currentUser } = useContext(AuthenticatedUserContext);
@@ -46,20 +48,6 @@ export default function Chat({ route }) {
   const currentUserProfileImageUrl = useSelector(state => state.authReducer.profileImageUrl);
 
   const dispatch = useDispatch();
-
-
-  async function getUserDataByEmail(email) {
-    const usersCollectionRef = collection(database, 'users');
-    const q = query(usersCollectionRef, where('email', '==', email));
-    const querySnapshot = await getDocs(q);
-
-    if (!querySnapshot.empty) {
-      const userDoc = querySnapshot.docs[0];
-      return userDoc.data();
-    } else {
-      return null;
-    }
-  }
 
   useEffect(() => {
     // async function fetchCurrentUserData() {
@@ -171,7 +159,7 @@ export default function Chat({ route }) {
             <TouchableOpacity>
               <MaterialIcons onPress={goToVideoChat} name="video-call" size={36} color="black" />
             </TouchableOpacity>
-            <PopChatMenu name={recipientName} email={recipientEmail}/>
+            <PopChatMenu name={recipientName} email={recipientEmail} />
           </View>
         </View>
         <GiftedChat
