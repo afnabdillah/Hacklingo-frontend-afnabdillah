@@ -209,7 +209,7 @@ export default function Chat({ route }) {
                 bottom: 5,
                 zIndex: 9999,
               }}
-              onPressActionButton={selectImage}
+              // onPressActionButton={selectImage}
               icon={() => <Ionicons name="camera" size={30} color={"grey"} />}
             />
           )}

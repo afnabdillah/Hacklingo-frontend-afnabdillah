@@ -10,7 +10,6 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { HeaderChat } from './HeadersChat/HeaderChat';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useSelector } from 'react-redux';
 dayjs.extend(relativeTime);
 
 
