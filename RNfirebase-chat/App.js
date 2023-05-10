@@ -36,6 +36,7 @@ import { LogBox } from 'react-native';
 LogBox.ignoreLogs(['new NativeEventEmitter']);
 import LoginView from "./screens/TemplateLogin";
 import SignUpView from "./screens/TemplateSignup";
+import GrammarCheckScreen from "./screens/GrammarCheck";
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -79,6 +80,7 @@ function ChatBottomTabNavigator() {
         <BottomTab.Screen name="Forum" component={MyStack} options={{
           tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="black" />
         }}/>
+        <BottomTab.Screen name="Grammar Check Screen" component={GrammarCheckScreen} />
       </BottomTab.Navigator>
     </SafeAreaView>
   );
