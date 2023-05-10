@@ -16,27 +16,27 @@ export default function MyStack() {
         headerRight: () => {
           return <HeaderPost />
         },
-        headerTitle: () => { return <FontAwesome name="comments-o" size={30} color="#004aad" /> },
+        headerTitle: () => { return <FontAwesome name="comments-o" size={30} color="black" /> },
         headerStyle: {
-          backgroundColor: "white"
+          backgroundColor: "#0097b2"
         },
       }} />
       <Stack.Screen name='AddPost' component={Post} options={{
         headerRight: () => {
           return <HeaderPost />
         },
-        headerTitle: () => { return <FontAwesome name="comments-o" size={30} color="#004aad" /> },
+        headerTitle: () => { return <FontAwesome name="comments-o" size={30} color="black" /> },
         headerStyle: {
-          backgroundColor: "white"
+          backgroundColor: "#0097b2"
         },
       }}/>
       <Stack.Screen name='Comment' component={Comments} options={{
         headerRight: () => {
           return <HeaderPost />
         },
-        headerTitle: () => { return <FontAwesome name="comments-o" size={30} color="#004aad" /> },
+        headerTitle: () => { return <FontAwesome name="comments-o" size={30} color="black" /> },
         headerStyle: {
-          backgroundColor: "white"
+          backgroundColor: "#0097b2"
         },
       }} />
     </Stack.Navigator>

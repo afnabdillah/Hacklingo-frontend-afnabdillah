@@ -35,7 +35,7 @@ export function PopMenu() {
     return (
         <>
             <TouchableOpacity onPress={() => resizeBox(1)}>
-                <FontAwesome name="user-circle" size={40} color="black" />
+                <FontAwesome name="user-circle" size={40} color="white" />
             </TouchableOpacity>
             <Modal transparent visible={visible}>
                 <SafeAreaView

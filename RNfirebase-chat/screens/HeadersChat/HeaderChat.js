@@ -16,7 +16,7 @@ export function HeaderChat() {
     const navigation = useNavigation()
     return (
         <>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', backgroundColor: "white" }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', backgroundColor: "#0097b2" }}>
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
                     <View style={{ justifyContent: 'center', marginRight: 10, marginLeft: 10 }}>
                         <PopMenu />
