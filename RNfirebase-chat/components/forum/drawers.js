@@ -6,6 +6,8 @@ import HeaderForum from "./Header";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllForums } from "../../stores/forumsSlice";
 import { View, ActivityIndicator } from "react-native";
+import { Image } from "react-native";
+
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNav() {
@@ -39,7 +41,7 @@ export default function DrawerNav() {
               },
               drawerIcon: () => {
                 return (
-                  <FontAwesome name="comments-o" size={24} color="black" />
+                  <Image source={{uri : el.flagImage}} style={{width: 24, height: 24, borderRadius: 100, backgroundColor: "black"}} />
                 );
               },
               drawerLabelStyle: {
