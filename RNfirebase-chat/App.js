@@ -30,6 +30,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { loginSuccess } from './stores/authSlice';
 import MyStack from './components/forum/stack';
 import RequestJoin from './screens/RequestJoin';
+import LoginView from "./screens/TemplateLogin";
+import SignUpView from "./screens/TemplateSignup";
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -67,7 +69,7 @@ function ChatBottomTabNavigator() {
             </>
           )}
         />
-        <BottomTab.Screen name="Forum" component={MyStack} />
+        <BottomTab.Screen name="Forum" component={MyStack} options={{ headerShown: false }}/>
       </BottomTab.Navigator>
     </SafeAreaView>
   );
@@ -110,8 +112,8 @@ function ChatStack() {
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Signup" component={Signup} />
+      <Stack.Screen name="Login" component={LoginView} />
+      <Stack.Screen name="Signup" component={SignUpView} />
     </Stack.Navigator>
   );
 }
