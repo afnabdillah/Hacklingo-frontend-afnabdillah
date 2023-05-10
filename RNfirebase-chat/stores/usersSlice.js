@@ -128,7 +128,7 @@ export const userLogin = createAsyncThunk(
 
 export const userSignUp = createAsyncThunk(
   "usersSlice/userSignUp",
-  async (input, { rejectWithValue }) => {
+  async (input, { rejectWithValue, dispatch }) => {
     try {
       // these are temporary additionals
       const additionals = {
@@ -159,8 +159,15 @@ export const userSignUp = createAsyncThunk(
       });
       // Save it to async storage
       await saveToAsyncStorage(response.data);
-      const userId = await AsyncStorage.getItem("itemid");
-      return userId;
+      dispatch(
+        loginSuccess({
+          userId: response.data._id,
+          email: response.data.email,
+          username: response.data.username,
+          profileImageUrl: response.data.profileImageUrl || "",
+        })
+      );
+      return true;
     } catch (err) {
       // return err.response if it was an axios error with reject with value
       if (err.response) {

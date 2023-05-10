@@ -34,6 +34,8 @@ import RequestJoin from './screens/RequestJoin';
 import { LogBox } from 'react-native';
 
 LogBox.ignoreLogs(['new NativeEventEmitter']);
+import LoginView from "./screens/TemplateLogin";
+import SignUpView from "./screens/TemplateSignup";
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -111,8 +113,8 @@ function ChatStack() {
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Signup" component={Signup} />
+      <Stack.Screen name="Login" component={LoginView} />
+      <Stack.Screen name="Signup" component={SignUpView} />
     </Stack.Navigator>
   );
 }

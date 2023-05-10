@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { HeaderChat } from './HeadersChat/HeaderChat';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSelector } from 'react-redux';
 dayjs.extend(relativeTime);
 
 
@@ -20,6 +21,7 @@ function ChatList() {
   const username = useSelector((state) => state.authReducer.username);
 
   useEffect(() => {
+    console.log(userEmail, "<<< ini userEmail di use Effect")
     if (!userEmail) return;
     const personalChatsRef = collection(database, 'personalChats');
     const personalChatsQuery = query(personalChatsRef);
@@ -37,6 +39,8 @@ function ChatList() {
       personalChatsUnsubscribe();
     };
   }, [userEmail]);
+
+  console.log(chats, "<<< ini chats");
 
   const mergeChatLists = (prevChats, newChats, userEmail) => {
     const mergedChats = newChats
