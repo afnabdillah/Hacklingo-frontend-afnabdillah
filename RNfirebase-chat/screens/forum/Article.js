@@ -16,8 +16,6 @@ const Article = () => {
     (state) => state.articlesReducer.status.articleDetails
   );
 
-  console.log(articleDetails, "<<< ini article details");
-
   useEffect(() => {
     dispatch(fetchArticleById(articleId))
       .unwrap()

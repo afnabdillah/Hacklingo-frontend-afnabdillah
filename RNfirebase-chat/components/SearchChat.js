@@ -9,9 +9,11 @@ export function SearchChat() {
   const dispatch = useDispatch();
 
   function handleSearch() {
-    dispatch(fetchUsersBySearch(searchUsername))
-    .unwrap()
-    .catch(err => showToast("error", "Fetch Data Error", err.message));
+    if (searchUsername.length !== 0) {
+      dispatch(fetchUsersBySearch(searchUsername))
+        .unwrap()
+        .catch((err) => showToast("error", "Fetch Data Error", err.message));
+    }
   }
 
   return (

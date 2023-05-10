@@ -72,8 +72,6 @@ const Carousel = ({ data, onPress }) => {
       </View>
     );
   }
-
-  console.log('Please provide Images');
   return null;
 };
 
