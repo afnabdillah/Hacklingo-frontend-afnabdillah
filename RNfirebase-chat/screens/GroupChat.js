@@ -25,12 +25,9 @@ import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import { auth, database } from '../config/firebase';
 import { getDocs } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialIcons, Entypo } from '@expo/vector-icons';
-import { StyleSheet } from 'react-native';
-
 
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AntDesign, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AntDesign, Ionicons, MaterialCommunityIcons, MaterialIcons, Entypo } from '@expo/vector-icons';
 import { PopChatMenu } from './HeadersChat/PopChatMenu';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -191,10 +188,6 @@ export default function GroupChat({ route, navigation }) {
         const goToVideoChat = () => {
             navigation.navigate("Video Chat", { roomId: groupId, username: username })
         };
-
-        const goToVideoChat = () => {
-            navigation.navigate("Video Chat", { roomId: groupId, username: 'jun' })
-        }
         const selectImage = async () => {
             try {
                 let result = await ImagePicker.launchImageLibraryAsync({
@@ -410,3 +403,4 @@ export default function GroupChat({ route, navigation }) {
             marginLeft: 10
         },
     })
+}

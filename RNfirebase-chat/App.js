@@ -11,7 +11,7 @@ import ChatList from "./screens/Chatlist";
 import Contacts from "./screens/Contacts";
 import GroupChat from "./screens/GroupChat";
 import Groups from "./screens/Group";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { HeaderChat } from "./screens/HeadersChat/HeaderChat";
 import CreateGroupChat from "./screens/CreateGroupChat"; // Import the CreateGroupChat component
