@@ -30,7 +30,7 @@ import MyStack from './components/forum/stack';
 import { Ionicons } from '@expo/vector-icons';
 import RequestJoin from './screens/RequestJoin';
 import { LogBox } from 'react-native';
-
+import { FontAwesome } from '@expo/vector-icons';
 LogBox.ignoreLogs(['new NativeEventEmitter']);
 import LoginView from "./screens/TemplateLogin";
 import SignUpView from "./screens/TemplateSignup";
@@ -78,7 +78,10 @@ function ChatBottomTabNavigator() {
         <BottomTab.Screen name="Forum" component={MyStack} options={{
           tabBarIcon: () => <Ionicons name="ios-compass-outline" size={24} color="black" />
         }}/>
-        <BottomTab.Screen name="Grammar Check Screen" component={GrammarCheckScreen} />
+        <BottomTab.Screen name="Grammar Check Screen" component={GrammarCheckScreen} options={{
+          tabBarIcon: () => <FontAwesome name="language" size={24} color="black" />,
+          title: "Grammar"
+        }}/>
       </BottomTab.Navigator>
     </SafeAreaView>
   );
