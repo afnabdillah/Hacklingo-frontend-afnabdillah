@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 
 export default function Post() {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
   const onHandleCreate = () => {
     // Replace this function with your own functionality to post the data to your backend server
-    console.log('Title:', title);
-    console.log('Description:', description);
-    console.log('Image Url:', imageUrl);
+    console.log("Title:", title);
+    console.log("Description:", description);
+    console.log("Image Url:", imageUrl);
   };
 
   return (
@@ -49,32 +55,32 @@ export default function Post() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 20,
   },
   label: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 5,
     paddingHorizontal: 10,
     paddingVertical: 5,
     marginBottom: 15,
   },
   button: {
-    backgroundColor: '#1E90FF',
+    backgroundColor: "#1E90FF",
     borderRadius: 25,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
 });
