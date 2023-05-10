@@ -29,6 +29,7 @@ export default function DrawerNav() {
               <HeaderForum />
             )
           },
+          headerTitle: () => <></>,
           drawerType: "front",
         }} />
       </Drawer.Navigator>
