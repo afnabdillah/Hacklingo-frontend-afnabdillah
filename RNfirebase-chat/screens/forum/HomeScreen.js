@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchForumDetails } from "../../stores/forumsSlice";
 import showToast from "../../helper/showToast";
 import { ActivityIndicator } from "react-native-paper";
-
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function HomeScreen({ navigation }) {
   const route = useRoute();
@@ -67,7 +67,7 @@ export default function HomeScreen({ navigation }) {
       </ScrollView>
       <TouchableOpacity
         style={{
-          backgroundColor: "#1E90FF",
+          backgroundColor: "#0097b2",
           borderRadius: 25,
           paddingHorizontal: 20,
           paddingVertical: 10,
@@ -79,14 +79,7 @@ export default function HomeScreen({ navigation }) {
         }}
         onPress={() => navigation.navigate("AddPost", { forumId })}
       >
-        <Text
-          style={{
-            color: "white",
-            fontWeight: "bold",
-          }}
-        >
-          {"Post"}
-        </Text>
+        <MaterialIcons name="post-add" size={24} color="white" />
       </TouchableOpacity>
     </>
   );

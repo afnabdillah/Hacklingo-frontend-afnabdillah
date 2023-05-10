@@ -74,7 +74,7 @@ function ChatBottomTabNavigator() {
             <>
               <HeaderChat />
               <TopTab.Navigator>
-                <TopTab.Screen name="Chat Lists" component={ChatList} />
+                <TopTab.Screen name="Chat Lists" component={ChatList} options={{ }}/>
                 <TopTab.Screen name="Find Contacts" component={Contacts} />
                 <TopTab.Screen name="Find Groups" component={Groups} />
               </TopTab.Navigator>
@@ -99,7 +99,9 @@ function ChatStack() {
         <Stack.Screen name="ChatList" component={ChatBottomTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
         <Stack.Screen name="Group Chat" component={GroupChat} />
-        <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} />
+        <Stack.Screen name="CreateGroupChat" component={CreateGroupChat} options={{
+          headerTitle: "Create Group"
+        }}/>
         <Stack.Screen name="RequestJoin" component={RequestJoin} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen

@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         paddingTop: 16,
     },
     createGroupButton: {
-        backgroundColor: '#1E90FF',
+        backgroundColor: '#0097b2',
         borderRadius: 25,
         paddingHorizontal: 20,
         paddingVertical: 10,
