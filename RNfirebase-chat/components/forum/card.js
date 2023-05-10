@@ -12,7 +12,7 @@ const CardForum = ({ navigation, post }) => {
       }}
     >
       <Card
-        style={{ backgroundColor: "white", marginLeft: 20, marginRight: 20 }}
+        style={{ backgroundColor: "white", marginHorizontal: 20, marginBottom: 20 }}
       >
         <Card.Content>
           <Text variant="titleLarge">{post.title}</Text>
