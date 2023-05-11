@@ -34,6 +34,8 @@ function Contacts({ navigation }) {
   );
   const usersByNativeLanguageFetched = useSelector(state => state.authReducer.usersByNativeLanguageFetched);
 
+  // console.log(contactsList[0].profileImageUrl, "<<< ini profileimage url");
+
     useEffect(() => {
       if (!usersByNativeLanguageFetched) {
         targetLanguage.forEach((language) => {
@@ -110,6 +112,7 @@ function Contacts({ navigation }) {
                 }}
                 style={styles.image}
               />
+              <Text>{contactsList.profileImageUrl}</Text>
               <View style={styles.content}>
                 <Text numberOfLines={1} style={styles.name}>
                   {contact.username}
