@@ -33,7 +33,6 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import AuthenticatedUserContext from "../helper/AuthenticatedUserContext";
 import { auth, database } from "../config/firebase";
 import { useDispatch, useSelector } from "react-redux";
 import bg from "../assets/BG.png";
@@ -51,8 +50,6 @@ import { PopChatMenu } from "./HeadersChat/PopChatMenu";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
 export default function Chat({ route }) {
 
   const senderEmail = useSelector(state => state.authReducer.email);
@@ -62,7 +59,8 @@ export default function Chat({ route }) {
   const [userEmail, setUserEmail] = useState("");
   const [username, setUsername] = useState("");
   const [messages, setMessages] = useState([]);
-  const { recipientEmail, recipientName } = route.params;
+  const { recipientEmail, recipientName, recipientAvatar } = route.params;
+  // console.log(recipientAvatar, "<<<<< ini avatar");
   // const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [roomId, setRoomId] = useState(null);
@@ -117,7 +115,7 @@ export default function Chat({ route }) {
       );
 
       const roomId = generateRoomId(senderEmail, recipientEmail);
-
+      console.log(roomId, ">>>> roomId");
       const roomDocRef = doc(database, "personalChats", roomId);
       const roomDocSnapshot = await getDoc(roomDocRef);
 
@@ -132,7 +130,7 @@ export default function Chat({ route }) {
             {
               email: recipientEmail,
               username: recipientName,
-              avatar: "https://i.pravatar.cc/300", // Set the recipient avatar if available
+              avatar: recipientAvatar || "https://i.pravatar.cc/300", // Set the recipient avatar if available
             },
           ],
           messages: [],
@@ -148,6 +146,8 @@ export default function Chat({ route }) {
           avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
         },
       };
+
+      console.log(message, ">>>>>>>");
 
       await updateDoc(roomDocRef, {
         messages: arrayUnion(message),
@@ -184,7 +184,7 @@ export default function Chat({ route }) {
             <AntDesign name="arrowleft" size={30} color="black" />
           </TouchableOpacity>
           <Image
-            source={{ uri: "https://i.pravatar.cc/300" }}
+            source={{ uri: recipientAvatar || "https://i.pravatar.cc/300" }}
             style={styles.image}
           />
           <Text style={{ fontStyle: "italic", fontSize: 25 }}>

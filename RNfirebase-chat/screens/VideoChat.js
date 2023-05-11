@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 const VideoChat = ({ route }) => {
     const [videoCall, setVideoCall] = useState(false);
     const { roomId, username } = route.params
+    console.log(roomId, "<<< room id");
     const navigation = useNavigation()
     console.log(roomId, "<< room id")
     /**
@@ -13,7 +14,7 @@ const VideoChat = ({ route }) => {
      */
     const connectionData = {
         appId: 'ab2001a4b2014114a6d31426bfc7185b',
-        channel: roomId,
+        channel: "afntest@mail.com_jun2@mail.com",
         username: username
     }
 

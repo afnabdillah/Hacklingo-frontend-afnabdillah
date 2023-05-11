@@ -153,6 +153,9 @@ function RootNavigator() {
         "email",
         "username",
         "profileimageurl",
+        "nativelanguage",
+        "targetlanguage",
+        "role"
       ]);
       dispatch(
         loginSuccess({
@@ -160,6 +163,9 @@ function RootNavigator() {
           email: userData[1][1],
           username: userData[2][1],
           profileImageUrl: userData[3][1] || "",
+          nativeLanguage: userData[4][1],
+          targetLanguage: JSON.parse(userData[5][1]),
+          role: userData[6][1]
         })
       );
 
