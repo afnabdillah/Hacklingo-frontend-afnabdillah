@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Text, View, ScrollView, Image, TextInput } from "react-native";
+import { Text, View, ScrollView, Image, TextInput, Dimensions } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,8 +17,7 @@ export default function DetailScreen({ navigation, route }) {
 
   const postDetails = useSelector(state => state.postsReducer.postDetails);
   const postDetailsStatus = useSelector(state => state.postsReducer.status.postDetails);
-
-  console.log(postDetails);
+  const lebar = Dimensions.get("window").height
 
   const handleAddComment = async () => {
     try {
