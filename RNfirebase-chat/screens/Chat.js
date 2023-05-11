@@ -59,8 +59,8 @@ export default function Chat({ route }) {
   const [userEmail, setUserEmail] = useState("");
   const [username, setUsername] = useState("");
   const [messages, setMessages] = useState([]);
-  const { recipientEmail, recipientName, recipentAvatar } = route.params;
-  console.log(recipentAvatar, "<<ini avatar");
+  const { recipientEmail, recipientName, recipientAvatar } = route.params;
+  console.log(recipientAvatar, "<<<<< ini avatar");
   // const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [roomId, setRoomId] = useState(null);
@@ -130,7 +130,7 @@ export default function Chat({ route }) {
             {
               email: recipientEmail,
               username: recipientName,
-              avatar: recipentAvatar || "https://i.pravatar.cc/300", // Set the recipient avatar if available
+              avatar: recipientAvatar || "https://i.pravatar.cc/300", // Set the recipient avatar if available
             },
           ],
           messages: [],
@@ -184,7 +184,7 @@ export default function Chat({ route }) {
             <AntDesign name="arrowleft" size={30} color="black" />
           </TouchableOpacity>
           <Image
-            source={{ uri: recipentAvatar }}
+            source={{ uri: recipientAvatar || "https://i.pravatar.cc/300" }}
             style={styles.image}
           />
           <Text style={{ fontStyle: "italic", fontSize: 25 }}>

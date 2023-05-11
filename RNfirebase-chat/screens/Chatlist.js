@@ -55,7 +55,7 @@ function ChatList() {
           console.log(lastMessageDate.toLocaleString(), "<<< item");
           return (
             <TouchableOpacity style={styles.container} onPress={() => {
-              navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username, senderEmail: userEmail, recipentAvatar: otherUser.avatar });
+              navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username, senderEmail: userEmail, recipientAvatar: otherUser.avatar });
             }}>
               <Image
                 source={{ uri: otherUser.avatar }}
