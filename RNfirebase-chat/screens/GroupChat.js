@@ -45,38 +45,28 @@ export default function GroupChat({ route, navigation }) {
 
         const database = getFirestore();
         const groupDocRef = doc(database, 'groupChats', groupId);
-
-        if (groupDocRef) {
-            const unsubscribe = onSnapshot(
-                groupDocRef,
-                (docSnapshot) => {
-                    const data = docSnapshot.data();
-                    if (data) {
-                        if (data.messages) {
-                            const fetchedMessages = data.messages.map((message) => ({
-                                _id: message._id,
-                                createdAt: message.createdAt.toDate(),
-                                text: message.text,
-                                user: message.user,
-                            }));
-                            setMessages((messages) => mergeMessages(messages, fetchedMessages));
-                        } else {
-                            setMessages([]);
-                        }
-                        setGroupLanguage(data.languages ? data.languages.join(', ') : '');
-                        setGroupMembers(data.users || []);
-                        setGroupAdmin(data.admin || null);
-                    }
-                },
-                (error) => {
-                    console.error('Error listening to group chat snapshot:', error);
+        const unsubscribe = onSnapshot(groupDocRef, (docSnapshot) => {
+            const data = docSnapshot.data();
+            if (data) {
+                if (data.messages) {
+                    const fetchedMessages = data.messages.map((message) => ({
+                        _id: message._id,
+                        createdAt: message.createdAt.toDate(),
+                        text: message.text,
+                        user: message.user,
+                    }));
+                    setMessages((messages) => mergeMessages(messages, fetchedMessages));
+                } else {
+                    setMessages([]);
                 }
-            );
-
-            return () => {
-                unsubscribe();
-            };
-        }
+                setGroupLanguage(data.languages);
+                setGroupMembers(data.users || []);
+                setGroupAdmin(data.admin || null);
+            }
+        });
+        return () => {
+            unsubscribe();
+        };
     }, [groupId]);
 
 
@@ -191,6 +181,7 @@ export default function GroupChat({ route, navigation }) {
             </View>
         );
     };
+    console.log(groupAdmin, "<<< group admin")
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <ImageBackground source={bg} style={{ flex: 1 }}>

@@ -21,7 +21,6 @@ import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
 
 function Groups({ navigation }) {
     const route = useRoute();
@@ -124,8 +123,6 @@ function Groups({ navigation }) {
             </TouchableOpacity>
         );
     };
-
-
     return (
         <>
             {joinedGroups.length === 0 && unjoinedGroups.length === 0 ? (
