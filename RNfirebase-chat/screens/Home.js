@@ -42,27 +42,27 @@ const App = () => {
       image: require('../assets/flag_inggris.jpeg'),
     },
     {
-      language: "Indonesian",
+      language: "Indonesian/Bahasa Indonesia",
       image: require('../assets/Flag_Indonesia.png'),
     },
     {
-      language: "Deutch",
+      language: "Dutch/Nederlands",
       image: require('../assets/Flag_Dutch.png'),
     },
     {
-      language: "Germany",
+      language: "German/Deutsch",
       image: require('../assets/Flag_Germany.jpg'),
     },
     {
-      language: "Spanish",
+      language: "Spanish/Español",
       image: require('../assets/Flag_Spanish.png'),
     },
     {
-      language: "Japanese",
+      language: "Japanese/日本語",
       image: require('../assets/Flag_Japanese.jpeg'),
     },
     {
-      language: "French",
+      language: "French/Français",
       image: require('../assets/Flag_French.png'),
     },
   ];

@@ -185,10 +185,6 @@ export default function GroupChat({ route, navigation }) {
           >
             <AntDesign name="arrowleft" size={30} color="black" />
           </TouchableOpacity>
-          <Image
-            source={{ uri: userProfileImageUrl }}
-            style={{ width: 45, height: 45, borderRadius: 30 }}
-          />
           <Text style={{ fontWeight: "bold", paddingLeft: 10, fontSize: 20 }}>
             {groupName}
           </Text>

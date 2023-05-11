@@ -24,7 +24,7 @@ function CreateGroupChat({ route, navigation }) {
     const [isProGroup, setIsProGroup] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState(new Set(groupMembers || []));
     const [selectedLanguage, setSelectedLanguage] = useState("");
-    const languages = ['English', 'German', 'Japanese', 'French', 'Indonesian', 'Deutch', 'Spanish'];
+    const languages = ['English', 'German/Deutsch', 'Japanese/日本語', 'French/Français', 'Indonesian/Bahasa Indonesia', 'Dutch/Nederlands', 'Spanish/Español'];
     const CustomCheckBox = ({ isSelected, onPress }) => (
         <>
             <TouchableOpacity
