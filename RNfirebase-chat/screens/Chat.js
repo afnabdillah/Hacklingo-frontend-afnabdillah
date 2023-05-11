@@ -60,6 +60,7 @@ export default function Chat({ route }) {
   const [username, setUsername] = useState("");
   const [messages, setMessages] = useState([]);
   const { recipientEmail, recipientName } = route.params;
+
   // const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [roomId, setRoomId] = useState(null);
@@ -83,7 +84,9 @@ export default function Chat({ route }) {
     return email1 < email2 ? `${email1}_${email2}` : `${email2}_${email1}`;
   };
 
+
   useEffect(() => {
+    console.log("use Effect triggered");
     const createRoomId = generateRoomId(senderEmail, recipientEmail);
     const roomDocRef = doc(database, "personalChats", createRoomId);
 
@@ -103,6 +106,14 @@ export default function Chat({ route }) {
       unsubscribe();
     };
   }, [recipientEmail, senderEmail]);
+
+  useEffect(()=> {
+    // const createRoomId = generateRoomId(senderEmail, recipientEmail);
+    
+  }, [])
+
+  console.log(roomId, "<<<< ini room Id di Chatt");
+
   const onSend = useCallback(
     async (messages = []) => {
       if (!currentUserUsername) {
@@ -113,9 +124,8 @@ export default function Chat({ route }) {
         GiftedChat.append(previousMessages, messages)
       );
 
-      const roomId = generateRoomId(senderEmail, recipientEmail);
-
-      const roomDocRef = doc(database, "personalChats", roomId);
+      const generateNewRoomId = generateRoomId(senderEmail, recipientEmail);
+      const roomDocRef = doc(database, "personalChats", generateNewRoomId);
       const roomDocSnapshot = await getDoc(roomDocRef);
 
       if (!roomDocSnapshot.exists()) {
@@ -152,9 +162,11 @@ export default function Chat({ route }) {
     }, [currentUserUsername]);
 
   const navigation = useNavigation()
+
   const goToVideoChat = () => {
+    const tempId = generateRoomId(senderEmail, recipientEmail);
     navigation.navigate("Video Chat", {
-      roomId: roomId,
+      roomId: roomId ?? tempId,
       username: currentUserUsername,
     });
   };

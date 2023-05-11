@@ -9,8 +9,8 @@ const authSlice = createSlice({
         profileImageUrl: "",
         nativeLanguage : null,
         targetLanguage : [],
-        role : null
-
+        role : null,
+        usersByNativeLanguageFetched: false
     },
     reducers: {
         loginSuccess(state, action) {
@@ -28,6 +28,9 @@ const authSlice = createSlice({
             state.profileImageUrl = action.payload.profileImageUrl
             state.nativeLanguage = action.payload.nativeLanguage
         },
+        setFetchStatus(state) {
+            state.usersByNativeLanguageFetched = true
+        },
         logout(state){
             state.userId = null
             state.email = null
@@ -42,4 +45,4 @@ const authSlice = createSlice({
   
   export default authSlice.reducer;
 
-  export const { loginSuccess, logout, updateSuccess } = authSlice.actions
+  export const { loginSuccess, logout, updateSuccess, setFetchStatus } = authSlice.actions

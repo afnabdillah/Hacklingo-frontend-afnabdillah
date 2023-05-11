@@ -7,7 +7,14 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth, database } from "../config/firebase";
-import { addDoc, collection, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
 import { NavigationActions, StackActions } from "react-navigation";
 import base_url from "./base_url";
@@ -115,7 +122,7 @@ export const userLogin = createAsyncThunk(
           profileImageUrl: response.data.profileImageUrl || "",
           nativeLanguage: response.data.nativeLanguage,
           targetLanguage: response.data.targetLanguage,
-          role: response.data.role
+          role: response.data.role,
         })
       );
       return true;
@@ -159,6 +166,7 @@ export const userSignUp = createAsyncThunk(
       await addDoc(collection(database, "users"), {
         email: user.email,
         username: username,
+        profileImageUrl: "",
       });
       // Save it to async storage
       await saveToAsyncStorage(response.data);
@@ -168,6 +176,9 @@ export const userSignUp = createAsyncThunk(
           email: response.data.email,
           username: response.data.username,
           profileImageUrl: response.data.profileImageUrl || "",
+          nativeLanguage: response.data.nativeLanguage,
+          targetLanguage: response.data.targetLanguage,
+          role: response.data.role,
         })
       );
       return true;
@@ -201,6 +212,7 @@ export const updateUserDetails = createAsyncThunk(
       input.append("context", "image");
       console.log(input, "<<<< ini input image");
       const userId = await AsyncStorage.getItem("userid");
+      const userEmail = await AsyncStorage.getItem("email");
       const response = await axios({
         method: "PUT",
         url: `${base_url}/users/${userId}`,
@@ -211,18 +223,29 @@ export const updateUserDetails = createAsyncThunk(
         data: input,
       });
       // Save it to reducer
-      dispatch(updateSuccess({
-        username: response.data.username,
-        profileImageUrl: response.data.profileImageUrl,
-        nativeLanguage: response.data.nativeLanguage
-      }))
+      dispatch(
+        updateSuccess({
+          username: response.data.username,
+          profileImageUrl: response.data.profileImageUrl,
+          nativeLanguage: response.data.nativeLanguage,
+        })
+      );
       // Save it to Async Storage
       await saveToAsyncStorage(response.data);
       // Save it to firebase database
-      // await updateDoc(collection(database, "users"), {
-      //   username: response.data.username,
-      //   profileImageUrl: response.data.profileImageUrl
-      // });
+      const usersCollectionRef = collection(database, "users");
+      const q = query(usersCollectionRef, where("email", "==", userEmail));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const userDocRef = querySnapshot.docs[0].ref;
+        await updateDoc(userDocRef, {
+          username: response.data.username,
+          profileImageUrl: response.data.profileImageUrl,
+        });
+      } else {
+        throw { message: "Email not found on firebase" };
+      }
       return response.data;
     } catch (err) {
       // return err.response if it was an axios error with reject with value
