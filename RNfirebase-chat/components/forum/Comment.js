@@ -1,7 +1,13 @@
 import { View, Text, Image } from "react-native";
 import React from "react";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 
 const Comment = ({ comment }) => {
+
+  console.log(comment, "<<< ini comment");
+
   return (
     <View>
       <View
@@ -13,7 +19,7 @@ const Comment = ({ comment }) => {
         }}
       >
         <Image
-          source={{ uri: "https://i.pravatar.cc/300" }}
+          source={{ uri: comment.userId.profileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA" }}
           style={{ height: 30, width: 30, borderRadius: 100 }}
         />
         <Text
@@ -24,7 +30,7 @@ const Comment = ({ comment }) => {
             fontWeight: "500",
           }}
         >
-          {comment.userId} • 5h ago
+          {comment.userId.username} • {dayjs(comment.createdAt).fromNow(false)}
         </Text>
       </View>
       <View

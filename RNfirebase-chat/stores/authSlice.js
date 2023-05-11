@@ -23,7 +23,6 @@ const authSlice = createSlice({
             state.role = action.payload.role
         },
         updateSuccess(state, action) {
-            console.log(action.payload, "<<<< ini hasil payload di updateSuccess");
             state.username = action.payload.username
             state.profileImageUrl = action.payload.profileImageUrl
             state.nativeLanguage = action.payload.nativeLanguage

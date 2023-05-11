@@ -44,7 +44,6 @@ export const fetchPostsBySearch = createAsyncThunk(
           forumId: input.forumId
         },
       });
-      console.log(response.data, "<<<< ini result");
       return response.data;
     } catch (err) {
       if (err.response) {

@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 const VideoChat = ({ route }) => {
     const [videoCall, setVideoCall] = useState(false);
     const { roomId, username } = route.params
-    console.log(roomId, "<<< room id");
     const navigation = useNavigation()
     /**
      * @type {import('agora-rn-uikit').ConnectionData}

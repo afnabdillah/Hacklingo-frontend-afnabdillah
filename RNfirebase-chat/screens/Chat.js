@@ -86,7 +86,6 @@ export default function Chat({ route }) {
 
 
   useEffect(() => {
-    console.log("use Effect triggered");
     const createRoomId = generateRoomId(senderEmail, recipientEmail);
     const roomDocRef = doc(database, "personalChats", createRoomId);
 
@@ -112,8 +111,6 @@ export default function Chat({ route }) {
     
   }, [])
 
-  console.log(roomId, "<<<< ini room Id di Chatt");
-
   const onSend = useCallback(
     async (messages = []) => {
       if (!currentUserUsername) {
@@ -135,12 +132,12 @@ export default function Chat({ route }) {
             {
               email: senderEmail,
               username: currentUserUsername,
-              avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
+              avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
             },
             {
               email: recipientEmail,
               username: recipientName,
-              avatar: recipientAvatar || "https://i.pravatar.cc/300", // Set the recipient avatar if available
+              avatar: recipientAvatar || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA", // Set the recipient avatar if available
             },
           ],
           messages: [],
@@ -153,7 +150,7 @@ export default function Chat({ route }) {
         user: {
           _id: senderEmail,
           username: currentUserUsername,
-          avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
+          avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
         },
       };
 
@@ -196,7 +193,7 @@ export default function Chat({ route }) {
             <AntDesign name="arrowleft" size={30} color="black" />
           </TouchableOpacity>
           <Image
-            source={{ uri: recipientAvatar || "https://i.pravatar.cc/300" }}
+            source={{ uri: recipientAvatar || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA" }}
             style={styles.image}
           />
           <Text style={{ fontStyle: "italic", fontSize: 25 }}>
@@ -221,7 +218,7 @@ export default function Chat({ route }) {
           user={{
             _id: senderEmail,
             username: currentUserUsername,
-            avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
+            avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
           }}
           renderActions={(props) => (
             <Actions
@@ -298,39 +295,6 @@ export default function Chat({ route }) {
               }}
             />
           )}
-        // renderMessageImage={(props) => {
-        //   console.log(props, "????????");
-        //   return (
-        //     <View style={{ borderRadius: 15, padding: 2 }}>
-        //       <TouchableOpacity
-        //         onPress={() => {
-        //           setModalVisible(true);
-        //           setSeletedImageView(props.currentMessage.image);
-        //         }}
-        //       >
-        //         <Image
-        //           resizeMode="contain"
-        //           style={{
-        //             width: 200,
-        //             height: 200,
-        //             padding: 6,
-        //             borderRadius: 15,
-        //             resizeMode: "cover",
-        //           }}
-        //           source={{ uri: props.currentMessage.image }}
-        //         />
-        //         {selectedImageView ? (
-        //           <ImageView
-        //             imageIndex={0}
-        //             visible={modalVisible}
-        //             onRequestClose={() => setModalVisible(false)}
-        //             images={[{ uri: selectedImageView }]}
-        //           />
-        //         ) : null}
-        //       </TouchableOpacity>
-        //     </View>
-        //   );
-        // }}
         />
       </ImageBackground>
     </SafeAreaView>

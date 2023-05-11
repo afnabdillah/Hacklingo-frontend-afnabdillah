@@ -19,12 +19,14 @@ export default function DetailScreen({ navigation, route }) {
   const postDetailsStatus = useSelector(state => state.postsReducer.status.postDetails);
   const lebar = Dimensions.get("window").height
 
+  console.log(postDetails, "<<<< ini post details");
+
   const handleAddComment = async () => {
     try {
       const input = { content: commentText, postId: postDetails._id };
       await dispatch(insertNewComment(input)).unwrap();
       setCommentText("");
-      const response = await dispatch(fetchPostDetails(id)).unwrap(); // Fetch the comments once again after success add comment
+      await dispatch(fetchPostDetails(id)).unwrap(); // Fetch the comments once again after success add comment
       showToast(
         "success",
         "Add Comment Success",
@@ -34,8 +36,6 @@ export default function DetailScreen({ navigation, route }) {
       console.error(err);
     }
   };
-
-  console.log(postDetails.postImageUrl);
 
   useFocusEffect(
     useCallback(() => {
@@ -64,7 +64,7 @@ export default function DetailScreen({ navigation, route }) {
             height: "100%",
           }}
         >
-          <View style={{ marginLeft: 20, padding: 5, flexDirection: "row" }}>
+          <View style={{ marginLeft: 20, marginTop:5, padding: 5, flexDirection: "row" }}>
             <Image
               source={{
                 uri:
@@ -74,15 +74,15 @@ export default function DetailScreen({ navigation, route }) {
               style={{ height: 40, width: 40, borderRadius: 100 }}
             />
             <View>
-              <Text style={{ marginLeft: 20 }}>
+              <Text style={{marginLeft: 20}}>
                 {postDetails.userId?.username}
               </Text>
-              <Text style={{ marginLeft: 20, color: "grey" }}>
+              <Text style={{marginTop:5, marginLeft: 20, color: "grey" }}>
                 {postDetails.createdAt?.split("T")[0]}
               </Text>
             </View>
           </View>
-          <View style={{ marginTop: 10 }}>
+          <View style={{ marginTop: 5 }}>
             <Text style={{ marginLeft: 20, fontSize: 20, fontWeight: "500" }}>
               {postDetails.title}
             </Text>
@@ -129,9 +129,9 @@ export default function DetailScreen({ navigation, route }) {
       <View
         style={{
           flexDirection: "row",
-          justifyContent: "space-evenly",
+          justifyContent: "center",
           alignItems: "center",
-          paddingBottom: 20,
+          paddingVertical:10
         }}
       >
         <View
