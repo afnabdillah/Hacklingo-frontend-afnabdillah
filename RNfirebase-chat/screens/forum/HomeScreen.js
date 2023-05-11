@@ -89,7 +89,7 @@ export default function HomeScreen({ navigation }) {
         style={{
           backgroundColor: "#0097b2",
           borderRadius: 25,
-          paddingHorizontal: 20,
+          paddingHorizontal: 10,
           paddingVertical: 10,
           alignItems: "center",
           justifyContent: "center",

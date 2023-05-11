@@ -35,6 +35,8 @@ export default function DetailScreen({ navigation, route }) {
     }
   };
 
+  console.log(postDetails.postImageUrl);
+
   useFocusEffect(
     useCallback(() => {
       dispatch(fetchPostDetails(id))
@@ -85,7 +87,7 @@ export default function DetailScreen({ navigation, route }) {
               {postDetails.title}
             </Text>
           </View>
-          <View style={{ marginTop: 10, width: "100%", height: 200 }}>
+          <View style={{ marginTop: 10, width: "100%", height: lebar * 0.3 }}>
             {postDetails.postImageUrl && (
               <Image
                 source={{ uri: postDetails.postImageUrl }}
