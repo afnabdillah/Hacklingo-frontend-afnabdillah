@@ -5,7 +5,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import HeaderPost from './HeaderPost';
 import Post from '../../screens/forum/Post';
 import Comments from '../../screens/forum/Comment';
-import webViews from '../../screens/forum/webview';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,7 +45,6 @@ export default function MyStack() {
           backgroundColor: "#0097b2"
         },
       }} />
-      <Stack.Screen name="image" component={webViews} />
     </Stack.Navigator>
   );
 }

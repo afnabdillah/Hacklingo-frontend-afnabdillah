@@ -43,6 +43,7 @@ function ChatList() {
       .sort((a, b) => b.createdAt - a.createdAt);
     return mergedChats;
   };
+  console.log('halaman chat')
   return (
     <View style={{ flex: 1, paddingTop: 10, backgroundColor: '#fff' }}>
       <FlatList
@@ -50,9 +51,12 @@ function ChatList() {
         keyExtractor={item => item.chatId}
         renderItem={({ item }) => {
           const lastMessage = item.messages[item.messages.length - 1];
+          console.log(lastMessage, "")
           const otherUser = item.users.find(u => u.email !== userEmail);
-          const lastMessageDate = new Date((lastMessage?.seconds * 1000) + (lastMessage?.nanoseconds / 1000));
-          console.log(lastMessageDate.toLocaleString(), "<<< item");
+          const lastMessageDate = new Date((lastMessage?.createdAt.seconds * 1000) + (lastMessage?.createdAt.nanoseconds / 1000));
+          console.log(lastMessageDate, "<<< last message date")
+          console.log(lastMessageDate.toLocaleString("id-ID"), "<<< item");
+
           return (
             <TouchableOpacity style={styles.container} onPress={() => {
               navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username, senderEmail: userEmail, recipientAvatar: otherUser.avatar });
@@ -64,7 +68,7 @@ function ChatList() {
               <View style={styles.content}>
                 <View style={styles.row}>
                   <Text numberOfLines={1} style={styles.name}>{otherUser.username}</Text>
-                  <Text style={styles.subTitle}>{dayjs(item.createdAt).fromNow(false)}</Text>
+                  <Text style={styles.subTitle}>{dayjs(lastMessageDate).fromNow(false)}</Text>
                 </View>
                 <Text style={styles.subTitle}>{lastMessage?.text}</Text>
               </View>
