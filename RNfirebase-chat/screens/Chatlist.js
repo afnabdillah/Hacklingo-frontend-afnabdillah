@@ -51,7 +51,6 @@ function ChatList() {
         keyExtractor={item => item.chatId}
         renderItem={({ item }) => {
           const lastMessage = item.messages[item.messages.length - 1];
-          console.log(lastMessage, "")
           const otherUser = item.users.find(u => u.email !== userEmail);
           const lastMessageDate = new Date((lastMessage?.createdAt.seconds * 1000) + (lastMessage?.createdAt.nanoseconds / 1000));
           
