@@ -60,8 +60,6 @@ export default function Chat({ route }) {
   const [username, setUsername] = useState("");
   const [messages, setMessages] = useState([]);
   const { recipientEmail, recipientName, recipientAvatar } = route.params;
-  // console.log(recipientAvatar, "<<<<< ini avatar");
-  // const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [roomId, setRoomId] = useState(null);
   const currentUserUsername = useSelector(
@@ -106,11 +104,6 @@ export default function Chat({ route }) {
     };
   }, [recipientEmail, senderEmail]);
 
-  useEffect(()=> {
-    // const createRoomId = generateRoomId(senderEmail, recipientEmail);
-    
-  }, [])
-
   const onSend = useCallback(
     async (messages = []) => {
       if (!currentUserUsername) {
@@ -122,7 +115,6 @@ export default function Chat({ route }) {
       );
 
       const roomId = generateRoomId(senderEmail, recipientEmail);
-      // console.log(roomId, ">>>> roomId");
       const roomDocRef = doc(database, "personalChats", roomId);
       const roomDocSnapshot = await getDoc(roomDocRef);
 
@@ -153,8 +145,6 @@ export default function Chat({ route }) {
           avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
         },
       };
-
-      console.log(message, ">>>>>>>");
 
       await updateDoc(roomDocRef, {
         messages: arrayUnion(message),
