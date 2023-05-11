@@ -80,7 +80,7 @@ export default function GroupChat({ route, navigation }) {
                 } else {
                     setMessages([]);
                 }
-                setGroupLanguage(data.languages ? data.languages.join(', ') : '');
+                setGroupLanguage(data.languages);
                 setGroupMembers(data.users || []);
                 setGroupAdmin(data.admin || null);
             }

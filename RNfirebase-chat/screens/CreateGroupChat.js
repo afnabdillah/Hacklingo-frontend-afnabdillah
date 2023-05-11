@@ -42,6 +42,11 @@ function CreateGroupChat({ route, navigation }) {
         const fetchEmail = async () => {
             const email = await AsyncStorage.getItem("email");
             setUserEmail(email);
+            setSelectedUsers(prevSelectedUsers => {
+                const newSelectedUsers = new Set(prevSelectedUsers);
+                newSelectedUsers.add(email);
+                return newSelectedUsers;
+            });
         };
 
         fetchEmail();

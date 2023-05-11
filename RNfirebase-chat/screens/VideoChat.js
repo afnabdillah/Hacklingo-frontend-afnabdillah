@@ -7,6 +7,7 @@ const VideoChat = ({ route }) => {
     const [videoCall, setVideoCall] = useState(false);
     const { roomId, username } = route.params
     const navigation = useNavigation()
+    console.log(roomId, "<< room id")
     /**
      * @type {import('agora-rn-uikit').ConnectionData}
      */
