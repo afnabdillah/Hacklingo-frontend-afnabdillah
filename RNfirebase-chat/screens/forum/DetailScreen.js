@@ -87,14 +87,16 @@ export default function DetailScreen({ navigation, route }) {
               {postDetails.title}
             </Text>
           </View>
-          <View style={{ marginTop: 10, width: "100%", height: lebar * 0.3 }}>
             {postDetails.postImageUrl && (
-              <Image
-                source={{ uri: postDetails.postImageUrl }}
-                style={{ height: "100%", width: "100%" }}
-              />
+            <View style={{ marginTop: 10, width: "100%", height: lebar * 0.3 }}>
+              <TouchableOpacity onPress={() => {return navigation.navigate("image", {imageUrl: postDetails.postImageUrl})}} >
+                <Image
+                  source={{ uri: postDetails.postImageUrl }}
+                  style={{ height: "100%", width: "100%" }}
+                />
+              </TouchableOpacity>
+            </View>
             )}
-          </View>
           <View style={{ justifyContent: "flex-start" }}>
             <View
               style={{

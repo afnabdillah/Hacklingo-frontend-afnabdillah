@@ -29,6 +29,8 @@ export default function GroupChat({ route, navigation }) {
     const [groupLanguage, setGroupLanguage] = useState('');
     const [groupMembers, setGroupMembers] = useState([]);
     const [groupAdmin, setGroupAdmin] = useState(null);
+    const userprofileimage = useSelector(state => state.authReducer.profileImageUrl)
+    console.log(userprofileimage, "<< ini avatar ");
     const mergeMessages = (oldMessages, newMessages) => {
         const allMessages = [...oldMessages, ...newMessages];
         const uniqueMessages = allMessages.filter(
@@ -90,7 +92,7 @@ export default function GroupChat({ route, navigation }) {
                 user: {
                     _id: userEmail,
                     username: username,
-                    avatar: 'https://i.pravatar.cc/300',
+                    avatar: userprofileimage,
                 },
             };
 
@@ -152,7 +154,7 @@ export default function GroupChat({ route, navigation }) {
                     <TouchableOpacity onPress={() => navigation.navigate("ChatList")} style={{ paddingRight: 10 }}>
                         <AntDesign name="arrowleft" size={30} color="black" />
                     </TouchableOpacity>
-                    <Image source={{ uri: 'https://i.pravatar.cc/300' }} style={{ width: 45, height: 45, borderRadius: 30, }} />
+
                     <Text style={{ fontWeight: 'bold', paddingLeft: 10, fontSize: 20 }}>{groupName}</Text>
                 </View>
             ),
@@ -172,10 +174,10 @@ export default function GroupChat({ route, navigation }) {
                 {!isCurrentUser && renderUsername(props.currentMessage)}
                 <Bubble
                     {...props}
-                    textStyle={{ right: { color: "grey" } }}
+                    textStyle={{ right: { color: "black" } }}
                     wrapperStyle={{
-                        left: { backgroundColor: bubbleBackgroundColor },
-                        right: { backgroundColor: bubbleBackgroundColor },
+                        left: { backgroundColor: '#fff' },
+                        right: { backgroundColor: '#dcf8c6' },
                     }}
                 />
             </View>
@@ -193,9 +195,8 @@ export default function GroupChat({ route, navigation }) {
                         user={{
                             _id: userEmail,
                             username: username,
-                            avatar: 'https://i.pravatar.cc/300',
+                            avatar: userprofileimage,
                         }}
-                        renderBubble={renderBubble}
                         renderActions={(props) => (
                             <Actions
                                 {...props}
@@ -257,6 +258,7 @@ export default function GroupChat({ route, navigation }) {
                                 }}
                             />
                         )}
+                        renderBubble={renderBubble}
                     />
                 </View>
             </ImageBackground>

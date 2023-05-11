@@ -14,7 +14,7 @@ const VideoChat = ({ route }) => {
      */
     const connectionData = {
         appId: 'ab2001a4b2014114a6d31426bfc7185b',
-        channel: "afntest@mail.com_jun2@mail.com",
+        channel: roomId,
         username: username
     }
 
