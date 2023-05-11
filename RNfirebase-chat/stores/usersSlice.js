@@ -168,6 +168,9 @@ export const userSignUp = createAsyncThunk(
           email: response.data.email,
           username: response.data.username,
           profileImageUrl: response.data.profileImageUrl || "",
+          nativeLanguage: response.data.nativeLanguage,
+          targetLanguage: response.data.targetLanguage,
+          role: response.data.role
         })
       );
       return true;
