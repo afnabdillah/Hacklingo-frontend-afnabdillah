@@ -53,7 +53,7 @@ import * as ImagePicker from "expo-image-picker";
 export default function Chat({ route }) {
 
   const senderEmail = useSelector(state => state.authReducer.email);
-
+  
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageView, setSeletedImageView] = useState("");
   const [userEmail, setUserEmail] = useState("");
