@@ -53,7 +53,7 @@ import * as ImagePicker from "expo-image-picker";
 export default function Chat({ route }) {
 
   const senderEmail = useSelector(state => state.authReducer.email);
-
+  
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageView, setSeletedImageView] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -156,8 +156,9 @@ export default function Chat({ route }) {
 
   const navigation = useNavigation()
   const goToVideoChat = () => {
+    const tempId = generateRoomId(senderEmail, recipientEmail)
     navigation.navigate("Video Chat", {
-      roomId: roomId,
+      roomId: roomId ? roomId : tempId,
       username: currentUserUsername,
     });
   };
