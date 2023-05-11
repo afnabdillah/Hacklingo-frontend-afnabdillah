@@ -61,6 +61,7 @@ const GrammarCheckScreen = () => {
                         style={styles.input}
                         multiline
                         numberOfLines={4}
+                        textAlignVertical="top"
                         onChangeText={setInputText}
                         value={inputText}
                         placeholder="Enter your text here"
@@ -71,6 +72,7 @@ const GrammarCheckScreen = () => {
                     <TextInput
                         style={styles.correctedText}
                         multiline
+                        textAlignVertical="top"
                         numberOfLines={4}
                         value={correctedText}
                         editable={false}

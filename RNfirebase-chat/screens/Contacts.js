@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersByNativeLanguage } from "../stores/usersSlice";
 import showToast from "../helper/showToast";
+import { useFocusEffect } from "@react-navigation/native";
+import { setFetchStatus } from "../stores/authSlice";
 
 function Contacts({ navigation }) {
   const dispatch = useDispatch();
@@ -30,14 +32,18 @@ function Contacts({ navigation }) {
   const contactsListByNativeLanguage = usersByNativeLanguage.filter(
     (user) => user._id !== userId
   );
+  const usersByNativeLanguageFetched = useSelector(state => state.authReducer.usersByNativeLanguageFetched);
 
-  useEffect(() => {
-    targetLanguage?.forEach((language) => {
-      dispatch(fetchUsersByNativeLanguage(language))
-        .unwrap()
-        .catch((err) => showToast("error", "Fetch Data Error", err.message));
-    });
-  }, []);
+    useEffect(() => {
+      if (!usersByNativeLanguageFetched) {
+        targetLanguage.forEach((language) => {
+          dispatch(fetchUsersByNativeLanguage(language))
+            .unwrap()
+            .catch((err) => showToast("error", "Fetch Data Error", err.message));
+        });
+        dispatch(setFetchStatus());
+      }
+    }, [targetLanguage])
 
 
   return (

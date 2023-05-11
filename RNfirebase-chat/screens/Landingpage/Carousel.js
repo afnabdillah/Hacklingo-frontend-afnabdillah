@@ -32,6 +32,7 @@ const Carousel = ({ data, onPress }) => {
   useEffect(() => {
     setDataList(data);
     infiniteScroll(dataList, flatListRef);
+    // return clearInterval(infiniteScroll);
   }, [data]);
 
   if (data && data.length) {

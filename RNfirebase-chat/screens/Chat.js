@@ -60,8 +60,6 @@ export default function Chat({ route }) {
   const [username, setUsername] = useState("");
   const [messages, setMessages] = useState([]);
   const { recipientEmail, recipientName, recipientAvatar } = route.params;
-  // console.log(recipientAvatar, "<<<<< ini avatar");
-  // const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [roomId, setRoomId] = useState(null);
   const currentUserUsername = useSelector(
@@ -84,6 +82,7 @@ export default function Chat({ route }) {
     return email1 < email2 ? `${email1}_${email2}` : `${email2}_${email1}`;
   };
 
+
   useEffect(() => {
     const createRoomId = generateRoomId(senderEmail, recipientEmail);
     const roomDocRef = doc(database, "personalChats", createRoomId);
@@ -104,6 +103,7 @@ export default function Chat({ route }) {
       unsubscribe();
     };
   }, [recipientEmail, senderEmail]);
+
   const onSend = useCallback(
     async (messages = []) => {
       if (!currentUserUsername) {
@@ -115,7 +115,6 @@ export default function Chat({ route }) {
       );
 
       const roomId = generateRoomId(senderEmail, recipientEmail);
-      // console.log(roomId, ">>>> roomId");
       const roomDocRef = doc(database, "personalChats", roomId);
       const roomDocSnapshot = await getDoc(roomDocRef);
 
@@ -125,12 +124,12 @@ export default function Chat({ route }) {
             {
               email: senderEmail,
               username: currentUserUsername,
-              avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
+              avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
             },
             {
               email: recipientEmail,
               username: recipientName,
-              avatar: recipientAvatar || "https://i.pravatar.cc/300", // Set the recipient avatar if available
+              avatar: recipientAvatar || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA", // Set the recipient avatar if available
             },
           ],
           messages: [],
@@ -143,11 +142,9 @@ export default function Chat({ route }) {
         user: {
           _id: senderEmail,
           username: currentUserUsername,
-          avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
+          avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
         },
       };
-
-      console.log(message, ">>>>>>>");
 
       await updateDoc(roomDocRef, {
         messages: arrayUnion(message),
@@ -155,10 +152,11 @@ export default function Chat({ route }) {
     }, [currentUserUsername]);
 
   const navigation = useNavigation()
+
   const goToVideoChat = () => {
-    const tempId = generateRoomId(senderEmail, recipientEmail)
+    const tempId = generateRoomId(senderEmail, recipientEmail);
     navigation.navigate("Video Chat", {
-      roomId: roomId ? roomId : tempId,
+      roomId: roomId ?? tempId,
       username: currentUserUsername,
     });
   };
@@ -185,7 +183,7 @@ export default function Chat({ route }) {
             <AntDesign name="arrowleft" size={30} color="black" />
           </TouchableOpacity>
           <Image
-            source={{ uri: recipientAvatar || "https://i.pravatar.cc/300" }}
+            source={{ uri: recipientAvatar || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA" }}
             style={styles.image}
           />
           <Text style={{ fontStyle: "italic", fontSize: 25 }}>
@@ -210,7 +208,7 @@ export default function Chat({ route }) {
           user={{
             _id: senderEmail,
             username: currentUserUsername,
-            avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
+            avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
           }}
           renderActions={(props) => (
             <Actions
@@ -287,39 +285,6 @@ export default function Chat({ route }) {
               }}
             />
           )}
-        // renderMessageImage={(props) => {
-        //   console.log(props, "????????");
-        //   return (
-        //     <View style={{ borderRadius: 15, padding: 2 }}>
-        //       <TouchableOpacity
-        //         onPress={() => {
-        //           setModalVisible(true);
-        //           setSeletedImageView(props.currentMessage.image);
-        //         }}
-        //       >
-        //         <Image
-        //           resizeMode="contain"
-        //           style={{
-        //             width: 200,
-        //             height: 200,
-        //             padding: 6,
-        //             borderRadius: 15,
-        //             resizeMode: "cover",
-        //           }}
-        //           source={{ uri: props.currentMessage.image }}
-        //         />
-        //         {selectedImageView ? (
-        //           <ImageView
-        //             imageIndex={0}
-        //             visible={modalVisible}
-        //             onRequestClose={() => setModalVisible(false)}
-        //             images={[{ uri: selectedImageView }]}
-        //           />
-        //         ) : null}
-        //       </TouchableOpacity>
-        //     </View>
-        //   );
-        // }}
         />
       </ImageBackground>
     </SafeAreaView>

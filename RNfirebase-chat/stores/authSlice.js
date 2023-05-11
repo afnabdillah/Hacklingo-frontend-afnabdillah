@@ -9,8 +9,8 @@ const authSlice = createSlice({
         profileImageUrl: "",
         nativeLanguage : null,
         targetLanguage : [],
-        role : null
-
+        role : null,
+        usersByNativeLanguageFetched: false
     },
     reducers: {
         loginSuccess(state, action) {
@@ -23,10 +23,12 @@ const authSlice = createSlice({
             state.role = action.payload.role
         },
         updateSuccess(state, action) {
-            console.log(action.payload, "<<<< ini hasil payload di updateSuccess");
             state.username = action.payload.username
             state.profileImageUrl = action.payload.profileImageUrl
             state.nativeLanguage = action.payload.nativeLanguage
+        },
+        setFetchStatus(state) {
+            state.usersByNativeLanguageFetched = true
         },
         logout(state){
             state.userId = null
@@ -42,4 +44,4 @@ const authSlice = createSlice({
   
   export default authSlice.reducer;
 
-  export const { loginSuccess, logout, updateSuccess } = authSlice.actions
+  export const { loginSuccess, logout, updateSuccess, setFetchStatus } = authSlice.actions
