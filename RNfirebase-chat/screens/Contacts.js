@@ -6,68 +6,117 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  ScrollView,
 } from "react-native";
-import AuthenticatedUserContext from "../helper/AuthenticatedUserContext";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUsersByNativeLanguage, fetchUsersBySearch } from "../stores/usersSlice";
-
+import { fetchUsersByNativeLanguage } from "../stores/usersSlice";
+import showToast from "../helper/showToast";
 
 function Contacts({ navigation }) {
-  const [contacts, setContacts] = useState([]);
-  const { user } = useContext(AuthenticatedUserContext);
   const dispatch = useDispatch();
 
   const usersBySearch = useSelector(
     (state) => state.usersReducer.usersBySearch
   );
-  const usersByNativeLanguage = useSelector((state) => state.usersReducer.users);
+  const usersByNativeLanguage = useSelector(
+    (state) => state.usersReducer.users
+  );
   const userId = useSelector((state) => state.authReducer.userId);
   const userEmail = useSelector((state) => state.authReducer.email);
-  const userProfileImageUrl = useSelector((state) => state.authReducer.profileImageUrl);
-  const username = useSelector((state) => state.authReducer.username);
+  const targetLanguage = useSelector(
+    (state) => state.authReducer.targetLanguage
+  );
   const contactsList = usersBySearch.filter((user) => user._id !== userId);
+  const contactsListByNativeLanguage = usersByNativeLanguage.filter(
+    (user) => user._id !== userId
+  );
 
   useEffect(() => {
-    dispatch(fetchUsersByNativeLanguage("Indonesian/Bahasa Indonesia"));
-    dispatch(fetchUsersBySearch(""));
+    targetLanguage?.forEach((language) => {
+      dispatch(fetchUsersByNativeLanguage(language))
+        .unwrap()
+        .catch((err) => showToast("error", "Fetch Data Error", err.message));
+    });
   }, []);
 
+  
   return (
-    <View style={{ flex: 1, backgroundColor: "white", paddingTop: 10 }}>
-      <FlatList
-        data={contactsList}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => {
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ backgroundColor: "white" }}>
+      {/* Kalau merge ambil yang ini guys */}
+      {contactsList.length !== 0 && (
+        <View>
+          <Text style={styles.sectionTitle}>Users By Search</Text>
+        </View>
+      )}
+      {contactsList.length !== 0 &&
+        contactsList.map((contact) => {
           return (
-            <TouchableOpacity
-              style={styles.container}
-              onPress={async () => {
-                navigation.navigate("Chat", {
-                  recipientEmail: item.email,
-                  recipientName: item.username,
-                  senderEmail: userEmail,
-                });
-              }}
-            >
-              <Image
-                source={{
-                  uri: item.profileImageUrl || "https://i.pravatar.cc/300",
+            <View key={contact._id}>
+              <TouchableOpacity
+                style={styles.container}
+                onPress={async () => {
+                  navigation.navigate("Chat", {
+                    recipientEmail: contact.email,
+                    recipientName: contact.username,
+                    senderEmail: userEmail,
+                  });
                 }}
-                style={styles.image}
-              />
-              <View style={styles.content}>
-                <Text numberOfLines={1} style={styles.name}>
-                  {item.username}
-                </Text>
-                <Text numberOfLines={2} style={styles.subTitle}>
-                  {item.email}
-                </Text>
-              </View>
-            </TouchableOpacity>
+              >
+                <Image
+                  source={{
+                    uri: contact.profileImageUrl || "https://i.pravatar.cc/300",
+                  }}
+                  style={styles.image}
+                />
+                <View style={styles.content}>
+                  <Text numberOfLines={1} style={styles.name}>
+                    {contact.username}
+                  </Text>
+                  <Text numberOfLines={2} style={styles.subTitle}>
+                    {contact.email}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           );
-        }}
-      />
-    </View>
+        })}
+      <View>
+        <Text style={styles.sectionTitle}>
+          Users You Might Be Interested In
+        </Text>
+      </View>
+      {contactsListByNativeLanguage.map(contact => {
+        return (
+          <View key={contact._id}>
+          <TouchableOpacity
+            style={styles.container}
+            onPress={async () => {
+              navigation.navigate("Chat", {
+                recipientEmail: contact.email,
+                recipientName: contact.username,
+                senderEmail: userEmail,
+              });
+            }}
+          >
+            <Image
+              source={{
+                uri: contact.profileImageUrl || "https://i.pravatar.cc/300",
+              }}
+              style={styles.image}
+            />
+            <View style={styles.content}>
+              <Text numberOfLines={1} style={styles.name}>
+                {contact.username}
+              </Text>
+              <Text numberOfLines={2} style={styles.subTitle}>
+                {contact.email}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+        )
+      })}
+    </ScrollView>
   );
 }
 
@@ -103,6 +152,13 @@ const styles = StyleSheet.create({
   subTitle: {
     color: "gray",
     fontStyle: "italic",
+  },
+
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginLeft: 15,
   },
 });
 

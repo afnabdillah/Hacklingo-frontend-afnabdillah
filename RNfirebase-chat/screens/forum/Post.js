@@ -53,7 +53,7 @@ export default function Post({ route }) {
           showToast(
             "success",
             "Insert Post Success!",
-            "you have succesfully update your post!"
+            "you have succesfully create your post!"
           );
           navigation.goBack();
         })
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
-    backgroundColor: "#1E90FF",
+    backgroundColor: "#0097b2",
     borderRadius: 25,
     paddingHorizontal: 20,
     paddingVertical: 10,

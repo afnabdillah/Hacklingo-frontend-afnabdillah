@@ -33,7 +33,6 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import AuthenticatedUserContext from "../helper/AuthenticatedUserContext";
 import { auth, database } from "../config/firebase";
 import { useDispatch, useSelector } from "react-redux";
 import bg from "../assets/BG.png";
@@ -50,8 +49,6 @@ import { useNavigation } from "@react-navigation/native";
 import { PopChatMenu } from "./HeadersChat/PopChatMenu";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Chat({ route }) {
 
@@ -148,6 +145,8 @@ export default function Chat({ route }) {
           avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
         },
       };
+
+      console.log(message, ">>>>>>>");
 
       await updateDoc(roomDocRef, {
         messages: arrayUnion(message),

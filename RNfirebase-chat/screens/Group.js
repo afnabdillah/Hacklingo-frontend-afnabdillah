@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useSelector } from 'react-redux';
 import {
     View,
     Text,
@@ -18,26 +19,34 @@ import {
 import { database, auth } from '../config/firebase';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRoute } from '@react-navigation/native';
+import { AntDesign } from '@expo/vector-icons'; 
 
 function Groups({ navigation }) {
+    const route = useRoute();
+    const language = route.params ? route.params.language : undefined;
     const [groups, setGroups] = useState([]);
     const [joinedGroups, setJoinedGroups] = useState([]);
     const [unjoinedGroups, setUnjoinedGroups] = useState([]);
+    const userEmail = useSelector((state) => state.authReducer.email);
     useEffect(() => {
         const fetchGroups = async () => {
-            const groupChatsRef = collection(database, 'groupChats');
-            const userEmail = await AsyncStorage.getItem('email');
+            const groupChatsRef = collection(database, "groupChats");
+
             const unsubscribe = onSnapshot(groupChatsRef, (querySnapshot) => {
                 const groupsData = querySnapshot.docs.map((doc) => ({
                     id: doc.id,
                     ...doc.data(),
-                }));
+                }))
+                console.log(groupsData.languages, "<< groups data");
 
-                const userEmail = auth.currentUser?.email;
-                const joined = groupsData.filter((group) =>
+                const filteredGroups = language
+                    ? groupsData.filter((group) => group.languages === language)
+                    : groupsData;
+                const joined = filteredGroups.filter((group) =>
                     group.users.includes(userEmail)
                 );
-                const unjoined = groupsData.filter(
+                const unjoined = filteredGroups.filter(
                     (group) => !group.users.includes(userEmail)
                 );
 
@@ -51,7 +60,7 @@ function Groups({ navigation }) {
         };
 
         fetchGroups();
-    }, []);
+    }, [language]);
 
     const navigateToCreateGroupChat = () => {
         navigation.navigate('CreateGroupChat');
@@ -114,8 +123,18 @@ function Groups({ navigation }) {
         );
     };
 
+
     return (
-        <View style={{ flex: 1, backgroundColor: 'white' }}>
+        <>
+          {joinedGroups.length === 0 && unjoinedGroups.length === 0 ? (
+            <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
+              <AntDesign name="deleteusergroup" size={200} color="black" />
+              <Text style={{ textAlign: "center", marginTop: 10 }}>
+                Group with {language} language is not found, maybe you can create them first!
+              </Text>
+            </View>
+          ) : (
+            <View style={{ flex: 1, backgroundColor: 'white' }}>
             <FlatList
                 data={joinedGroups}
                 keyExtractor={(item) => item.id}
@@ -143,7 +162,9 @@ function Groups({ navigation }) {
                 <Text style={styles.createGroupButtonText}>Create Group Chat</Text>
             </TouchableOpacity>
         </View>
-    );
+          )}
+        </>
+      );
 }
 
 const styles = StyleSheet.create({

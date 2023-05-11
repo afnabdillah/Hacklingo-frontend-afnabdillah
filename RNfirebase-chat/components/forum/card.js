@@ -1,9 +1,10 @@
-import { Image, View } from "react-native";
+import { Dimensions, Image, View } from "react-native";
 import { Button, Card, Text } from "react-native-paper";
 import { FontAwesome } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 const CardForum = ({ navigation, post }) => {
+  const lebar = Dimensions.get("window").height
 
   return (
     <TouchableOpacity
@@ -23,7 +24,7 @@ const CardForum = ({ navigation, post }) => {
           {post.postImageUrl && (
             <Image
               source={{ uri: post.postImageUrl }}
-              style={{ width: 200, height: 100 }}
+              style={{ width: "100%", height: lebar * 0.3, marginVertical: 20 }}
             />
           )}
           <Text variant="bodyMedium">{post.content}</Text>
