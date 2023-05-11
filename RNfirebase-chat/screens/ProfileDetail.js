@@ -1,4 +1,4 @@
-import { Image, ScrollView, Text, View } from "react-native";
+import { Dimensions, Image, ScrollView, Text, View } from "react-native";
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
@@ -6,7 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function DetailProfile({route}) {
   const { name, email } = route.params;
-  console.log(name, email);
+  const lebar = Dimensions.get("window").width
   return (
     <>
       <View style={{flex: 1}}>
@@ -41,14 +41,14 @@ export default function DetailProfile({route}) {
                 <FontAwesome name="image" size={16} color="white" />
                 </View>
                 <Text style={{ marginLeft: 10, fontSize: 14 }}>Media, Links, and Docs</Text>
-                <Text style={{ marginLeft: 130, fontSize: 14, color: "grey" }}>0 <AntDesign name="right" size={16} color="grey" /></Text>
+                <Text style={{ marginLeft: lebar * 0.33, fontSize: 14, color: "grey" }}>0 <AntDesign name="right" size={16} color="grey" /></Text>
               </View>
               <View style={{ padding: 10, flexDirection: "row", borderTopWidth: 1, borderTopColor: "#F6F1F1" }}>
                 <View style={{ marginLeft: 10, backgroundColor: "#ffc700", padding: 4, borderRadius: 4 }}>
                   <FontAwesome name="star" size={16} color="white" />
                 </View>
                 <Text style={{ marginLeft: 10, fontSize: 14 }}>Starred Messages</Text>
-                <Text style={{ marginLeft: 137, fontSize: 14, color: "grey" }}>None <AntDesign name="right" size={16} color="grey" /></Text>
+                <Text style={{ marginLeft: lebar * 0.348, fontSize: 14, color: "grey" }}>None <AntDesign name="right" size={16} color="grey" /></Text>
               </View>
             </View>
 
@@ -58,21 +58,21 @@ export default function DetailProfile({route}) {
                   <FontAwesome name="volume-up" size={16} color="white" />
                 </View>
                 <Text style={{ marginLeft: 10, fontSize: 14 }}>Mute</Text>
-                <Text style={{ marginLeft: 233, fontSize: 14, color: "grey" }}>No <AntDesign name="right" size={16} color="grey" /></Text>
+                <Text style={{ marginLeft: lebar * 0.592, fontSize: 14, color: "grey" }}>No <AntDesign name="right" size={16} color="grey" /></Text>
               </View>
               <View style={{ padding: 10, flexDirection: "row", borderTopWidth: 1, borderTopColor: "#F6F1F1" }}>
                 <View style={{ marginLeft: 10, backgroundColor: "#eb72d8", padding: 4, borderRadius: 4 }}>
                   <Ionicons name="ios-flower-outline" size={16} color="white" />
                 </View>
                 <Text style={{ marginLeft: 10, fontSize: 14 }}>Wallpaper & Sound</Text>
-                <Text style={{ marginLeft: 166, fontSize: 14, color: "grey" }}><AntDesign name="right" size={16} color="grey" /></Text>
+                <Text style={{ marginLeft: lebar * 0.424, fontSize: 14, color: "grey" }}><AntDesign name="right" size={16} color="grey" /></Text>
               </View>
               <View style={{ padding: 10, flexDirection: "row", borderTopWidth: 1, borderTopColor: "#F6F1F1" }}>
                 <View style={{ marginLeft: 10, backgroundColor: "#ffc700", padding: 4, borderRadius: 4 }}>
                   <Ionicons name="ios-download-outline" size={16} color="white" />
                 </View>
                 <Text style={{ marginLeft: 10, fontSize: 14 }}>Save to Camera Roll</Text>
-                <Text style={{ marginLeft: 125, fontSize: 14, color: "grey" }}>Default</Text>
+                <Text style={{ marginLeft: lebar * 0.32, fontSize: 14, color: "grey" }}>Default</Text>
               </View>
             </View>
 
@@ -82,14 +82,14 @@ export default function DetailProfile({route}) {
                   <FontAwesome5 name="lock" size={16} color="white" />
                 </View>
                 <Text style={{ marginLeft: 10, fontSize: 14 }}>Encryption</Text>
-                <Text style={{ marginLeft: 224, fontSize: 14, color: "grey" }}><AntDesign name="right" size={16} color="grey" /></Text>
+                <Text style={{ marginLeft: lebar * 0.562, fontSize: 14, color: "grey" }}><AntDesign name="right" size={16} color="grey" /></Text>
               </View>
               <View style={{ padding: 10, flexDirection: "row", borderTopWidth: 1, borderTopColor: "#F6F1F1" }}>
                 <View style={{ marginLeft: 10, backgroundColor: "#077eff", padding: 4, borderRadius: 4 }}>
                   <MaterialCommunityIcons name="progress-clock" size={16} color="white" />
                 </View>
                 <Text style={{ marginLeft: 10, fontSize: 14 }}>Disappearing Messages</Text>
-                <Text style={{ marginLeft: 113, fontSize: 14, color: "grey" }}>Off <AntDesign name="right" size={16} color="grey" /></Text>
+                <Text style={{ marginLeft: lebar * 0.283, fontSize: 14, color: "grey" }}>Off <AntDesign name="right" size={16} color="grey" /></Text>
               </View>
             </View>
 

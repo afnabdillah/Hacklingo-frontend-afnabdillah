@@ -45,7 +45,7 @@ function Contacts({ navigation }) {
       }
     }, [targetLanguage])
 
-  
+
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ backgroundColor: "white" }}>
       {/* Kalau merge ambil yang ini guys */}
@@ -94,32 +94,32 @@ function Contacts({ navigation }) {
       {contactsListByNativeLanguage.map(contact => {
         return (
           <View key={contact._id}>
-          <TouchableOpacity
-            style={styles.container}
-            onPress={async () => {
-              navigation.navigate("Chat", {
-                recipientEmail: contact.email,
-                recipientName: contact.username,
-                senderEmail: userEmail,
-              });
-            }}
-          >
-            <Image
-              source={{
-                uri: contact.profileImageUrl || "https://i.pravatar.cc/300",
+            <TouchableOpacity
+              style={styles.container}
+              onPress={async () => {
+                navigation.navigate("Chat", {
+                  recipientEmail: contact.email,
+                  recipientName: contact.username,
+                  senderEmail: userEmail,
+                });
               }}
-              style={styles.image}
-            />
-            <View style={styles.content}>
-              <Text numberOfLines={1} style={styles.name}>
-                {contact.username}
-              </Text>
-              <Text numberOfLines={2} style={styles.subTitle}>
-                {contact.email}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+            >
+              <Image
+                source={{
+                  uri: contact.profileImageUrl || "https://i.pravatar.cc/300",
+                }}
+                style={styles.image}
+              />
+              <View style={styles.content}>
+                <Text numberOfLines={1} style={styles.name}>
+                  {contact.username}
+                </Text>
+                <Text numberOfLines={2} style={styles.subTitle}>
+                  {contact.email}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         )
       })}
     </ScrollView>

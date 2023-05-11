@@ -20,7 +20,7 @@ import { database, auth } from '../config/firebase';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
-import { AntDesign } from '@expo/vector-icons'; 
+import { AntDesign } from '@expo/vector-icons';
 
 function Groups({ navigation }) {
     const route = useRoute();
@@ -38,7 +38,8 @@ function Groups({ navigation }) {
                     id: doc.id,
                     ...doc.data(),
                 }))
-                console.log(groupsData.languages, "<< groups data");
+                // console.log(groupsData.languages, "<< groups data");
+                // console.log(groupsData.languages, "<< groups data");
 
                 const filteredGroups = language
                     ? groupsData.filter((group) => group.languages === language)
@@ -122,49 +123,47 @@ function Groups({ navigation }) {
             </TouchableOpacity>
         );
     };
-
-
     return (
         <>
-          {joinedGroups.length === 0 && unjoinedGroups.length === 0 ? (
-            <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
-              <AntDesign name="deleteusergroup" size={200} color="black" />
-              <Text style={{ textAlign: "center", marginTop: 10 }}>
-                Group with {language} language is not found, maybe you can create them first!
-              </Text>
-            </View>
-          ) : (
-            <View style={{ flex: 1, backgroundColor: 'white' }}>
-            <FlatList
-                data={joinedGroups}
-                keyExtractor={(item) => item.id}
-                renderItem={(item) => renderGroupItem(item, false)} // Joined groups
-                ListHeaderComponent={() => (
-                    <View>
-                        <Text style={styles.sectionTitle}>Joined Groups</Text>
-                    </View>
-                )}
-                ListFooterComponent={() => (
-                    <View>
-                        <Text style={styles.sectionTitle}>Unjoined Groups</Text>
-                        <FlatList
-                            data={unjoinedGroups}
-                            keyExtractor={(item) => item.id}
-                            renderItem={(item) => renderGroupItem(item, true)} // Unjoined groups
-                        />
-                    </View>
-                )}
-            />
-            <TouchableOpacity
-                style={styles.createGroupButton}
-                onPress={navigateToCreateGroupChat}
-            >
-                <Text style={styles.createGroupButtonText}>Create Group Chat</Text>
-            </TouchableOpacity>
-        </View>
-          )}
+            {joinedGroups.length === 0 && unjoinedGroups.length === 0 ? (
+                <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
+                    <AntDesign name="deleteusergroup" size={200} color="black" />
+                    <Text style={{ textAlign: "center", marginTop: 10 }}>
+                        Group with {language} language is not found, maybe you can create them first!
+                    </Text>
+                </View>
+            ) : (
+                <View style={{ flex: 1, backgroundColor: 'white' }}>
+                    <FlatList
+                        data={joinedGroups}
+                        keyExtractor={(item) => item.id}
+                        renderItem={(item) => renderGroupItem(item, false)} // Joined groups
+                        ListHeaderComponent={() => (
+                            <View>
+                                <Text style={styles.sectionTitle}>Joined Groups</Text>
+                            </View>
+                        )}
+                        ListFooterComponent={() => (
+                            <View>
+                                <Text style={styles.sectionTitle}>Unjoined Groups</Text>
+                                <FlatList
+                                    data={unjoinedGroups}
+                                    keyExtractor={(item) => item.id}
+                                    renderItem={(item) => renderGroupItem(item, true)} // Unjoined groups
+                                />
+                            </View>
+                        )}
+                    />
+                    <TouchableOpacity
+                        style={styles.createGroupButton}
+                        onPress={navigateToCreateGroupChat}
+                    >
+                        <Text style={styles.createGroupButtonText}>Create Group Chat</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </>
-      );
+    );
 }
 
 const styles = StyleSheet.create({

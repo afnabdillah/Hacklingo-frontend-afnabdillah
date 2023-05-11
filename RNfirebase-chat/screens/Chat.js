@@ -59,8 +59,8 @@ export default function Chat({ route }) {
   const [userEmail, setUserEmail] = useState("");
   const [username, setUsername] = useState("");
   const [messages, setMessages] = useState([]);
-  const { recipientEmail, recipientName } = route.params;
-
+  const { recipientEmail, recipientName, recipientAvatar } = route.params;
+  // console.log(recipientAvatar, "<<<<< ini avatar");
   // const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [roomId, setRoomId] = useState(null);
@@ -124,8 +124,9 @@ export default function Chat({ route }) {
         GiftedChat.append(previousMessages, messages)
       );
 
-      const generateNewRoomId = generateRoomId(senderEmail, recipientEmail);
-      const roomDocRef = doc(database, "personalChats", generateNewRoomId);
+      const roomId = generateRoomId(senderEmail, recipientEmail);
+      console.log(roomId, ">>>> roomId");
+      const roomDocRef = doc(database, "personalChats", roomId);
       const roomDocSnapshot = await getDoc(roomDocRef);
 
       if (!roomDocSnapshot.exists()) {
@@ -139,7 +140,7 @@ export default function Chat({ route }) {
             {
               email: recipientEmail,
               username: recipientName,
-              avatar: "https://i.pravatar.cc/300", // Set the recipient avatar if available
+              avatar: recipientAvatar || "https://i.pravatar.cc/300", // Set the recipient avatar if available
             },
           ],
           messages: [],
@@ -155,6 +156,8 @@ export default function Chat({ route }) {
           avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
         },
       };
+
+      console.log(message, ">>>>>>>");
 
       await updateDoc(roomDocRef, {
         messages: arrayUnion(message),
@@ -193,7 +196,7 @@ export default function Chat({ route }) {
             <AntDesign name="arrowleft" size={30} color="black" />
           </TouchableOpacity>
           <Image
-            source={{ uri: "https://i.pravatar.cc/300" }}
+            source={{ uri: recipientAvatar || "https://i.pravatar.cc/300" }}
             style={styles.image}
           />
           <Text style={{ fontStyle: "italic", fontSize: 25 }}>

@@ -7,18 +7,9 @@ import React, {
 } from 'react';
 import bg from '../assets/BG.png'
 import { TouchableOpacity, Text, View, ImageBackground, StyleSheet, Image } from 'react-native';
+import { useSelector } from 'react-redux'
 import { GiftedChat, Bubble, InputToolbar, Actions } from 'react-native-gifted-chat';
-import {
-    collection,
-    addDoc,
-    orderBy,
-    query,
-    onSnapshot,
-    where,
-    updateDoc,
-    arrayUnion,
-    doc,
-} from 'firebase/firestore';
+import { getFirestore, collection, addDoc, orderBy, query, onSnapshot, where, updateDoc, arrayUnion, doc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
 import { auth, database } from '../config/firebase';
@@ -30,26 +21,14 @@ import { PopChatMenu } from './HeadersChat/PopChatMenu';
 import * as ImagePicker from 'expo-image-picker';
 
 export default function GroupChat({ route, navigation }) {
-    const [userEmail, setUserEmail] = useState(null);
-    const [username, setUsername] = useState(null);
+    const userEmail = useSelector((state) => state.authReducer.email);
+    const username = useSelector((state) => state.authReducer.username);
     const [messages, setMessages] = useState([]);
     const { groupId, groupName } = route.params;
-    const { user: currentUser } = useContext(AuthenticatedUserContext);
     const [currentUsername, setCurrentUsername] = useState(null);
     const [groupLanguage, setGroupLanguage] = useState('');
     const [groupMembers, setGroupMembers] = useState([]);
     const [groupAdmin, setGroupAdmin] = useState(null);
-
-    useEffect(() => {
-        const fetchUserData = async () => {
-            const email = await AsyncStorage.getItem("email");
-            const username = await AsyncStorage.getItem("username");
-            setUserEmail(email);
-            setUsername(username);
-        };
-
-        fetchUserData();
-    }, []);
     const mergeMessages = (oldMessages, newMessages) => {
         const allMessages = [...oldMessages, ...newMessages];
         const uniqueMessages = allMessages.filter(
@@ -64,8 +43,8 @@ export default function GroupChat({ route, navigation }) {
             return;
         }
 
+        const database = getFirestore();
         const groupDocRef = doc(database, 'groupChats', groupId);
-
         const unsubscribe = onSnapshot(groupDocRef, (docSnapshot) => {
             const data = docSnapshot.data();
             if (data) {
@@ -111,7 +90,7 @@ export default function GroupChat({ route, navigation }) {
                 user: {
                     _id: userEmail,
                     username: username,
-                    avatar: currentUser?.avatar || 'https://i.pravatar.cc/300',
+                    avatar: 'https://i.pravatar.cc/300',
                 },
             };
 
@@ -202,6 +181,7 @@ export default function GroupChat({ route, navigation }) {
             </View>
         );
     };
+    console.log(groupAdmin, "<<< group admin")
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <ImageBackground source={bg} style={{ flex: 1 }}>
@@ -213,7 +193,7 @@ export default function GroupChat({ route, navigation }) {
                         user={{
                             _id: userEmail,
                             username: username,
-                            avatar: currentUser?.avatar || 'https://i.pravatar.cc/300',
+                            avatar: 'https://i.pravatar.cc/300',
                         }}
                         renderBubble={renderBubble}
                         renderActions={(props) => (
