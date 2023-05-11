@@ -22,12 +22,13 @@ const App = () => {
   const dispatch = useDispatch()
   const articles = useSelector((state) => state.articlesReducer.articles);
   const navigation = useNavigation()
+  
   useEffect(() => {
     dispatch(fetchArticles())
       .unwrap()
       .catch((err) => showToast("error", "fetch data error", err.message));
   }, []);
-  console.log(articles, "<<< articles")
+
   const data = articles.map((article) => ({
     title: article.title,
     url: article.articleImageUrl, // Replace with the actual image URL from your data if available

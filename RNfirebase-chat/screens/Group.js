@@ -24,7 +24,7 @@ import { AntDesign } from '@expo/vector-icons';
 
 function Groups({ navigation }) {
     const route = useRoute();
-    const { language } = route.params;
+    const language  = route.params ? route.params.language : undefined;
     const [groups, setGroups] = useState([]);
     const [joinedGroups, setJoinedGroups] = useState([]);
     const [unjoinedGroups, setUnjoinedGroups] = useState([]);
