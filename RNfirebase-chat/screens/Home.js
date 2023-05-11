@@ -27,7 +27,7 @@ const App = () => {
       .unwrap()
       .catch((err) => showToast("error", "fetch data error", err.message));
   }, []);
-
+  console.log(articles, "<<< articles")
   const data = articles.map((article) => ({
     title: article.title,
     url: article.articleImageUrl, // Replace with the actual image URL from your data if available
