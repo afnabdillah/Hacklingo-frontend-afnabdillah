@@ -54,7 +54,7 @@ export default function DrawerNav() {
                 color: "black",
               },
               headerRight: () => {
-                return <HeaderForum />;
+                return <HeaderForum forumId={el._id} />;
               },
               headerTitle: () => <></>,
               drawerType: "front",

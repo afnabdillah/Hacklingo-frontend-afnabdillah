@@ -11,7 +11,8 @@ import { addDoc, collection, updateDoc } from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
 import { NavigationActions, StackActions } from "react-navigation";
 import base_url from "./base_url";
-import { loginSuccess } from "./authSlice";
+import { loginSuccess, updateSuccess } from "./authSlice";
+import { FirebaseError } from "firebase/app";
 
 export const fetchUserDetails = createAsyncThunk(
   "usersSlice/fetchUserDetails", // this is the action name
@@ -42,8 +43,8 @@ export const fetchUsersByNativeLanguage = createAsyncThunk(
   async (nativeLanguage, { rejectWithValue }) => {
     try {
       const userId = await AsyncStorage.getItem("userid");
-      console.log(userId, "<<< userId di function")
-      console.log(nativeLanguage,"<<< language di function")
+      // console.log(userId, "<<< userId di function")
+      // console.log(nativeLanguage,"<<< language di function")
       const response = await axios({
         method: "GET",
         url: `${base_url}/users`,
@@ -54,7 +55,7 @@ export const fetchUsersByNativeLanguage = createAsyncThunk(
           nativeLanguage,
         },
       });
-      console.log(response.data, "<<< response di function")
+      // console.log(response.data, "<<< response di function")
       return response.data;
     } catch (err) {
       if (err.response) {
@@ -112,6 +113,9 @@ export const userLogin = createAsyncThunk(
           email: response.data.email,
           username: response.data.username,
           profileImageUrl: response.data.profileImageUrl || "",
+          nativeLanguage: response.data.nativeLanguage,
+          targetLanguage: response.data.targetLanguage,
+          role: response.data.role
         })
       );
       return true;
@@ -192,9 +196,10 @@ export const logoutUser = createAsyncThunk(
 
 export const updateUserDetails = createAsyncThunk(
   "usersSlice/updateUserDetails",
-  async (input, { rejectWithValue }) => {
+  async (input, { rejectWithValue, dispatch }) => {
     try {
       input.append("context", "image");
+      console.log(input, "<<<< ini input image");
       const userId = await AsyncStorage.getItem("userid");
       const response = await axios({
         method: "PUT",
@@ -205,19 +210,30 @@ export const updateUserDetails = createAsyncThunk(
         },
         data: input,
       });
-      // Save it to firebase database
-      await updateDoc(collection(database, "users"), {
+      // Save it to reducer
+      dispatch(updateSuccess({
         username: response.data.username,
-        profileImageUrl: response.data.profileImageUrl
-      });
+        profileImageUrl: response.data.profileImageUrl,
+        nativeLanguage: response.data.nativeLanguage
+      }))
+      // Save it to Async Storage
+      await saveToAsyncStorage(response.data);
+      // Save it to firebase database
+      // await updateDoc(collection(database, "users"), {
+      //   username: response.data.username,
+      //   profileImageUrl: response.data.profileImageUrl
+      // });
       return response.data;
     } catch (err) {
       // return err.response if it was an axios error with reject with value
       if (err.response) {
-        console.log(err.response.data);
         return rejectWithValue(err.response.data);
+      } else if (err instanceof FirebaseError) {
+        console.log(err, "masuk error firebase");
+        return rejectWithValue(err);
       } else {
         console.log(err, "masuk throw error");
+        return rejectWithValue(err);
       }
     }
   }
@@ -280,7 +296,7 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsersByNativeLanguage.fulfilled, (state, action) => {
         state.status.users = "idle";
-        state.users = action.payload;
+        state.users.push(...action.payload);
       })
       .addCase(fetchUsersByNativeLanguage.rejected, (state, action) => {
         state.status.users = "error";

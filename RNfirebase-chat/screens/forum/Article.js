@@ -1,39 +1,50 @@
-import React from 'react';
-import { ScrollView, Text, StyleSheet, Image } from 'react-native';
-import { useRoute } from '@react-navigation/native'
+import React, { useEffect } from "react";
+import { ScrollView, Text, StyleSheet, Image, View, ActivityIndicator } from "react-native";
+import { useRoute } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchArticleById } from "../../stores/articlesSlices";
+import showToast from "../../helper/showToast";
+
 const Article = () => {
   const route = useRoute();
-  const { article } = route.params;
-  console.log(article, "<<< article")
+  const { articleId } = route.params;
+  const dispatch = useDispatch();
+  const articleDetails = useSelector(
+    (state) => state.articlesReducer.articleDetails
+  );
+  const fetchArticleDetailsStatus = useSelector(
+    (state) => state.articlesReducer.status.articleDetails
+  );
+
+  useEffect(() => {
+    dispatch(fetchArticleById(articleId))
+      .unwrap()
+      .catch((err) => showToast("error", "Fetch Data Error", err.message));
+  }, [articleId]);
+
+  if (fetchArticleDetailsStatus === "loading") {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView>
-      <Text style={styles.title}>Highly Motivated and Detail-Oriented Software Developer</Text>
+      <Text style={styles.title}>
+        {articleDetails.title}
+      </Text>
       <Text style={styles.subtitle}>Published on May 10, 2023</Text>
       <Text style={styles.author}>By Admin</Text>
       <Image
-        style={{ height: 200, width: '100%' }}
-        source={{ uri: "https://contenthub-static.grammarly.com/blog/wp-content/uploads/2022/08/BMD-3398.png" }}
+        style={{ height: 200, width: "100%" }}
+        source={{
+          uri: articleDetails.articleImageUrl,
+        }}
       />
       <Text style={[styles.content, { marginTop: 10 }]}>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vestibulum risus non ullamcorper auctor.
-        Nulla facilisi. Nam et massa massa. Aenean lacinia dolor non lectus auctor, vitae bibendum ex dapibus.
-        Curabitur euismod malesuada lacus, id sollicitudin lorem commodo in. Nulla facilisi. Proin in dolor id
-        sapien iaculis elementum.
-      </Text>
-      <Text style={styles.content}>
-        Fusce non semper tortor. Cras eget massa ex. Duis accumsan fringilla tortor, non vestibulum erat dapibus
-        a. Donec nec lacinia mauris. Aliquam malesuada interdum odio, in lobortis urna mattis a. Morbi efficitur
-        ultricies magna, at tincidunt lectus fringilla sed. Quisque pulvinar purus ut justo elementum dapibus.
-      </Text>
-      <Text style={styles.content}>
-        Fusce non semper tortor. Cras eget massa ex. Duis accumsan fringilla tortor, non vestibulum erat dapibus
-        a. Donec nec lacinia mauris. Aliquam malesuada interdum odio, in lobortis urna mattis a. Morbi efficitur
-        ultricies magna, at tincidunt lectus fringilla sed. Quisque pulvinar purus ut justo elementum dapibus.
-      </Text>
-      <Text style={styles.content}>
-        Fusce non semper tortor. Cras eget massa ex. Duis accumsan fringilla tortor, non vestibulum erat dapibus
-        a. Donec nec lacinia mauris. Aliquam malesuada interdum odio, in lobortis urna mattis a. Morbi efficitur
-        ultricies magna, at tincidunt lectus fringilla sed. Quisque pulvinar purus ut justo elementum dapibus.
+        {articleDetails.content}
       </Text>
     </ScrollView>
   );
@@ -47,26 +58,26 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    color: '#333',
+    color: "#333",
   },
   subtitle: {
     fontSize: 16,
-    color: '#888',
+    color: "#888",
     marginBottom: 10,
   },
   author: {
     fontSize: 14,
-    color: '#888',
+    color: "#888",
     marginBottom: 20,
   },
   content: {
-    fontStyle: 'italic',
+    fontStyle: "italic",
     fontSize: 16,
     lineHeight: 20,
     marginBottom: 10,
-    padding: 5
+    padding: 5,
   },
 });
 

@@ -5,7 +5,7 @@ import base_url from "./base_url";
 
 export const fetchArticles = createAsyncThunk(
   "articlesSlice/fetchArticles", // this is the action name
-  async (input, { rejectWithValue }) => {
+  async (input, { rejectWithValue, dispatch }) => {
     // this is the action
     try {
       const userId = await AsyncStorage.getItem("userid");
