@@ -1,9 +1,9 @@
-import React, { useState, useEffect,} from 'react';
+import React, { useState, useEffect, } from 'react';
 import { useSelector } from 'react-redux';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { database } from '../config/firebase';
-import { collection, onSnapshot, query,} from 'firebase/firestore';
+import { collection, onSnapshot, query, } from 'firebase/firestore';
 import { Image } from 'react-native';
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -55,7 +55,7 @@ function ChatList() {
           console.log(lastMessageDate.toLocaleString(), "<<< item");
           return (
             <TouchableOpacity style={styles.container} onPress={() => {
-              navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username, senderEmail: userEmail });
+              navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username, senderEmail: userEmail, recipientAvatar: otherUser.avatar });
             }}>
               <Image
                 source={{ uri: otherUser.avatar }}

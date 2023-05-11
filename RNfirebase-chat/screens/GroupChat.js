@@ -25,13 +25,10 @@ export default function GroupChat({ route, navigation }) {
     const username = useSelector((state) => state.authReducer.username);
     const [messages, setMessages] = useState([]);
     const { groupId, groupName } = route.params;
-    console.log(route.params)
-    const { user: currentUser } = useContext(AuthenticatedUserContext);
     const [currentUsername, setCurrentUsername] = useState(null);
     const [groupLanguage, setGroupLanguage] = useState('');
     const [groupMembers, setGroupMembers] = useState([]);
     const [groupAdmin, setGroupAdmin] = useState(null);
-
     const mergeMessages = (oldMessages, newMessages) => {
         const allMessages = [...oldMessages, ...newMessages];
         const uniqueMessages = allMessages.filter(
@@ -103,7 +100,7 @@ export default function GroupChat({ route, navigation }) {
                 user: {
                     _id: userEmail,
                     username: username,
-                    avatar: currentUser?.avatar || 'https://i.pravatar.cc/300',
+                    avatar: 'https://i.pravatar.cc/300',
                 },
             };
 
@@ -205,7 +202,7 @@ export default function GroupChat({ route, navigation }) {
                         user={{
                             _id: userEmail,
                             username: username,
-                            avatar: currentUser?.avatar || 'https://i.pravatar.cc/300',
+                            avatar: 'https://i.pravatar.cc/300',
                         }}
                         renderBubble={renderBubble}
                         renderActions={(props) => (
