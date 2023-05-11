@@ -54,9 +54,6 @@ function ChatList() {
           console.log(lastMessage, "")
           const otherUser = item.users.find(u => u.email !== userEmail);
           const lastMessageDate = new Date((lastMessage?.createdAt.seconds * 1000) + (lastMessage?.createdAt.nanoseconds / 1000));
-          console.log(lastMessageDate, "<<< last message date")
-          console.log(lastMessageDate.toLocaleString("id-ID"), "<<< item");
-
           return (
             <TouchableOpacity style={styles.container} onPress={() => {
               navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username, senderEmail: userEmail, recipientAvatar: otherUser.avatar });

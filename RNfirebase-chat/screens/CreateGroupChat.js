@@ -56,14 +56,20 @@ function CreateGroupChat({ route, navigation }) {
         async function fetchUsers() {
             const usersCollectionRef = collection(database, 'users');
             const querySnapshot = await getDocs(usersCollectionRef);
-            const fetchedUsers = querySnapshot.docs.map(doc => ({
-                email: doc.id,
-                ...doc.data()
-            }));
+            const fetchedUsers = querySnapshot.docs
+                .map(doc => ({
+                    email: doc.id,
+                    ...doc.data(),
+                }))
+                .filter(user => user.email !== userEmail); // filter out the current user
             setUsers(fetchedUsers);
         }
 
         fetchUsers();
+    }, [userEmail]); // Add userEmail as a dependency
+
+    useEffect(() => {
+        setUserEmail(userEmail)
     }, []);
 
     const toggleUserSelection = user => {
@@ -87,25 +93,27 @@ function CreateGroupChat({ route, navigation }) {
     const onCreateGroupChat = async () => {
         const groupData = {
             groupName,
-            users: Array.from(selectedUsers),
+            users: Array.from(selectedUsers.add(userEmail)), // Include the current user's email
             languages: selectedLanguage,
             createdAt: new Date(),
             messages: [],
             admin: userEmail,
             isProGroup,
-            requestJoin: []
+            requestJoin: [],
         };
 
         const groupChatsRef = collection(database, 'groupChats');
-        console.log(`Group Chat ${groupName} created`)
+        console.log(`Group Chat ${groupName} created`);
         if (editMode) {
             const groupDocRef = doc(database, 'groupChats', groupId);
             await setDoc(groupDocRef, groupData);
             navigation.goBack();
         } else {
             await addDoc(groupChatsRef, groupData);
+            navigation.goBack();
         }
     };
+
 
     useEffect(() => {
         if (editMode) {
