@@ -146,6 +146,8 @@ export default function Chat({ route }) {
         },
       };
 
+      console.log(message, ">>>>>>>");
+
       await updateDoc(roomDocRef, {
         messages: arrayUnion(message),
       });

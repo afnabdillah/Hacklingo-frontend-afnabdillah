@@ -32,7 +32,7 @@ function Contacts({ navigation }) {
   );
 
   useEffect(() => {
-    targetLanguage.forEach((language) => {
+    targetLanguage?.forEach((language) => {
       dispatch(fetchUsersByNativeLanguage(language))
         .unwrap()
         .catch((err) => showToast("error", "Fetch Data Error", err.message));
