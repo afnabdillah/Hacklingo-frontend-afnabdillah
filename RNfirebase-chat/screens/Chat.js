@@ -115,7 +115,7 @@ export default function Chat({ route }) {
       );
 
       const roomId = generateRoomId(senderEmail, recipientEmail);
-      console.log(roomId, ">>>> roomId");
+      // console.log(roomId, ">>>> roomId");
       const roomDocRef = doc(database, "personalChats", roomId);
       const roomDocSnapshot = await getDoc(roomDocRef);
 

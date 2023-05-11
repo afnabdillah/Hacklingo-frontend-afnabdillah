@@ -39,7 +39,7 @@ export default function GroupChat({ route, navigation }) {
     const [groupLanguage, setGroupLanguage] = useState('');
     const [groupMembers, setGroupMembers] = useState([]);
     const [groupAdmin, setGroupAdmin] = useState(null);
-
+    console.log(groupMembers, "<<<<<current user");
     useEffect(() => {
         const fetchUserData = async () => {
             const email = await AsyncStorage.getItem("email");
@@ -80,7 +80,7 @@ export default function GroupChat({ route, navigation }) {
                 } else {
                     setMessages([]);
                 }
-                setGroupLanguage(data.languages ? data.languages.join(', ') : '');
+                setGroupLanguage(data.languages);
                 setGroupMembers(data.users || []);
                 setGroupAdmin(data.admin || null);
             }
@@ -184,6 +184,7 @@ export default function GroupChat({ route, navigation }) {
         });
     }, [navigation, groupId, groupName, groupLanguage, groupMembers, userEmail, groupAdmin]);
 
+    const ColorCode = 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
     const renderBubble = (props) => {
         const isCurrentUser = props.currentMessage.user._id === userEmail;
         const bubbleBackgroundColor = isCurrentUser ? '#dcf8c6  ' : 'grey';
@@ -193,10 +194,10 @@ export default function GroupChat({ route, navigation }) {
                 {!isCurrentUser && renderUsername(props.currentMessage)}
                 <Bubble
                     {...props}
-                    textStyle={{ right: { color: "grey" } }}
+                    textStyle={{ right: { color: "black" } }}
                     wrapperStyle={{
-                        left: { backgroundColor: bubbleBackgroundColor },
-                        right: { backgroundColor: bubbleBackgroundColor },
+                        left: { backgroundColor: ColorCode },
+                        right: { backgroundColor: '#dcf8c6' },
                     }}
                 />
             </View>
@@ -215,7 +216,6 @@ export default function GroupChat({ route, navigation }) {
                             username: username,
                             avatar: currentUser?.avatar || 'https://i.pravatar.cc/300',
                         }}
-                        renderBubble={renderBubble}
                         renderActions={(props) => (
                             <Actions
                                 {...props}
@@ -277,6 +277,7 @@ export default function GroupChat({ route, navigation }) {
                                 }}
                             />
                         )}
+                        renderBubble={renderBubble}
                     />
                 </View>
             </ImageBackground>
