@@ -7,40 +7,70 @@ import {
   Text,
   Dimensions,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux'
 import CustomImageCarousalLandscape from './Landingpage/CustomImageCarousalLandscape';
 import Carousel from './Landingpage/Carousel'
 import HeaderDefault from '../components/forum/HeaderDefault';
+import { fetchArticles } from '../stores/articlesSlices';
+import showToast from '../helper/showToast';
+import { useNavigation } from '@react-navigation/native';
 const lebar = Dimensions.get("window").width
 
 
 const App = () => {
-  const data = [
-    {
-      title: 'Anise Aroma Art Bazar', url: 'https://i.ibb.co/hYjK44F/anise-aroma-art-bazaar-277253.jpg',
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-      id: 1
+  const dispatch = useDispatch()
+  const articles = useSelector((state) => state.articlesReducer.articles);
+  const navigation = useNavigation()
+  useEffect(() => {
+    dispatch(fetchArticles())
+      .unwrap()
+      .catch((err) => showToast("error", "fetch data error", err.message));
+  }, []);
 
-    },
-    {
-      title: 'Food inside a Bowl', url: 'https://i.ibb.co/JtS24qP/food-inside-bowl-1854037.jpg',
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-      id: 2
-    },
-    {
-      title: 'Vegatable Salad', url: 'https://i.ibb.co/JxykVBt/flat-lay-photography-of-vegetable-salad-on-plate-1640777.jpg',
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-      id: 3
-    }
-  ];
+  const data = articles.map((article) => ({
+    title: article.title,
+    url: article.articleImageUrl, // Replace with the actual image URL from your data if available
+    description: "", // Add a description if available in your data
+    id: article._id,
+  }));
+
   const data2 = [
     {
+      language: "English",
       image: require('../assets/flag_inggris.jpeg'),
     },
     {
+      language: "Indonesian",
       image: require('../assets/Flag_Indonesia.png'),
-    }
+    },
+    {
+      language: "Deutch",
+      image: require('../assets/Flag_Dutch.png'),
+    },
+    {
+      language: "Germany",
+      image: require('../assets/Flag_Germany.jpg'),
+    },
+    {
+      language: "Spanish",
+      image: require('../assets/Flag_Spanish.png'),
+    },
+    {
+      language: "Japanese",
+      image: require('../assets/Flag_Japanese.jpeg'),
+    },
+    {
+      language: "French",
+      image: require('../assets/Flag_French.png'),
+    },
   ];
+  const handleArticlePress = (article) => {
+    navigation.navigate('Article', { articleId : article.id }); // Navigate to DetailScreen with article data
+  };
+  const navigateToGroups = (language) => {
+    navigation.navigate("Chats", { screen: "Find Groups", params : { language } });
+  };
   return (
     <>
       <HeaderDefault />
@@ -50,14 +80,16 @@ const App = () => {
             data={data}
             autoPlay={true}
             pagination={true}
+            onPress={handleArticlePress}
           />
         </View>
         <View style={styles.carouselContainer}>
-          <Text style={styles.text}>SELECT LANGUAGE</Text>
+          <Text style={styles.text}>FIND GROUP</Text>
           <CustomImageCarousalLandscape
             data={data2}
             autoPlay={false}
             pagination={true}
+            navigateToGroups={navigateToGroups}
           />
         </View>
       </SafeAreaView>

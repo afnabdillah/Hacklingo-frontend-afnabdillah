@@ -33,7 +33,6 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import AuthenticatedUserContext from "../helper/AuthenticatedUserContext";
 import { auth, database } from "../config/firebase";
 import { useDispatch, useSelector } from "react-redux";
 import bg from "../assets/BG.png";
@@ -50,8 +49,6 @@ import { useNavigation } from "@react-navigation/native";
 import { PopChatMenu } from "./HeadersChat/PopChatMenu";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Chat({ route }) {
 
@@ -89,7 +86,7 @@ export default function Chat({ route }) {
   useEffect(() => {
     const createRoomId = generateRoomId(senderEmail, recipientEmail);
     const roomDocRef = doc(database, "personalChats", createRoomId);
-  
+
     const unsubscribe = onSnapshot(roomDocRef, (docSnapshot) => {
       if (docSnapshot.exists()) {
         const fetchedMessages = docSnapshot.data().messages.map((message) => ({
@@ -116,44 +113,44 @@ export default function Chat({ route }) {
         GiftedChat.append(previousMessages, messages)
       );
 
-    const roomId = generateRoomId(senderEmail, recipientEmail);
-    
-    const roomDocRef = doc(database, "personalChats", roomId);
-    const roomDocSnapshot = await getDoc(roomDocRef);
-    
-    if (!roomDocSnapshot.exists()) {
-      await setDoc(roomDocRef, {
-        users: [
-          {
-            email: senderEmail,
-            username: currentUserUsername,
-            avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
-          },
-          {
-            email: recipientEmail,
-            username: recipientName,
-            avatar: "https://i.pravatar.cc/300", // Set the recipient avatar if available
-          },
-        ],
-        messages: [],
+      const roomId = generateRoomId(senderEmail, recipientEmail);
+
+      const roomDocRef = doc(database, "personalChats", roomId);
+      const roomDocSnapshot = await getDoc(roomDocRef);
+
+      if (!roomDocSnapshot.exists()) {
+        await setDoc(roomDocRef, {
+          users: [
+            {
+              email: senderEmail,
+              username: currentUserUsername,
+              avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
+            },
+            {
+              email: recipientEmail,
+              username: recipientName,
+              avatar: "https://i.pravatar.cc/300", // Set the recipient avatar if available
+            },
+          ],
+          messages: [],
+        });
+      }
+      const message = {
+        _id: messages[0]._id,
+        createdAt: messages[0].createdAt,
+        text: messages[0].text,
+        user: {
+          _id: senderEmail,
+          username: currentUserUsername,
+          avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
+        },
+      };
+
+      await updateDoc(roomDocRef, {
+        messages: arrayUnion(message),
       });
-    }
-    const message = {
-      _id: messages[0]._id,
-      createdAt: messages[0].createdAt,
-      text: messages[0].text,
-      user: {
-        _id: senderEmail,
-        username: currentUserUsername,
-        avatar: currentUserProfileImageUrl || "https://i.pravatar.cc/300",
-      },
-    };
-    
-    await updateDoc(roomDocRef, {
-      messages: arrayUnion(message),
-    });
-  }, [currentUserUsername]);
-  
+    }, [currentUserUsername]);
+
   const navigation = useNavigation()
   const goToVideoChat = () => {
     navigation.navigate("Video Chat", {
@@ -161,34 +158,47 @@ export default function Chat({ route }) {
       username: currentUserUsername,
     });
   };
+
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 5, paddingRight: 15 }}>
+          <TouchableOpacity>
+            <MaterialIcons
+              onPress={goToVideoChat}
+              name="video-call"
+              size={36}
+              color="black"
+            />
+          </TouchableOpacity>
+          <PopChatMenu name={recipientName} email={recipientEmail} />
+        </View>
+      ),
+      headerTitle: () => (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity onPress={() => navigation.navigate("ChatList")}>
+            <AntDesign name="arrowleft" size={30} color="black" />
+          </TouchableOpacity>
+          <Image
+            source={{ uri: "https://i.pravatar.cc/300" }}
+            style={styles.image}
+          />
+          <Text style={{ fontStyle: "italic", fontSize: 25 }}>
+            {recipientName}
+          </Text>
+        </View>
+      ),
+      headerLeft: () => {
+        <View >
+        </View>
+      }
+    });
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground source={bg} style={{ flex: 1 }}>
-        <View style={styles.headers}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TouchableOpacity onPress={() => navigation.navigate("ChatList")}>
-              <AntDesign name="arrowleft" size={30} color="black" />
-            </TouchableOpacity>
-            <Image
-              source={{ uri: "https://i.pravatar.cc/300" }}
-              style={styles.image}
-            />
-            <Text style={{ fontStyle: "italic", fontSize: 25 }}>
-              {recipientName}
-            </Text>
-          </View>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-            <TouchableOpacity>
-              <MaterialIcons
-                onPress={goToVideoChat}
-                name="video-call"
-                size={36}
-                color="black"
-              />
-            </TouchableOpacity>
-            <PopChatMenu name={recipientName} email={recipientEmail} />
-          </View>
-        </View>
         <GiftedChat
           messages={messages}
           showAvatarForEveryMessage={true}
@@ -273,39 +283,39 @@ export default function Chat({ route }) {
               }}
             />
           )}
-          // renderMessageImage={(props) => {
-          //   console.log(props, "????????");
-          //   return (
-          //     <View style={{ borderRadius: 15, padding: 2 }}>
-          //       <TouchableOpacity
-          //         onPress={() => {
-          //           setModalVisible(true);
-          //           setSeletedImageView(props.currentMessage.image);
-          //         }}
-          //       >
-          //         <Image
-          //           resizeMode="contain"
-          //           style={{
-          //             width: 200,
-          //             height: 200,
-          //             padding: 6,
-          //             borderRadius: 15,
-          //             resizeMode: "cover",
-          //           }}
-          //           source={{ uri: props.currentMessage.image }}
-          //         />
-          //         {selectedImageView ? (
-          //           <ImageView
-          //             imageIndex={0}
-          //             visible={modalVisible}
-          //             onRequestClose={() => setModalVisible(false)}
-          //             images={[{ uri: selectedImageView }]}
-          //           />
-          //         ) : null}
-          //       </TouchableOpacity>
-          //     </View>
-          //   );
-          // }}
+        // renderMessageImage={(props) => {
+        //   console.log(props, "????????");
+        //   return (
+        //     <View style={{ borderRadius: 15, padding: 2 }}>
+        //       <TouchableOpacity
+        //         onPress={() => {
+        //           setModalVisible(true);
+        //           setSeletedImageView(props.currentMessage.image);
+        //         }}
+        //       >
+        //         <Image
+        //           resizeMode="contain"
+        //           style={{
+        //             width: 200,
+        //             height: 200,
+        //             padding: 6,
+        //             borderRadius: 15,
+        //             resizeMode: "cover",
+        //           }}
+        //           source={{ uri: props.currentMessage.image }}
+        //         />
+        //         {selectedImageView ? (
+        //           <ImageView
+        //             imageIndex={0}
+        //             visible={modalVisible}
+        //             onRequestClose={() => setModalVisible(false)}
+        //             images={[{ uri: selectedImageView }]}
+        //           />
+        //         ) : null}
+        //       </TouchableOpacity>
+        //     </View>
+        //   );
+        // }}
         />
       </ImageBackground>
     </SafeAreaView>

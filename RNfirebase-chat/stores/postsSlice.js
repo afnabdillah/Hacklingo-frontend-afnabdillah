@@ -31,7 +31,6 @@ export const fetchPostsBySearch = createAsyncThunk(
   "postsSlice/fetchPostsBySearch", // this is the action name
   async (input, { rejectWithValue }) => {
     // this is the action
-    console.log("masuk sini");
     try {
       const userId = await AsyncStorage.getItem("userid");
       const response = await axios({
@@ -41,10 +40,11 @@ export const fetchPostsBySearch = createAsyncThunk(
           userid: userId,
         },
         params: {
-          search: input,
+          search: input.search,
+          forumId: input.forumId
         },
       });
-      console.log(response.data);
+      console.log(response.data, "<<<< ini result");
       return response.data;
     } catch (err) {
       if (err.response) {

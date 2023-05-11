@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
+import React, { useState, useEffect,} from 'react';
 import { useSelector } from 'react-redux';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { database } from '../config/firebase';
-import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
-import AuthenticatedUserContext from '../helper/AuthenticatedUserContext';
+import { collection, onSnapshot, query,} from 'firebase/firestore';
 import { Image } from 'react-native';
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { HeaderChat } from './HeadersChat/HeaderChat';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 dayjs.extend(relativeTime);
 
 
@@ -20,7 +17,6 @@ function ChatList() {
   const username = useSelector((state) => state.authReducer.username);
 
   useEffect(() => {
-    console.log(userEmail, "<<< ini userEmail di use Effect")
     if (!userEmail) return;
     const personalChatsRef = collection(database, 'personalChats');
     const personalChatsQuery = query(personalChatsRef);
@@ -38,9 +34,6 @@ function ChatList() {
       personalChatsUnsubscribe();
     };
   }, [userEmail]);
-
-  console.log(chats, "<<< ini chats");
-
   const mergeChatLists = (prevChats, newChats, userEmail) => {
     const mergedChats = newChats
       .map(chat => {
@@ -58,9 +51,11 @@ function ChatList() {
         renderItem={({ item }) => {
           const lastMessage = item.messages[item.messages.length - 1];
           const otherUser = item.users.find(u => u.email !== userEmail);
+          const lastMessageDate = new Date((lastMessage?.seconds * 1000) + (lastMessage?.nanoseconds / 1000));
+          console.log(lastMessageDate.toLocaleString(), "<<< item");
           return (
             <TouchableOpacity style={styles.container} onPress={() => {
-              navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username, senderEmail : userEmail });
+              navigation.navigate('Chat', { recipientEmail: otherUser.email, recipientName: otherUser.username, senderEmail: userEmail });
             }}>
               <Image
                 source={{ uri: otherUser.avatar }}

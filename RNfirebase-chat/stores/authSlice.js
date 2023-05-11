@@ -5,7 +5,12 @@ const authSlice = createSlice({
     initialState: {
         userId : null,
         email : null,
-        username: null
+        username: null,
+        profileImageUrl: "",
+        nativeLanguage : null,
+        targetLanguage : [],
+        role : null
+
     },
     reducers: {
         loginSuccess(state, action) {
@@ -13,16 +18,28 @@ const authSlice = createSlice({
             state.email = action.payload.email
             state.username = action.payload.username
             state.profileImageUrl = action.payload.profileImageUrl
+            state.nativeLanguage = action.payload.nativeLanguage
+            state.targetLanguage = action.payload.targetLanguage
+            state.role = action.payload.role
+        },
+        updateSuccess(state, action) {
+            console.log(action.payload, "<<<< ini hasil payload di updateSuccess");
+            state.username = action.payload.username
+            state.profileImageUrl = action.payload.profileImageUrl
+            state.nativeLanguage = action.payload.nativeLanguage
         },
         logout(state){
             state.userId = null
             state.email = null
             state.username = null
             state.profileImageUrl = null
+            state.nativeLanguage = null
+            state.targetLanguage = null
+            state.role = null
         }
     },
   });
   
   export default authSlice.reducer;
 
-  export const { loginSuccess, logout } = authSlice.actions
+  export const { loginSuccess, logout, updateSuccess } = authSlice.actions
