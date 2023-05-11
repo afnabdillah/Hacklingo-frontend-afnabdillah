@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
-import { Text, View, ScrollView, Image, TextInput } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Text, View, ScrollView, Image, TextInput, Dimensions } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 import { insertNewComment } from "../../stores/commentsSlice";
@@ -15,10 +15,9 @@ export default function DetailScreen({ navigation, route }) {
   const [commentText, setCommentText] = useState("");
   const dispatch = useDispatch();
 
-  const postDetails = useSelector((state) => state.postsReducer.postDetails);
-  const postDetailsStatus = useSelector(
-    (state) => state.postsReducer.status.postDetails
-  );
+  const postDetails = useSelector(state => state.postsReducer.postDetails);
+  const postDetailsStatus = useSelector(state => state.postsReducer.status.postDetails);
+  const lebar = Dimensions.get("window").height
 
   const handleAddComment = async () => {
     try {
@@ -35,6 +34,8 @@ export default function DetailScreen({ navigation, route }) {
       console.error(err);
     }
   };
+
+  console.log(postDetails.postImageUrl);
 
   useFocusEffect(
     useCallback(() => {
@@ -86,7 +87,7 @@ export default function DetailScreen({ navigation, route }) {
               {postDetails.title}
             </Text>
           </View>
-          <View style={{ marginTop: 10, width: "100%", height: 200 }}>
+          <View style={{ marginTop: 10, width: "100%", height: lebar * 0.3 }}>
             {postDetails.postImageUrl && (
               <Image
                 source={{ uri: postDetails.postImageUrl }}
