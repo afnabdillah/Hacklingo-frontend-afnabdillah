@@ -163,6 +163,7 @@ export default function GroupChat({ route, navigation }) {
         });
     }, [navigation, groupId, groupName, groupLanguage, groupMembers, userEmail, groupAdmin]);
 
+    const ColorCode = 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
     const renderBubble = (props) => {
         const isCurrentUser = props.currentMessage.user._id === userEmail;
         const bubbleBackgroundColor = isCurrentUser ? '#dcf8c6  ' : 'grey';
@@ -172,10 +173,10 @@ export default function GroupChat({ route, navigation }) {
                 {!isCurrentUser && renderUsername(props.currentMessage)}
                 <Bubble
                     {...props}
-                    textStyle={{ right: { color: "grey" } }}
+                    textStyle={{ right: { color: "black" } }}
                     wrapperStyle={{
-                        left: { backgroundColor: bubbleBackgroundColor },
-                        right: { backgroundColor: bubbleBackgroundColor },
+                        left: { backgroundColor: ColorCode },
+                        right: { backgroundColor: '#dcf8c6' },
                     }}
                 />
             </View>
@@ -195,7 +196,6 @@ export default function GroupChat({ route, navigation }) {
                             username: username,
                             avatar: 'https://i.pravatar.cc/300',
                         }}
-                        renderBubble={renderBubble}
                         renderActions={(props) => (
                             <Actions
                                 {...props}
@@ -257,6 +257,7 @@ export default function GroupChat({ route, navigation }) {
                                 }}
                             />
                         )}
+                        renderBubble={renderBubble}
                     />
                 </View>
             </ImageBackground>
