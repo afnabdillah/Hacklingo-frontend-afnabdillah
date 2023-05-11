@@ -275,7 +275,7 @@ export default function Chat({ route }) {
           renderBubble={(props) => (
             <Bubble
               {...props}
-              textStyle={{ right: { color: "grey" } }}
+              textStyle={{ right: { color: "black" } }}
               wrapperStyle={{
                 left: {
                   backgroundColor: "white",
