@@ -115,11 +115,11 @@ export default function DetailScreen({ navigation, route }) {
               />
               <Text style={{ fontSize: 12, color: "grey", marginLeft: 5 }}>
                 {" "}
-                {postDetails.comments.length}{" "}
+                {postDetails.comments?.length}{" "}
               </Text>
             </View>
             {/* comment di forum */}
-            {postDetails.comments.map(comment => {
+            {postDetails.comments?.map(comment => {
               return <Comment key={comment._id} comment={comment} />
             })}
           </View>
