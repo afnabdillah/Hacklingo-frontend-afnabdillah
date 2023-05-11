@@ -60,7 +60,7 @@ export default function Chat({ route }) {
   const [username, setUsername] = useState("");
   const [messages, setMessages] = useState([]);
   const { recipientEmail, recipientName, recipientAvatar } = route.params;
-  console.log(recipientAvatar, "<<<<< ini avatar");
+  // console.log(recipientAvatar, "<<<<< ini avatar");
   // const { user: currentUser } = useContext(AuthenticatedUserContext);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [roomId, setRoomId] = useState(null);
@@ -115,7 +115,7 @@ export default function Chat({ route }) {
       );
 
       const roomId = generateRoomId(senderEmail, recipientEmail);
-
+      console.log(roomId, ">>>> roomId");
       const roomDocRef = doc(database, "personalChats", roomId);
       const roomDocSnapshot = await getDoc(roomDocRef);
 
