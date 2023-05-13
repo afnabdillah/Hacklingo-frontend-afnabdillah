@@ -145,7 +145,7 @@ export default function DetailScreen({ navigation, route }) {
               </Text>
             </View>
             {/* comment di forum */}
-            {postDetails.comments.length > 0 ? (
+            {postDetails.comments?.length > 0 ? (
               postDetails.comments.map((comment) => (
                 <Comment key={comment._id} comment={comment} />
               ))
