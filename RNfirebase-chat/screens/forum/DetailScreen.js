@@ -1,10 +1,16 @@
-import React, { useCallback, useState } from "react";
-import { Text, View, ScrollView, Image, TextInput, Dimensions } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Text,
+  View,
+  ScrollView,
+  Image,
+  TextInput,
+  Dimensions,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 import { insertNewComment } from "../../stores/commentsSlice";
-import { useFocusEffect } from "@react-navigation/native";
 import { fetchPostDetails } from "../../stores/postsSlice";
 import showToast from "../../helper/showToast";
 import { ActivityIndicator } from "react-native-paper";
@@ -15,11 +21,11 @@ export default function DetailScreen({ navigation, route }) {
   const [commentText, setCommentText] = useState("");
   const dispatch = useDispatch();
 
-  const postDetails = useSelector(state => state.postsReducer.postDetails);
-  const postDetailsStatus = useSelector(state => state.postsReducer.status.postDetails);
-  const lebar = Dimensions.get("window").height
-
-  console.log(postDetails, "<<<< ini post details");
+  const postDetails = useSelector((state) => state.postsReducer.postDetails);
+  const postDetailsStatus = useSelector(
+    (state) => state.postsReducer.status.postDetails
+  );
+  const lebar = Dimensions.get("window").height;
 
   const handleAddComment = async () => {
     try {
@@ -37,13 +43,11 @@ export default function DetailScreen({ navigation, route }) {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      dispatch(fetchPostDetails(id))
-        .unwrap()
-        .catch((err) => showToast("error", "Error Fetching Post", err.message));
-    }, [id])
-  );
+  useEffect(() => {
+    dispatch(fetchPostDetails(id))
+      .unwrap()
+      .catch((err) => showToast("error", "Error Fetching Post", err.message));
+  }, [id]);
 
   if (postDetailsStatus === "loading") {
     return (
@@ -64,20 +68,27 @@ export default function DetailScreen({ navigation, route }) {
             height: "100%",
           }}
         >
-          <View style={{ marginLeft: 20, marginTop:5, padding: 5, flexDirection: "row" }}>
+          <View
+            style={{
+              marginLeft: 20,
+              marginTop: 5,
+              padding: 5,
+              flexDirection: "row",
+            }}
+          >
             <Image
               source={{
                 uri:
                   postDetails.userId?.profileImageUrl ||
-                  "https://i.pravatar.cc/300",
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
               }}
               style={{ height: 40, width: 40, borderRadius: 100 }}
             />
             <View>
-              <Text style={{marginLeft: 20}}>
+              <Text style={{ marginLeft: 20 }}>
                 {postDetails.userId?.username}
               </Text>
-              <Text style={{marginTop:5, marginLeft: 20, color: "grey" }}>
+              <Text style={{ marginTop: 5, marginLeft: 20, color: "grey" }}>
                 {postDetails.createdAt?.split("T")[0]}
               </Text>
             </View>
@@ -87,16 +98,28 @@ export default function DetailScreen({ navigation, route }) {
               {postDetails.title}
             </Text>
           </View>
-            {postDetails.postImageUrl && (
+          {postDetails.postImageUrl && (
             <View style={{ marginTop: 10, width: "100%", height: lebar * 0.3 }}>
-              <TouchableOpacity onPress={() => {return navigation.navigate("image", {imageUrl: postDetails.postImageUrl})}} >
+              <TouchableOpacity
+                onPress={() => {
+                  return navigation.navigate("Image", {
+                    postImageUrl: postDetails.postImageUrl,
+                  });
+                }}
+              >
                 <Image
                   source={{ uri: postDetails.postImageUrl }}
                   style={{ height: "100%", width: "100%" }}
                 />
               </TouchableOpacity>
             </View>
-            )}
+          )}
+          {/* content */}
+          <View style={{ marginHorizontal: 20, marginVertical: 10 }}>
+            <Text style={{ color: "#615d5d", fontWeight: "300", fontSize: 15 }}>
+              {postDetails.content}
+            </Text>
+          </View>
           <View style={{ justifyContent: "flex-start" }}>
             <View
               style={{
@@ -122,9 +145,23 @@ export default function DetailScreen({ navigation, route }) {
               </Text>
             </View>
             {/* comment di forum */}
-            {postDetails.comments?.map(comment => {
-              return <Comment key={comment._id} comment={comment} />
-            })}
+            {postDetails.comments.length > 0 ? (
+              postDetails.comments.map((comment) => (
+                <Comment key={comment._id} comment={comment} />
+              ))
+            ) : (
+              <View style={{ backgroundColor: "#F6F1F1" }}>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    marginTop: 20,
+                    color: "gray",
+                  }}
+                >
+                  No comments found. Be the first one to comment!
+                </Text>
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -133,7 +170,7 @@ export default function DetailScreen({ navigation, route }) {
           flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
-          paddingVertical:10
+          paddingVertical: 10,
         }}
       >
         <View

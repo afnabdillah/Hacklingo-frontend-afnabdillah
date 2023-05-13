@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
-  FlatList,
   TouchableOpacity,
   StyleSheet,
   Image,
@@ -11,8 +10,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersByNativeLanguage } from "../stores/usersSlice";
 import showToast from "../helper/showToast";
-import { useFocusEffect } from "@react-navigation/native";
-import { setFetchStatus } from "../stores/authSlice";
 
 function Contacts({ navigation }) {
   const dispatch = useDispatch();
@@ -32,24 +29,18 @@ function Contacts({ navigation }) {
   const contactsListByNativeLanguage = usersByNativeLanguage.filter(
     (user) => user._id !== userId
   );
-  const usersByNativeLanguageFetched = useSelector(state => state.authReducer.usersByNativeLanguageFetched);
 
-  // console.log(contactsList[0].profileImageUrl, "<<< ini profileimage url");
-
-    useEffect(() => {
-      if (!usersByNativeLanguageFetched) {
-        targetLanguage.forEach((language) => {
-          dispatch(fetchUsersByNativeLanguage(language))
-            .unwrap()
-            .catch((err) => showToast("error", "Fetch Data Error", err.message));
-        });
-        dispatch(setFetchStatus());
-      }
-    }, [targetLanguage])
-
+  useEffect(() => {
+    dispatch(fetchUsersByNativeLanguage(targetLanguage))
+    .unwrap()
+    .catch((err) => showToast("error", "Fetch Data Error", err.message));
+  }, []);
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ backgroundColor: "white" }}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ backgroundColor: "white" }}
+    >
       {/* Kalau merge ambil yang ini guys */}
       {contactsList.length !== 0 && (
         <View>
@@ -72,7 +63,7 @@ function Contacts({ navigation }) {
               >
                 <Image
                   source={{
-                    uri: contact.profileImageUrl || "https://i.pravatar.cc/300",
+                    uri: contact.profileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
                   }}
                   style={styles.image}
                 />
@@ -93,7 +84,7 @@ function Contacts({ navigation }) {
           Users You Might Be Interested In
         </Text>
       </View>
-      {contactsListByNativeLanguage.map(contact => {
+      {contactsListByNativeLanguage.map((contact) => {
         return (
           <View key={contact._id}>
             <TouchableOpacity
@@ -108,7 +99,7 @@ function Contacts({ navigation }) {
             >
               <Image
                 source={{
-                  uri: contact.profileImageUrl || "https://i.pravatar.cc/300",
+                  uri: contact.profileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
                 }}
                 style={styles.image}
               />
@@ -123,7 +114,7 @@ function Contacts({ navigation }) {
               </View>
             </TouchableOpacity>
           </View>
-        )
+        );
       })}
     </ScrollView>
   );

@@ -4,7 +4,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 const CardForum = ({ navigation, post }) => {
-  const lebar = Dimensions.get("window").height
+  const lebar = Dimensions.get("window").height;
 
   return (
     <TouchableOpacity
@@ -28,8 +28,9 @@ const CardForum = ({ navigation, post }) => {
             />
           )}
           <Text variant="bodyMedium">{post.content}</Text>
-          <View style={{ alignItems: "flex-end" }}>
-            <Button style={{}}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+            <Text style={{fontSize: 12, color: "grey"}}>{post.createdAt.split("T")[0]}</Text>
+            <Button>
               <FontAwesome name="comments-o" size={24} color="black" />
             </Button>
           </View>

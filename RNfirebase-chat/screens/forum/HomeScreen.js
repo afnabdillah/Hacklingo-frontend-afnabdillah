@@ -56,14 +56,24 @@ export default function HomeScreen({ navigation }) {
   return (
     <>
       <View style={{ backgroundColor: "white", paddingBottom: 20 }}>
-        <View style={{ marginLeft: 10, marginTop: 20 }}>
-          <Text style={{ fontSize: 25, fontWeight: "500", marginBottom: 5 }}>
-            {forumName}{" "}
+        <View style={{ marginLeft: 10, marginTop: 10, marginRight: 15 }}>
+          <View
+            style={{
+              marginBottom: 10,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontSize: 25, fontWeight: "500" }}>
+              {forumName.split("/")[0]}
+              {" Forum "}
+            </Text>
             <Image
               source={{ uri: forumDetails.flagImage }}
-              style={{ width: 25, height: 25, borderRadius: 100 }}
+              style={{ width: 25, height: 25}}
             />
-          </Text>
+          </View>
           <Pressable onPress={() => setShowFullText(!showFullText)}>
             <Text style={{ color: "grey", fontWeight: "300", fontSize: 15 }}>
               {showFullText
@@ -74,7 +84,7 @@ export default function HomeScreen({ navigation }) {
           </Pressable>
         </View>
       </View>
-      <ScrollView style={{ backgroundColor: "#F6F1F1", paddingVertical: 12 }}>
+      <ScrollView contentContainerStyle={{ backgroundColor: "#F6F1F1", paddingVertical: 12 }}>
         {posts?.length > 0 ? (
           posts.map((post) => (
             <CardForum key={post._id} navigation={navigation} post={post} />

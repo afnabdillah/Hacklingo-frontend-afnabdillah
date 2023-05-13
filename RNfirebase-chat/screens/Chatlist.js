@@ -43,7 +43,7 @@ function ChatList() {
       .sort((a, b) => b.createdAt - a.createdAt);
     return mergedChats;
   };
-  console.log('halaman chat')
+
   return (
     <View style={{ flex: 1, paddingTop: 10, backgroundColor: '#fff' }}>
       <FlatList
@@ -52,7 +52,7 @@ function ChatList() {
         renderItem={({ item }) => {
           const lastMessage = item.messages[item.messages.length - 1];
           const otherUser = item.users.find(u => u.email !== userEmail);
-          const lastMessageDate = new Date((lastMessage?.createdAt.seconds * 1000) + (lastMessage?.createdAt.nanoseconds / 1000));
+          const lastMessageDate = new Date((lastMessage.createdAt.seconds * 1000) + (lastMessage.createdAt.nanoseconds / 1000));
           
           return (
             <TouchableOpacity style={styles.container} onPress={() => {

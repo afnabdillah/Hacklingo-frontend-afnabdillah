@@ -6,8 +6,6 @@ dayjs.extend(relativeTime);
 
 const Comment = ({ comment }) => {
 
-  console.log(comment, "<<< ini comment");
-
   return (
     <View>
       <View
@@ -41,7 +39,7 @@ const Comment = ({ comment }) => {
           paddingBottom: 10,
         }}
       >
-        <Text style={{ fontSize: 12, marginLeft: 5, fontWeight: "400" }}>
+        <Text style={{ fontSize: 12, marginLeft: 10, fontWeight: "400" }}>
           {comment.content}
         </Text>
       </View>

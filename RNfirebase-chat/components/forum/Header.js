@@ -25,7 +25,7 @@ export default function HeaderForum({ forumId }) {
         placeholder="Search"
         style={{
           backgroundColor: "#F6F1F1",
-          width: width * 0.7,
+          width: width * 0.64,
           marginRight: 10,
           height: 50,
         }}

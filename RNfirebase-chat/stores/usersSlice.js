@@ -16,7 +16,6 @@ import {
   where,
 } from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
-import { NavigationActions, StackActions } from "react-navigation";
 import base_url from "./base_url";
 import { loginSuccess, updateSuccess } from "./authSlice";
 import { FirebaseError } from "firebase/app";
@@ -47,11 +46,9 @@ export const fetchUserDetails = createAsyncThunk(
 
 export const fetchUsersByNativeLanguage = createAsyncThunk(
   "usersSlice/fetchUsersByNativeLanguage",
-  async (nativeLanguage, { rejectWithValue }) => {
+  async (targetLanguage, { rejectWithValue }) => {
     try {
       const userId = await AsyncStorage.getItem("userid");
-      // console.log(userId, "<<< userId di function")
-      // console.log(nativeLanguage,"<<< language di function")
       const response = await axios({
         method: "GET",
         url: `${base_url}/users`,
@@ -59,10 +56,10 @@ export const fetchUsersByNativeLanguage = createAsyncThunk(
           userid: userId,
         },
         params: {
-          nativeLanguage,
+          targetLanguage,
         },
       });
-      // console.log(response.data, "<<< response di function")
+      // console.log(response.data.map(el => {return {language: el.nativeLanguage, username: el.username}}), "<<< response di function")
       return response.data;
     } catch (err) {
       if (err.response) {
@@ -319,7 +316,7 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsersByNativeLanguage.fulfilled, (state, action) => {
         state.status.users = "idle";
-        state.users.push(...action.payload);
+        state.users = action.payload;
       })
       .addCase(fetchUsersByNativeLanguage.rejected, (state, action) => {
         state.status.users = "error";
