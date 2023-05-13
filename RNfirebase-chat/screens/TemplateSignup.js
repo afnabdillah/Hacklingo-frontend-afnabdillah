@@ -102,14 +102,13 @@ export default SignUpView = () => {
 
   const onSelectImagePress = async () => {
     const imageData = await pickImage();
-    setSelectedImage(imageData.uri || "");
+    setSelectedImage(imageData?.uri || "");
     setSelectedImageData(imageData || {});
   };
 
   return (
     <ScrollView>
       <View style={styles.container}>
-        {signUpStatus === "loading" && <ActivityIndicator />}
         <Image source={logo} style={styles.logo} resizeMode="contain" />
         <TouchableOpacity onPress={onSelectImagePress}>
           {!selectedImage ? (
@@ -147,7 +146,6 @@ export default SignUpView = () => {
             onChangeText={(fullName) => setFullName(fullName)}
           />
         </View>
-
         <View style={styles.inputContainer}>
           <Image
             style={styles.inputIcon}
@@ -210,7 +208,6 @@ export default SignUpView = () => {
             onSelect={(item) => setLanguage(item)}
           />
         </View>
-
         <View>
           {columns.map((column, index) => (
             <View key={column.id} style={styles.inputContainer}>
@@ -257,6 +254,12 @@ export default SignUpView = () => {
             </View>
           ))}
         </View>
+        {signUpStatus === "loading" ? (
+          <View style={{marginBottom: 15}}>
+            <ActivityIndicator style={{marginBottom: 5}} />
+            <Text>Signing you up...</Text>
+          </View>
+        ) : (
         <TouchableOpacity
           onPress={() => navigation.navigate("Login")}
           style={styles.buttonContainer}
@@ -271,6 +274,7 @@ export default SignUpView = () => {
             Already have an account? login here
           </Text>
         </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={[styles.buttonContainer, styles.signupButton]}
           onPress={onHandleSignup}

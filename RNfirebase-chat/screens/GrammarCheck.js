@@ -20,7 +20,6 @@ const GrammarCheckScreen = () => {
   const [inputText, setInputText] = useState("");
   const [correctedText, setCorrectedText] = useState("");
   const [loading, setLoading] = useState("idle");
-  // const apiKey = "P7b1h6xCkRb650yT";
   const apiKey = Constants.manifest.extra.grammarApiKey;
 
   const handleGrammarCheck = async () => {

@@ -11,7 +11,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import showToast from "../helper/showToast";
 import { userLogin } from "../stores/usersSlice";
-import logo from '../assets/HACKLINGO.png'
+import logo from "../assets/HACKLINGO.png";
+import { ActivityIndicator } from "react-native-paper";
 
 export default LoginView = () => {
   const [email, setEmail] = useState("");
@@ -24,21 +25,8 @@ export default LoginView = () => {
 
   const onHandleLogin = () => {
     if (email !== "" && password !== "") {
-      console.log("masuk login");
       dispatch(userLogin({ email, password }))
         .unwrap()
-        .then(() => {
-          // Navigate to ChatList after successful login
-          navigation.navigate({
-            screen: "ChatStack",
-            params: {
-              screen: "ChatList",
-              params: {
-                screen: "Home",
-              },
-            },
-          });
-        })
         .catch((err) => {
           showToast("error", "Login error", err.message);
         });
@@ -47,11 +35,7 @@ export default LoginView = () => {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={logo}
-        style={styles.logo}
-        resizeMode="contain"
-      />
+      <Image source={logo} style={styles.logo} resizeMode="contain" />
       <View style={styles.inputContainer}>
         <Image
           style={[styles.icon, styles.inputIcon]}
@@ -82,6 +66,12 @@ export default LoginView = () => {
         />
       </View>
 
+      {loginStatus === "loading" ? (
+        <View style={{marginBottom: 15}}>
+          <ActivityIndicator style={{marginBottom: 5}} />
+          <Text>Logging you in...</Text>
+        </View>
+      ) : (
       <TouchableOpacity
         onPress={() => navigation.navigate("Signup")}
         style={styles.buttonContainer}
@@ -96,6 +86,7 @@ export default LoginView = () => {
           Don't have an account? register here
         </Text>
       </TouchableOpacity>
+      )}
 
       <TouchableOpacity
         onPress={onHandleLogin}
