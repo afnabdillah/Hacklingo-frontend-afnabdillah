@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AgoraUIKit from 'agora-rn-uikit';
 import { Button, View, TextInput, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Constants from 'expo-constants';
 
 const VideoChat = ({ route }) => {
     const [videoCall, setVideoCall] = useState(false);
@@ -12,7 +13,7 @@ const VideoChat = ({ route }) => {
      * @type {import('agora-rn-uikit').ConnectionData}
      */
     const connectionData = {
-        appId: 'ab2001a4b2014114a6d31426bfc7185b',
+        appId: Constants.manifest.extra.videoCallApiKey,
         channel: roomId,
         username: username
     }

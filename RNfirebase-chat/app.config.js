@@ -37,6 +37,8 @@ export default {
       storageBucket: process.env.STORAGE_BUCKET,
       messagingSenderId: process.env.MESSAGING_SENDER_ID,
       appId: process.env.APP_ID,
+      videoCallApiKey: process.env.VIDEO_CALL_API_KEY,
+      grammarApiKey: process.env.GRAMMAR_API_KEY,
       "eas": {
         "projectId": "72573024-e688-4354-8aa8-e0d00aafa619"
       }
