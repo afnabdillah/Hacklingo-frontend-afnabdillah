@@ -138,20 +138,17 @@ export const userSignUp = createAsyncThunk(
   async (input, { rejectWithValue, dispatch }) => {
     try {
       // these are temporary additionals
-      const additionals = {
-        nativeLanguage: "Indonesian/Bahasa Indonesia",
-        targetLanguage: ["English", "German/Deutsch"],
-        role: "regular",
-      };
+      input.append("role", "regular");
+      input.append("context", "image");
       // Sign up first to the project database
       const { email, password, username } = input;
       const response = await axios({
         method: "POST",
         url: `${base_url}/users/register`,
-        data: {
-          ...input,
-          ...additionals,
-        },
+        data: input,
+        headers: {
+          "Content-Type" : "multipart/form-data"
+        }
       });
       // Sign Up to firebase if success
       const { user } = await createUserWithEmailAndPassword(
@@ -163,7 +160,7 @@ export const userSignUp = createAsyncThunk(
       await addDoc(collection(database, "users"), {
         email: user.email,
         username: username,
-        profileImageUrl: "",
+        profileImageUrl: response.data.profileImageUrl || "",
       });
       // Save it to async storage
       await saveToAsyncStorage(response.data);

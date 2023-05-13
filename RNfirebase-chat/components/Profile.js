@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import React, { useContext, useEffect, useState } from "react";
 import {
   View,
@@ -9,21 +8,15 @@ import {
   Button,
   ActivityIndicator,
 } from "react-native";
-import Constants from "expo-constants";
-import * as DocumentPicker from "expo-document-picker";
 import {
   MaterialCommunityIcons,
   AntDesign,
-  Feather,
   Ionicons,
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import * as ImagePicker from "expo-image-picker";
-import { fetchUserDetails, updateUserDetails } from "../stores/usersSlice";
+import { updateUserDetails } from "../stores/usersSlice";
 import { useDispatch, useSelector } from "react-redux";
 import pickImage from "../helper/imagePicker";
-import * as FileSystem from "expo-file-system";
-import { log } from "react-native-reanimated";
 import showToast from "../helper/showToast";
 
 export default function Profile() {

@@ -15,6 +15,7 @@ import HeaderDefault from '../components/forum/HeaderDefault';
 import { fetchArticles } from '../stores/articlesSlices';
 import showToast from '../helper/showToast';
 import { useNavigation } from '@react-navigation/native';
+import { ActivityIndicator } from 'react-native-paper';
 const lebar = Dimensions.get("window").width
 
 
@@ -72,19 +73,26 @@ const App = () => {
   const navigateToGroups = (language) => {
     navigation.navigate("Chats", { screen: "Find Groups", params : { language } });
   };
+
+  const fetchArticlesStatus = useSelector(state => state.articlesReducer.status.articles);
+
   return (
     <>
       <HeaderDefault />
       <SafeAreaView style={styles.container}>
-        <View style={styles.carouselContainer}>
-          <Carousel
-            data={data}
-            autoPlay={true}
-            pagination={true}
-            onPress={handleArticlePress}
-          />
+        <View style={styles.topCarouselContainer}>
+          {fetchArticlesStatus === "loading" ? (
+            <ActivityIndicator size={24} />
+          ) : (
+            <Carousel
+              data={data}
+              autoPlay={true}
+              pagination={true}
+              onPress={handleArticlePress}
+            />
+          )}
         </View>
-        <View style={styles.carouselContainer}>
+        <View style={styles.bottomCarouselContainer}>
           <Text style={styles.text}>FIND GROUP</Text>
           <CustomImageCarousalLandscape
             data={data2}
@@ -114,8 +122,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     width: lebar * 1
   },
-  carouselContainer: {
+  topCarouselContainer: {
     marginBottom: 40,
+    height: 300,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  bottomCarouselContainer: {
+    marginBottom: 40,
+    height: 200,
+    alignItems: "center",
+    justifyContent: "center"
   },
   carouselFlag: {
     marginBottom: 40,

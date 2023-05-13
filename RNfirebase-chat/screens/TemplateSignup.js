@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { EvilIcons, AntDesign } from "@expo/vector-icons";
+import React, { useState } from "react";
+import {
+  EvilIcons,
+  AntDesign,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import {
   StyleSheet,
   Text,
@@ -7,9 +11,9 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  Alert,
-  SafeAreaView,
-  Modal,
+  ScrollView,
+  Pressable,
+  Dimensions,
 } from "react-native";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -18,13 +22,16 @@ import showToast from "../helper/showToast";
 import { userSignUp } from "../stores/usersSlice";
 import { ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
-import logo from '../assets/HACKLINGO.png'
+import logo from "../assets/HACKLINGO.png";
+import pickImage from "../helper/imagePicker";
 
 export default SignUpView = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [language, setLanguage] = useState("");
+  const [selectedImage, setSelectedImage] = useState("");
+  const [selectedImageData, setSelectedImageData] = useState({});
   // const [columns, setColumns] = useState([""]);
   const [columns, setColumns] = useState([{ id: 0, value: "" }]);
   const signUpStatus = useSelector(
@@ -51,20 +58,25 @@ export default SignUpView = () => {
       language !== "" &&
       columns[0] !== ""
     ) {
-      console.log("masuk sini");
-      dispatch(
-        userSignUp({
-          email,
-          password,
-          username: fullName,
-          nativeLanguage: language,
-          targetLanguage: columns,
-        })
-      )
+      const targetLanguages = columns.map(el => el.value);
+      const formData = new FormData();
+      if (Object.keys(selectedImageData).length !== 0) {
+        formData.append("file", selectedImageData);
+      }
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("username", fullName);
+      formData.append("nativeLanguage", language);
+      // columns.forEach(el => formData.append("targetLanguage[]", el));
+      formData.append("targetLanguage", JSON.stringify(targetLanguages));
+      dispatch(userSignUp(formData))
         .unwrap()
         .catch((err) => {
+          console.log(err);
           showToast("error", "Sign Up Error", err.message);
         });
+    } else {
+      showToast("error", "Input Incomplete", "All input must be filled");
     }
   };
 
@@ -88,159 +100,196 @@ export default SignUpView = () => {
     setColumns(updatedColumns);
   };
 
+  const onSelectImagePress = async () => {
+    const imageData = await pickImage();
+    setSelectedImage(imageData.uri || "");
+    setSelectedImageData(imageData || {});
+  };
+
   return (
-    <View style={styles.container}>
-      {signUpStatus === "loading" && <ActivityIndicator />}
-      <Image
-        source={logo}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <View style={styles.inputContainer}>
-        <Image
-          style={styles.inputIcon}
-          source={{
-            uri: "https://img.icons8.com/ios-glyphs/512/user-male-circle.png",
-          }}
-        />
-        <TextInput
-          style={styles.inputs}
-          placeholder="Full name"
-          keyboardType="email-address"
-          underlineColorAndroid="transparent"
-          onChangeText={(fullName) => setFullName(fullName)}
-        />
-      </View>
-
-      <View style={styles.inputContainer}>
-        <Image
-          style={styles.inputIcon}
-          source={{
-            uri: "https://img.icons8.com/ios-filled/512/circled-envelope.png",
-          }}
-        />
-        <TextInput
-          style={styles.inputs}
-          placeholder="Email"
-          keyboardType="email-address"
-          underlineColorAndroid="transparent"
-          onChangeText={(email) => setEmail(email)}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Image
-          style={styles.inputIcon}
-          source={{ uri: "https://img.icons8.com/ios-glyphs/512/key.png" }}
-        />
-        <TextInput
-          style={styles.inputs}
-          placeholder="Password"
-          secureTextEntry={true}
-          underlineColorAndroid="transparent"
-          onChangeText={(password) => setPassword(password)}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <SelectDropdown
-          data={countries}
-          // defaultValueByIndex={1}
-          // defaultValue={'Egypt'}
-          defaultButtonText={"Select Native Language"}
-          buttonTextAfterSelection={(selectedItem, index) => {
-            return selectedItem;
-          }}
-          rowTextForSelection={(item, index) => {
-            return item;
-          }}
-          buttonStyle={styles.dropdown1BtnStyle}
-          buttonTextStyle={styles.dropdown1BtnTxtStyle}
-          renderDropdownIcon={(isOpened) => {
-            return (
-              <FontAwesome
-                name={isOpened ? "chevron-up" : "chevron-down"}
-                color={"white"}
-                size={18}
-              />
-            );
-          }}
-          dropdownIconPosition={"right"}
-          dropdownStyle={styles.dropdown1DropdownStyle}
-          rowStyle={styles.dropdown1RowStyle}
-          rowTextStyle={styles.dropdown1RowTxtStyle}
-          onSelect={(item) => setLanguage(item)}
-        />
-      </View>
-
-      <View>
-        {columns.map((column, index) => (
-          <View key={column.id} style={styles.inputContainer}>
-            <SelectDropdown
-              data={countries}
-              defaultButtonText={"Select Target Language"}
-              buttonTextAfterSelection={(selectedItem, index) => {
-                return selectedItem;
-              }}
-              rowTextForSelection={(item, index) => {
-                return item;
-              }}
-              buttonStyle={styles.dropdown1BtnStyle}
-              buttonTextStyle={styles.dropdown1BtnTxtStyle}
-              renderDropdownIcon={(isOpened) => {
-                return (
-                  <FontAwesome
-                    name={isOpened ? "chevron-up" : "chevron-down"}
-                    color={"#f8f8ff"}
-                    size={18}
-                  />
-                );
-              }}
-              dropdownIconPosition={"right"}
-              dropdownStyle={styles.dropdown1DropdownStyle}
-              rowStyle={styles.dropdown1RowStyle}
-              rowTextStyle={styles.dropdown1RowTxtStyle}
-              onSelect={(value) => handleColumnChange(value, column.id)}
+    <ScrollView>
+      <View style={styles.container}>
+        {signUpStatus === "loading" && <ActivityIndicator />}
+        <Image source={logo} style={styles.logo} resizeMode="contain" />
+        <TouchableOpacity onPress={onSelectImagePress}>
+          {!selectedImage ? (
+            <MaterialCommunityIcons
+              name="camera-plus"
+              color={"grey"}
+              size={45}
+              style={{ marginBottom: 30 }}
             />
-            {columns.length > 1 && (
-              <TouchableOpacity onPress={() => removeColumn(column.id)}>
-                <AntDesign name="delete" size={18} color="black" />
+          ) : (
+            <Image
+              source={{ uri: selectedImage }}
+              style={{
+                width: 100,
+                aspectRatio: 1,
+                borderRadius: 120,
+                marginBottom: 30,
+              }}
+            />
+          )}
+          {/* <Image source={logo} style={styles.logo} resizeMode="contain" /> */}
+        </TouchableOpacity>
+        <View style={styles.inputContainer}>
+          <Image
+            style={styles.inputIcon}
+            source={{
+              uri: "https://img.icons8.com/ios-glyphs/512/user-male-circle.png",
+            }}
+          />
+          <TextInput
+            style={styles.inputs}
+            placeholder="Full name"
+            keyboardType="email-address"
+            underlineColorAndroid="transparent"
+            onChangeText={(fullName) => setFullName(fullName)}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Image
+            style={styles.inputIcon}
+            source={{
+              uri: "https://img.icons8.com/ios-filled/512/circled-envelope.png",
+            }}
+          />
+          <TextInput
+            style={styles.inputs}
+            placeholder="Email"
+            keyboardType="email-address"
+            underlineColorAndroid="transparent"
+            onChangeText={(email) => setEmail(email)}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Image
+            style={styles.inputIcon}
+            source={{ uri: "https://img.icons8.com/ios-glyphs/512/key.png" }}
+          />
+          <TextInput
+            style={styles.inputs}
+            placeholder="Password"
+            secureTextEntry={true}
+            underlineColorAndroid="transparent"
+            onChangeText={(password) => setPassword(password)}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Image
+            style={[styles.inputIconDropdown, { width: 25, height: 25 }]}
+            source={{
+              uri: "https://img.icons8.com/ios-filled/25/flag--v1.png",
+            }}
+          />
+          <SelectDropdown
+            data={countries}
+            defaultButtonText={"Select Native Language"}
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem;
+            }}
+            rowTextForSelection={(item, index) => {
+              return item;
+            }}
+            buttonStyle={styles.dropdown1BtnStyle}
+            buttonTextStyle={styles.dropdown1BtnTxtStyle}
+            renderDropdownIcon={(isOpened) => {
+              return (
+                <FontAwesome
+                  name={isOpened ? "chevron-up" : "chevron-down"}
+                  color={"white"}
+                  size={18}
+                />
+              );
+            }}
+            dropdownIconPosition={"right"}
+            dropdownStyle={styles.dropdown1DropdownStyle}
+            rowStyle={styles.dropdown1RowStyle}
+            rowTextStyle={styles.dropdown1RowTxtStyle}
+            onSelect={(item) => setLanguage(item)}
+          />
+        </View>
+
+        <View>
+          {columns.map((column, index) => (
+            <View key={column.id} style={styles.inputContainer}>
+              <Image
+                style={[styles.inputIconDropdown, { width: 30, height: 30 }]}
+                source={{
+                  uri: "https://img.icons8.com/ios-glyphs/30/globe--v1.png",
+                }}
+              />
+              <SelectDropdown
+                data={countries}
+                defaultButtonText={"Select Target Language"}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                  return selectedItem;
+                }}
+                rowTextForSelection={(item, index) => {
+                  return item;
+                }}
+                buttonStyle={styles.dropdown1BtnStyle}
+                buttonTextStyle={styles.dropdown1BtnTxtStyle}
+                renderDropdownIcon={(isOpened) => {
+                  return (
+                    <FontAwesome
+                      name={isOpened ? "chevron-up" : "chevron-down"}
+                      color={"#f8f8ff"}
+                      size={18}
+                    />
+                  );
+                }}
+                dropdownIconPosition={"right"}
+                dropdownStyle={styles.dropdown1DropdownStyle}
+                rowStyle={styles.dropdown1RowStyle}
+                rowTextStyle={styles.dropdown1RowTxtStyle}
+                onSelect={(value) => handleColumnChange(value, column.id)}
+              />
+              {columns.length > 1 && (
+                <TouchableOpacity onPress={() => removeColumn(column.id)}>
+                  <AntDesign name="delete" size={18} color="black" />
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity onPress={addColumn} style={styles.addButton}>
+                <EvilIcons name="plus" size={24} color="black" />
               </TouchableOpacity>
-            )}
-            <TouchableOpacity onPress={addColumn} style={styles.addButton}>
-              <EvilIcons name="plus" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
-        ))}
-      </View>
-      <TouchableOpacity
-        onPress={() => navigation.navigate("Login")}
-        style={styles.buttonContainer}
-      >
-        <Text
-          style={{
-            textDecorationLine: "underline",
-            color: "blue",
-            fontSize: 12,
-          }}
+            </View>
+          ))}
+        </View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Login")}
+          style={styles.buttonContainer}
         >
-          Already have an account? login here
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.buttonContainer, styles.signupButton]}
-        onPress={onHandleSignup}
-      >
-        <Text style={styles.signUpText}>Sign up</Text>
-      </TouchableOpacity>
-    </View>
+          <Text
+            style={{
+              textDecorationLine: "underline",
+              color: "blue",
+              fontSize: 12,
+            }}
+          >
+            Already have an account? login here
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.buttonContainer, styles.signupButton]}
+          onPress={onHandleSignup}
+        >
+          <Text style={styles.signUpText}>Sign up</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    paddingVertical: 40,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#B0E0E6",
+    minHeight: Dimensions.get("window").height,
   },
   logo: {
     width: 200,
@@ -257,6 +306,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     flexDirection: "row",
     alignItems: "center",
+    position: "relative",
   },
   inputs: {
     height: 45,
@@ -269,6 +319,13 @@ const styles = StyleSheet.create({
     height: 30,
     marginLeft: 15,
     justifyContent: "center",
+  },
+  inputIconDropdown: {
+    width: 30,
+    height: 30,
+    position: "absolute",
+    left: 15,
+    zIndex: 40,
   },
   buttonContainer: {
     height: 45,
