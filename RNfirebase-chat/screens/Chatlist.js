@@ -26,7 +26,6 @@ function ChatList() {
         return chat.users.some(userObj => userObj.email === userEmail);
       });
 
-
       setChats(prevChats => mergeChatLists(prevChats, userChats, userEmail));
     });
 
@@ -52,7 +51,7 @@ function ChatList() {
         renderItem={({ item }) => {
           const lastMessage = item.messages[item.messages.length - 1];
           const otherUser = item.users.find(u => u.email !== userEmail);
-          const lastMessageDate = new Date((lastMessage.createdAt.seconds * 1000) + (lastMessage.createdAt.nanoseconds / 1000));
+          const lastMessageDate = new Date((lastMessage?.createdAt.seconds * 1000) + (lastMessage?.createdAt.nanoseconds / 1000));
           
           return (
             <TouchableOpacity style={styles.container} onPress={() => {

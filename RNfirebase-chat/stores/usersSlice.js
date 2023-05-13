@@ -44,6 +44,33 @@ export const fetchUserDetails = createAsyncThunk(
   }
 );
 
+export const uploadChatImage = createAsyncThunk(
+  "usersSlice/uploadChatImage", // this is the action name
+  async (input, { rejectWithValue }) => {
+    // this is the action
+    try {
+      const formData = new FormData();
+      formData.append("file", input);
+      const userId = await AsyncStorage.getItem("userid");
+      const response = await axios({
+        method: "POST",
+        url: `${base_url}/users/chatImage`,
+        headers: {
+          userid: userId,
+        },
+        data : formData
+      });
+      return response.data;
+    } catch (err) {
+      if (err.response) {
+        return rejectWithValue(err.response.data);
+      } else {
+        throw err;
+      }
+    }
+  }
+);
+
 export const fetchUsersByNativeLanguage = createAsyncThunk(
   "usersSlice/fetchUsersByNativeLanguage",
   async (targetLanguage, { rejectWithValue }) => {
@@ -59,7 +86,6 @@ export const fetchUsersByNativeLanguage = createAsyncThunk(
           targetLanguage,
         },
       });
-      // console.log(response.data.map(el => {return {language: el.nativeLanguage, username: el.username}}), "<<< response di function")
       return response.data;
     } catch (err) {
       if (err.response) {
@@ -101,7 +127,7 @@ export const userLogin = createAsyncThunk(
   "usersSlice/userLogin",
   async (input, { rejectWithValue, dispatch }) => {
     try {
-      const { email, password, navigation } = input;
+      const { email, password} = input;
       // Login first to the project db for validation
       const response = await axios({
         method: "POST",
@@ -141,7 +167,6 @@ export const userSignUp = createAsyncThunk(
       input.append("role", "regular");
       input.append("context", "image");
       // Sign up first to the project database
-      const { email, password, username } = input;
       const response = await axios({
         method: "POST",
         url: `${base_url}/users/register`,
@@ -153,13 +178,13 @@ export const userSignUp = createAsyncThunk(
       // Sign Up to firebase if success
       const { user } = await createUserWithEmailAndPassword(
         auth,
-        email,
-        password
+        response.data.email,
+        response.data.password
       );
       // Save it to firebase database
       await addDoc(collection(database, "users"), {
         email: user.email,
-        username: username,
+        username: response.data.username,
         profileImageUrl: response.data.profileImageUrl || "",
       });
       // Save it to async storage
@@ -293,6 +318,7 @@ const usersSlice = createSlice({
       userSignUp: "idle",
       userLogin: "idle",
       usersBySearch: "idle",
+      uploadChatImage : "idle"
     },
   },
   reducers: {},
@@ -354,6 +380,15 @@ const usersSlice = createSlice({
       })
       .addCase(userLogin.rejected, (state, action) => {
         state.status.userLogin = "error";
+      })
+      .addCase(uploadChatImage.pending, (state, action) => {
+        state.status.uploadChatImage = "loading";
+      })
+      .addCase(uploadChatImage.fulfilled, (state, action) => {
+        state.status.uploadChatImage = "idle";
+      })
+      .addCase(uploadChatImage.rejected, (state, action) => {
+        state.status.uploadChatImage = "error";
       });
   },
 });

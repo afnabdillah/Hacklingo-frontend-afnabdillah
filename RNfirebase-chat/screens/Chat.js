@@ -47,8 +47,7 @@ import {
 import { Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PopChatMenu } from "./HeadersChat/PopChatMenu";
-import * as DocumentPicker from "expo-document-picker";
-import * as ImagePicker from "expo-image-picker";
+import pickImage from "../helper/imagePicker";
 
 export default function Chat({ route }) {
 
@@ -81,7 +80,6 @@ export default function Chat({ route }) {
   const generateRoomId = (email1, email2) => {
     return email1 < email2 ? `${email1}_${email2}` : `${email2}_${email1}`;
   };
-
 
   useEffect(() => {
     const createRoomId = generateRoomId(senderEmail, recipientEmail);
@@ -161,6 +159,10 @@ export default function Chat({ route }) {
     });
   };
 
+  const selectImage = async () => {
+    const imageData = await pickImage();
+    console.log(imageData, "<<<< ini imageData");
+  }
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -219,7 +221,7 @@ export default function Chat({ route }) {
                 bottom: 5,
                 zIndex: 9999,
               }}
-              // onPressActionButton={selectImage}
+              // onPressActionButton={selectImage}m
               icon={() => <Ionicons name="camera" size={30} color={"grey"} />}
             />
           )}

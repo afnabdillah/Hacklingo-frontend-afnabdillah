@@ -1,10 +1,5 @@
-import { Searchbar } from "react-native-paper";
-import { signOut } from 'firebase/auth';
 import { useNavigation } from "@react-navigation/native";
-import { TouchableOpacity } from "react-native";
-import { Text } from "react-native";
 import { View } from "react-native";
-import { MaterialIcons, AntDesign, Entypo, FontAwesome } from '@expo/vector-icons';
 import { Image } from "react-native";
 import logo from '../../assets/HACKLINGO.png'
 import { StyleSheet } from "react-native";

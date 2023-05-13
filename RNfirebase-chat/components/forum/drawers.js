@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import HomeScreen from "../../screens/forum/HomeScreen";
-import { FontAwesome } from "@expo/vector-icons";
 import HeaderForum from "./Header";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllForums } from "../../stores/forumsSlice";

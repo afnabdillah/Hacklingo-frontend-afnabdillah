@@ -7,11 +7,11 @@ export default {
     slug: 'Hacklingo',
     version: '1.0.0',
     orientation: 'portrait',
-    icon: './assets/icon.png',
+    icon: './assets/HACKLINGO.png',
     splash: {
-      image: './assets/splash.png',
+      image: './assets/hacklingo-splash.png',
       resizeMode: 'contain',
-      backgroundColor: '#ffffff'
+      backgroundColor: '#0097B2'
     },
     updates: {
       fallbackToCacheTimeout: 0
@@ -23,8 +23,8 @@ export default {
     android: {
       package : "com.hacklingo",
       adaptiveIcon: {
-        foregroundImage: './assets/adaptive-icon.png',
-        backgroundColor: '#FFFFFF'
+        foregroundImage: './assets/HACKLINGO.png',
+        backgroundColor: '#0097B2'
       }
     },
     web: {
