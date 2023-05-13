@@ -90,7 +90,7 @@ export default function GroupChat({ route, navigation }) {
         } else {
           setMessages([]);
         }
-        console.log(data.users[0], "<<< ini isi data users");
+        // console.log(data.users[0], "<<< ini isi data users");
         setGroupLanguage(data.languages);
         setGroupMembers(data.users || []);
         setGroupAdmin(data.admin || null);
@@ -119,7 +119,7 @@ export default function GroupChat({ route, navigation }) {
         user: {
           _id: userEmail,
           username: username,
-          avatar: userProfileImageUrl,
+          avatar: userProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
         },
       };
 
@@ -234,7 +234,7 @@ export default function GroupChat({ route, navigation }) {
             user={{
               _id: userEmail,
               username: username,
-              avatar: userProfileImageUrl,
+              avatar: userProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
             }}
             renderActions={(props) => (
               <Actions
