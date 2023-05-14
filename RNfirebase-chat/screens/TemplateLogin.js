@@ -27,6 +27,7 @@ export default LoginView = () => {
     if (email !== "" && password !== "") {
       dispatch(userLogin({ email, password }))
         .unwrap()
+        .then(() => showToast("success", "Login success", "You logged in successfully"))
         .catch((err) => {
           showToast("error", "Login error", err.message);
         });

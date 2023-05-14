@@ -70,7 +70,7 @@ export default function HomeScreen({ navigation }) {
               {" Forum "}
             </Text>
             <Image
-              source={{ uri: forumDetails.flagImage }}
+              source={{ uri: forumDetails.flagImage || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA" }}
               style={{ width: 25, height: 25}}
             />
           </View>

@@ -163,14 +163,24 @@ export const userSignUp = createAsyncThunk(
   "usersSlice/userSignUp",
   async (input, { rejectWithValue, dispatch }) => {
     try {
-      // these are temporary additionals
-      input.append("role", "regular");
-      input.append("context", "image");
+      const formData = new FormData();
+      formData.append("email", input.email);
+      formData.append("password", input.password);
+      formData.append("username", input.username);
+      formData.append("nativeLanguage", input.nativeLanguage);
+      formData.append("targetLanguage", JSON.stringify(input.targetLanguage));
+      formData.append("role", "regular");
+      console.log(input.selectedImageData, "<<<< ini hasil selected image data");
+      if (Object.keys(input.selectedImageData).length !== 0) {
+        formData.append("file", input.selectedImageData);
+        formData.append("context", "image");
+      }
+      console.log(formData, "<<<< ini isi form Sign Up");
       // Sign up first to the project database
       const response = await axios({
         method: "POST",
         url: `${base_url}/users/register`,
-        data: input,
+        data: formData,
         headers: {
           "Content-Type" : "multipart/form-data"
         }
@@ -178,10 +188,11 @@ export const userSignUp = createAsyncThunk(
       // Sign Up to firebase if success
       const { user } = await createUserWithEmailAndPassword(
         auth,
-        response.data.email,
-        response.data.password
+        input.email,
+        input.password
       );
       // Save it to firebase database
+      // console.log(response.data.profileImageUrl, "<<<<< iin hasil profile image url sign up");
       await addDoc(collection(database, "users"), {
         email: user.email,
         username: response.data.username,
@@ -229,7 +240,7 @@ export const updateUserDetails = createAsyncThunk(
   async (input, { rejectWithValue, dispatch }) => {
     try {
       input.append("context", "image");
-      console.log(input, "<<<< ini input image");
+      // console.log(input, "<<<< ini input image");
       const userId = await AsyncStorage.getItem("userid");
       const userEmail = await AsyncStorage.getItem("email");
       const response = await axios({

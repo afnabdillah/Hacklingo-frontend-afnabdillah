@@ -12,6 +12,15 @@ export function SearchChat() {
     if (searchUsername.length !== 0) {
       dispatch(fetchUsersBySearch(searchUsername))
         .unwrap()
+        .then(
+          (data) =>
+            data.length === 0 &&
+            showToast(
+              "info",
+              "There weren't any result",
+              `There was no user with username containing ${searchUsername}`
+            )
+        )
         .catch((err) => showToast("error", "Fetch Data Error", err.message));
     }
   }

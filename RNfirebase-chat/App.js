@@ -31,7 +31,7 @@ import { Ionicons } from '@expo/vector-icons';
 import RequestJoin from './screens/RequestJoin';
 import { LogBox } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-LogBox.ignoreAllLogs();
+// LogBox.ignoreAllLogs();
 import LoginView from "./screens/TemplateLogin";
 import SignUpView from "./screens/TemplateSignup";
 import GrammarCheckScreen from "./screens/GrammarCheck";

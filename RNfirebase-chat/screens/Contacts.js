@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  Dimensions
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersByNativeLanguage } from "../stores/usersSlice";
@@ -13,6 +14,7 @@ import showToast from "../helper/showToast";
 
 function Contacts({ navigation }) {
   const dispatch = useDispatch();
+  // const height = Dimensions.get("screen").height;
 
   const usersBySearch = useSelector(
     (state) => state.usersReducer.usersBySearch
@@ -80,6 +82,7 @@ function Contacts({ navigation }) {
       contentContainerStyle={{ backgroundColor: "white" }}
     >
       {/* Kalau merge ambil yang ini guys */}
+      <View style={{flex: 1, minHeight: 580}}>
       {contactsList.length !== 0 && (
         <View>
           <Text style={styles.sectionTitle}>Users By Search</Text>
@@ -188,6 +191,7 @@ function Contacts({ navigation }) {
           </View>
         );
       })}
+      </View>
     </ScrollView>
   );
 }

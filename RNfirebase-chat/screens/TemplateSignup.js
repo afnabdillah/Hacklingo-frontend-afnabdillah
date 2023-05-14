@@ -43,7 +43,7 @@ export default SignUpView = () => {
   const countries = [
     "English",
     "Indonesian/Bahasa Indonesia",
-    "Japanase/日本語",
+    "Japanese/日本語",
     "German/Deutsch",
     "French/Français",
     "Spanish/Español",
@@ -58,19 +58,19 @@ export default SignUpView = () => {
       language !== "" &&
       columns[0] !== ""
     ) {
-      const targetLanguages = columns.map(el => el.value);
-      const formData = new FormData();
-      if (Object.keys(selectedImageData).length !== 0) {
-        formData.append("file", selectedImageData);
+      const targetLanguage = columns.map(el => el.value);
+
+      const input = {
+        email,
+        password,
+        username : fullName,
+        nativeLanguage : language,
+        targetLanguage,
+        selectedImageData
       }
-      formData.append("email", email);
-      formData.append("password", password);
-      formData.append("username", fullName);
-      formData.append("nativeLanguage", language);
-      // columns.forEach(el => formData.append("targetLanguage[]", el));
-      formData.append("targetLanguage", JSON.stringify(targetLanguages));
-      dispatch(userSignUp(formData))
+      dispatch(userSignUp(input))
         .unwrap()
+        .then(() => showToast("success", "Sign up success", "You signed up successfully"))
         .catch((err) => {
           console.log(err);
           showToast("error", "Sign Up Error", err.message);
