@@ -98,6 +98,7 @@ function Contacts({ navigation }) {
                   navigation.navigate("Chat", {
                     recipientEmail: contact.email,
                     recipientName: contact.username,
+                    recipientAvatar: contact.profileImageUrl,
                     senderEmail: userEmail,
                   });
                 }}
@@ -151,6 +152,7 @@ function Contacts({ navigation }) {
                 navigation.navigate("Chat", {
                   recipientEmail: contact.email,
                   recipientName: contact.username,
+                  recipientAvatar: contact.profileImageUrl,
                   senderEmail: userEmail,
                 });
               }}

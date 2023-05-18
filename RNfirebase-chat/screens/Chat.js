@@ -77,6 +77,7 @@ export default function Chat({ route }) {
 
     return uniqueMessages.sort((a, b) => b.createdAt - a.createdAt);
   };
+
   const generateRoomId = (email1, email2) => {
     return email1 < email2 ? `${email1}_${email2}` : `${email2}_${email1}`;
   };
@@ -180,6 +181,7 @@ export default function Chat({ route }) {
         </View>
       ),
       headerTitle: () => (
+        // This is the Chat Header
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity onPress={() => navigation.navigate("ChatList")}>
             <AntDesign name="arrowleft" size={30} color="black" />

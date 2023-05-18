@@ -27,7 +27,7 @@ const CardForum = ({ navigation, post }) => {
               style={{ width: "100%", height: lebar * 0.3, marginVertical: 20 }}
             />
           )}
-          <Text variant="bodyMedium">{post.content}</Text>
+          <Text variant="bodyMedium" style={{color: "black"}}>{post.content.length >= 200 ? post.content.slice(0,200) + "..." : post.content}</Text>
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
             <Text style={{fontSize: 12, color: "grey"}}>{post.createdAt.split("T")[0]}</Text>
             <Button>

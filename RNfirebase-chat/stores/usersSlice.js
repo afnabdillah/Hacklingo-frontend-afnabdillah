@@ -193,11 +193,12 @@ export const userSignUp = createAsyncThunk(
       );
       // Save it to firebase database
       // console.log(response.data.profileImageUrl, "<<<<< iin hasil profile image url sign up");
-      await addDoc(collection(database, "users"), {
+      const firebaseResult = await addDoc(collection(database, "users"), {
         email: user.email,
         username: response.data.username,
         profileImageUrl: response.data.profileImageUrl || "",
       });
+      console.log(firebaseResult, "<<<<< this is the result from firebase add Doc");
       // Save it to async storage
       await saveToAsyncStorage(response.data);
       dispatch(
@@ -266,13 +267,15 @@ export const updateUserDetails = createAsyncThunk(
       const usersCollectionRef = collection(database, "users");
       const q = query(usersCollectionRef, where("email", "==", userEmail));
       const querySnapshot = await getDocs(q);
-
+      console.log(querySnapshot.empty, "<<<< ini isi snapshot kosong atau tidak");
+      console.log(querySnapshot.docs[0].ref, "<<<< ini hasil mendapatkan query dari update users");
       if (!querySnapshot.empty) {
         const userDocRef = querySnapshot.docs[0].ref;
-        await updateDoc(userDocRef, {
+        const updatedFirebaseResult = await updateDoc(userDocRef, {
           username: response.data.username,
           profileImageUrl: response.data.profileImageUrl,
         });
+        console.log(updatedFirebaseResult, "<<<< ini hasil update firebase");
       } else {
         throw { message: "Email not found on firebase" };
       }
