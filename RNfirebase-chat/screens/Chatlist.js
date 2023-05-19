@@ -83,7 +83,7 @@ function ChatList() {
             const lastMessage = item.messages[item.messages.length - 1];
             const otherUser = item.users.find((u) => u.email !== userEmail);
             const lastMessageDate = new Date(
-              lastMessage.createdAt.seconds * 1000
+              lastMessage?.createdAt.seconds * 1000
             );
   
             return (
@@ -95,6 +95,7 @@ function ChatList() {
                     recipientName: otherUser.username,
                     senderEmail: userEmail,
                     recipientAvatar: otherUser.avatar,
+                    recipientDeviceToken: otherUser.deviceToken,
                   });
                 }}
               >

@@ -21,6 +21,7 @@ export default {
       supportsTablet: true
     },
     android: {
+      googleServicesFile: "./google-services.json",
       package : "com.hacklingo",
       adaptiveIcon: {
         foregroundImage: './assets/HACKLINGO.png',
@@ -39,6 +40,7 @@ export default {
       appId: process.env.APP_ID,
       videoCallApiKey: process.env.VIDEO_CALL_API_KEY,
       grammarApiKey: process.env.GRAMMAR_API_KEY,
+      firebaseServerKey: process.env.FIREBASE_SERVER_KEY,
       "eas": {
         "projectId": "72573024-e688-4354-8aa8-e0d00aafa619"
       }

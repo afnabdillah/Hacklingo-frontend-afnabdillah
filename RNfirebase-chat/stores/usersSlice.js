@@ -58,7 +58,7 @@ export const uploadChatImage = createAsyncThunk(
         headers: {
           userid: userId,
         },
-        data : formData
+        data: formData,
       });
       return response.data;
     } catch (err) {
@@ -127,7 +127,7 @@ export const userLogin = createAsyncThunk(
   "usersSlice/userLogin",
   async (input, { rejectWithValue, dispatch }) => {
     try {
-      const { email, password} = input;
+      const { email, password } = input;
       // Login first to the project db for validation
       const response = await axios({
         method: "POST",
@@ -146,6 +146,7 @@ export const userLogin = createAsyncThunk(
           nativeLanguage: response.data.nativeLanguage,
           targetLanguage: response.data.targetLanguage,
           role: response.data.role,
+          deviceToken: response.data.deviceToken,
         })
       );
       return true;
@@ -169,21 +170,22 @@ export const userSignUp = createAsyncThunk(
       formData.append("username", input.username);
       formData.append("nativeLanguage", input.nativeLanguage);
       formData.append("targetLanguage", JSON.stringify(input.targetLanguage));
+      formData.append("deviceToken", input.deviceToken);
       formData.append("role", "regular");
-      console.log(input.selectedImageData, "<<<< ini hasil selected image data");
+      // console.log(input.selectedImageData, "<<<< ini hasil selected image data");
       if (Object.keys(input.selectedImageData).length !== 0) {
         formData.append("file", input.selectedImageData);
         formData.append("context", "image");
       }
-      console.log(formData, "<<<< ini isi form Sign Up");
+      // console.log(formData, "<<<< ini isi form Sign Up");
       // Sign up first to the project database
       const response = await axios({
         method: "POST",
         url: `${base_url}/users/register`,
         data: formData,
         headers: {
-          "Content-Type" : "multipart/form-data"
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
       // Sign Up to firebase if success
       const { user } = await createUserWithEmailAndPassword(
@@ -198,7 +200,7 @@ export const userSignUp = createAsyncThunk(
         username: response.data.username,
         profileImageUrl: response.data.profileImageUrl || "",
       });
-      console.log(firebaseResult, "<<<<< this is the result from firebase add Doc");
+      // console.log(firebaseResult, "<<<<< this is the result from firebase add Doc");
       // Save it to async storage
       await saveToAsyncStorage(response.data);
       dispatch(
@@ -210,6 +212,7 @@ export const userSignUp = createAsyncThunk(
           nativeLanguage: response.data.nativeLanguage,
           targetLanguage: response.data.targetLanguage,
           role: response.data.role,
+          deviceToken: response.data.deviceToken,
         })
       );
       return true;
@@ -219,6 +222,30 @@ export const userSignUp = createAsyncThunk(
         return rejectWithValue(err.response.data);
       } else {
         throw err;
+      }
+    }
+  }
+);
+
+export const fetchOtherUserByEmail = createAsyncThunk(
+  "usersSlice/fetchOtherUserByEmail",
+  async (email, { rejectWithValue }) => {
+    try {
+      const userId = await AsyncStorage.getItem("userid");
+      const response = await axios({
+        method: "GET",
+        url: `${base_url}/users/email`,
+        headers: {
+          userid: userId,
+        },
+        params: {email}
+      });
+      return response.data;
+    } catch (err) {
+      if (err.response) {
+        return rejectWithValue(err.response.data.message);
+      } else {
+        console.log("Error logging out: ", err);
       }
     }
   }
@@ -267,8 +294,14 @@ export const updateUserDetails = createAsyncThunk(
       const usersCollectionRef = collection(database, "users");
       const q = query(usersCollectionRef, where("email", "==", userEmail));
       const querySnapshot = await getDocs(q);
-      console.log(querySnapshot.empty, "<<<< ini isi snapshot kosong atau tidak");
-      console.log(querySnapshot.docs[0].ref, "<<<< ini hasil mendapatkan query dari update users");
+      console.log(
+        querySnapshot.empty,
+        "<<<< ini isi snapshot kosong atau tidak"
+      );
+      console.log(
+        querySnapshot.docs[0].ref,
+        "<<<< ini hasil mendapatkan query dari update users"
+      );
       if (!querySnapshot.empty) {
         const userDocRef = querySnapshot.docs[0].ref;
         const updatedFirebaseResult = await updateDoc(userDocRef, {
@@ -325,6 +358,7 @@ const usersSlice = createSlice({
     users: [],
     userDetails: {},
     usersBySearch: [],
+    userByEmail: {},
     status: {
       userDetails: "idle",
       users: "idle",
@@ -332,7 +366,8 @@ const usersSlice = createSlice({
       userSignUp: "idle",
       userLogin: "idle",
       usersBySearch: "idle",
-      uploadChatImage : "idle"
+      uploadChatImage: "idle",
+      userByEmail: "idle",
     },
   },
   reducers: {},
@@ -403,6 +438,16 @@ const usersSlice = createSlice({
       })
       .addCase(uploadChatImage.rejected, (state, action) => {
         state.status.uploadChatImage = "error";
+      })
+      .addCase(fetchOtherUserByEmail.pending, (state, action) => {
+        state.status.userByEmail = "loading";
+      })
+      .addCase(fetchOtherUserByEmail.fulfilled, (state, action) => {
+        state.status.userByEmail = "idle";
+        state.userByEmail = action.payload;
+      })
+      .addCase(fetchOtherUserByEmail.rejected, (state, action) => {
+        state.status.userByEmail = "error";
       });
   },
 });

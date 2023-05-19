@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect} from "react";
 import { useSelector } from "react-redux";
 import {
   View,
@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import {
   collection,
-  getDocs,
   onSnapshot,
   doc,
   updateDoc,

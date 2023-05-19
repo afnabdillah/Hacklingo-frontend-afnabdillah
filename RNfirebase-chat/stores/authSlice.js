@@ -10,6 +10,7 @@ const authSlice = createSlice({
         nativeLanguage : null,
         targetLanguage : [],
         role : null,
+        deviceToken: null,
         usersByNativeLanguageFetched: false
     },
     reducers: {
@@ -21,6 +22,7 @@ const authSlice = createSlice({
             state.nativeLanguage = action.payload.nativeLanguage
             state.targetLanguage = action.payload.targetLanguage
             state.role = action.payload.role
+            state.deviceToken = action.payload.deviceToken
         },
         updateSuccess(state, action) {
             state.username = action.payload.username
@@ -37,7 +39,8 @@ const authSlice = createSlice({
             state.profileImageUrl = null
             state.nativeLanguage = null
             state.targetLanguage = null
-            state.role = null
+            state.role = null,
+            state.deviceToken = null
         }
     },
   });

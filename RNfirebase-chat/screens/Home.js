@@ -19,10 +19,10 @@ import { ActivityIndicator } from 'react-native-paper';
 const lebar = Dimensions.get("window").width
 
 
-const App = () => {
+const LandingPage = () => {
   const dispatch = useDispatch()
   const articles = useSelector((state) => state.articlesReducer.articles);
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   
   useEffect(() => {
     dispatch(fetchArticles())
@@ -106,7 +106,7 @@ const App = () => {
   );
 };
 
-export default App;
+export default LandingPage;
 
 const styles = StyleSheet.create({
   container: {

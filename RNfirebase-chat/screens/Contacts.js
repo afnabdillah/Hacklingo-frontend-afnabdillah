@@ -100,6 +100,7 @@ function Contacts({ navigation }) {
                     recipientName: contact.username,
                     recipientAvatar: contact.profileImageUrl,
                     senderEmail: userEmail,
+                    recipientDeviceToken: contact.deviceToken,
                   });
                 }}
               >
@@ -154,6 +155,7 @@ function Contacts({ navigation }) {
                   recipientName: contact.username,
                   recipientAvatar: contact.profileImageUrl,
                   senderEmail: userEmail,
+                  recipientDeviceToken: contact.deviceToken,
                 });
               }}
             >

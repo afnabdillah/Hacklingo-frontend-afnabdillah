@@ -2,7 +2,6 @@ import React, {
   useState,
   useEffect,
   useCallback,
-  useContext,
   useLayoutEffect,
 } from "react";
 import {
@@ -10,8 +9,6 @@ import {
   Text,
   ImageBackground,
   StyleSheet,
-  Button,
-  Platform,
 } from "react-native";
 import {
   Actions,
@@ -20,20 +17,14 @@ import {
   InputToolbar,
 } from "react-native-gifted-chat";
 import {
-  collection,
-  addDoc,
-  orderBy,
-  query,
   onSnapshot,
-  where,
   doc,
-  getDocs,
   getDoc,
   setDoc,
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import { auth, database } from "../config/firebase";
+import { database } from "../config/firebase";
 import { useDispatch, useSelector } from "react-redux";
 import bg from "../assets/BG.png";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -48,18 +39,15 @@ import { Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PopChatMenu } from "./HeadersChat/PopChatMenu";
 import pickImage from "../helper/imagePicker";
+import { fetchOtherUserByEmail } from "../stores/usersSlice";
+import axios from "axios";
+import Constants from 'expo-constants';
 
 export default function Chat({ route }) {
 
   const senderEmail = useSelector(state => state.authReducer.email);
-  
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedImageView, setSeletedImageView] = useState("");
-  const [userEmail, setUserEmail] = useState("");
-  const [username, setUsername] = useState("");
   const [messages, setMessages] = useState([]);
-  const { recipientEmail, recipientName, recipientAvatar } = route.params;
-  const [currentUserData, setCurrentUserData] = useState(null);
+  const { recipientEmail, recipientName, recipientAvatar, recipientDeviceToken } = route.params;
   const [roomId, setRoomId] = useState(null);
   const currentUserUsername = useSelector(
     (state) => state.authReducer.username
@@ -67,6 +55,9 @@ export default function Chat({ route }) {
   const currentUserProfileImageUrl = useSelector(
     (state) => state.authReducer.profileImageUrl
   );
+  const recipientData = useSelector(state => state.usersReducer.userByEmail);
+
+  const dispatch = useDispatch();
 
   const mergeMessages = (oldMessages, newMessages) => {
     const allMessages = [...oldMessages, ...newMessages];
@@ -103,12 +94,20 @@ export default function Chat({ route }) {
     };
   }, [recipientEmail, senderEmail]);
 
+  useEffect(() => {
+    dispatch(fetchOtherUserByEmail(recipientEmail))
+    .unwrap()
+    .catch(err => console.log(err));
+  }, [recipientEmail])
+
   const onSend = useCallback(
     async (messages = []) => {
       if (!currentUserUsername) {
         console.error("User data not loaded yet. Please try again later.");
         return;
       }
+
+      // Render the message on screen
       setMessages((previousMessages) =>
         GiftedChat.append(previousMessages, messages)
       );
@@ -117,6 +116,7 @@ export default function Chat({ route }) {
       const roomDocRef = doc(database, "personalChats", roomId);
       const roomDocSnapshot = await getDoc(roomDocRef);
 
+      // Generate a new Room 
       if (!roomDocSnapshot.exists()) {
         await setDoc(roomDocRef, {
           users: [
@@ -148,6 +148,32 @@ export default function Chat({ route }) {
       await updateDoc(roomDocRef, {
         messages: arrayUnion(message),
       });
+
+      // Sending notification to the other user
+      if (recipientData.deviceToken) {
+
+        const notification = {
+          to: recipientData.deviceToken,
+          notification: {
+            title: currentUserUsername,
+            body: messages[0].text,
+          },
+          priority: "high",
+          soundName: "default",
+        };
+  
+        axios({
+          method: "POST",
+          url: "https://fcm.googleapis.com/fcm/send",
+          headers: {
+            Authorization: `key=${Constants.manifest.extra.firebaseServerKey}`, // Server key dari firebase
+            "Content-Type": "application/json"
+          },
+          data: notification
+        })
+        .catch(err => console.log(err, "<<<< ini error kirim notif axios"));
+      }
+
     }, [currentUserUsername]);
 
   const navigation = useNavigation()
@@ -162,7 +188,7 @@ export default function Chat({ route }) {
 
   const selectImage = async () => {
     const imageData = await pickImage();
-    console.log(imageData, "<<<< ini imageData");
+    // console.log(imageData, "<<<< ini imageData");
   }
 
   useLayoutEffect(() => {
@@ -190,7 +216,7 @@ export default function Chat({ route }) {
             source={{ uri: recipientAvatar || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA" }}
             style={styles.image}
           />
-          <Text style={{ fontStyle: "italic", fontSize: 25 }}>
+          <Text style={{ fontStyle: "italic", fontSize: 20 }}>
             {recipientName}
           </Text>
         </View>
@@ -333,8 +359,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   image: {
-    width: 45,
-    height: 45,
+    width: 35,
+    aspectRatio: 1,
     borderRadius: 30,
     marginRight: 10,
     marginLeft: 10,
