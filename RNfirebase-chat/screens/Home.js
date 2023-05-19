@@ -33,7 +33,7 @@ const LandingPage = () => {
   const data = articles.map((article) => ({
     title: article.title,
     url: article.articleImageUrl, // Replace with the actual image URL from your data if available
-    description: "", // Add a description if available in your data
+    description: article.content, // Add a description if available in your data
     id: article._id,
   }));
 

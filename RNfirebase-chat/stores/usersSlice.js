@@ -238,14 +238,14 @@ export const fetchOtherUserByEmail = createAsyncThunk(
         headers: {
           userid: userId,
         },
-        params: {email}
+        params: { email },
       });
       return response.data;
     } catch (err) {
       if (err.response) {
         return rejectWithValue(err.response.data.message);
       } else {
-        console.log("Error logging out: ", err);
+        throw err;
       }
     }
   }
@@ -370,7 +370,11 @@ const usersSlice = createSlice({
       userByEmail: "idle",
     },
   },
-  reducers: {},
+  reducers: {
+    deleteUsersBySearch(state, action) {
+      state.usersBySearch = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserDetails.pending, (state, action) => {
@@ -453,3 +457,5 @@ const usersSlice = createSlice({
 });
 
 export default usersSlice.reducer;
+
+export const { deleteUsersBySearch } = usersSlice.actions;

@@ -1,11 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
-import { View } from "react-native";
+import { View, Dimensions } from "react-native";
 import { Image } from "react-native";
 import logo from "../../assets/HACKLINGO.png";
 import { StyleSheet } from "react-native";
 import { PopMenu } from "./PopMenu";
-import { SearchChat } from "../../components/SearchChat";
-import { Searchbar } from "react-native-paper";
+import { Searchbar} from "react-native-paper";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { fetchUsersBySearch } from "../../stores/usersSlice";
@@ -16,6 +15,8 @@ export function HeaderChat() {
 
   const [searchUsername, setSearchUsername] = useState("");
   const dispatch = useDispatch();
+
+  const width = Dimensions.get("window").width;
 
   function handleSearch() {
     if (searchUsername.length !== 0) {
@@ -41,6 +42,7 @@ export function HeaderChat() {
           flexDirection: "row",
           justifyContent: "space-evenly",
           backgroundColor: "#0097b2",
+          paddingVertical: 3
         }}
       >
         <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
@@ -66,8 +68,9 @@ export function HeaderChat() {
               value={searchUsername}
               onChangeText={(value) => setSearchUsername(value)}
               onSubmitEditing={handleSearch}
-              placeholder="Search"
-              style={{ flex: 1, width: 70 }}
+              placeholder="search users..."
+              style={{ flex: 1, width: width * 0.64, height: 40, backgroundColor: "#F6F1F1"}}
+              inputStyle={{fontSize: 14, alignSelf: "center"}}
             />
           </View>
           <Image source={logo} style={styles.image} />

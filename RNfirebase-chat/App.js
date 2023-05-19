@@ -37,6 +37,7 @@ import LoginView from "./screens/TemplateLogin";
 import SignUpView from "./screens/TemplateSignup";
 import GrammarCheckScreen from "./screens/GrammarCheck";
 import Article from "./screens/forum/Article";
+import showToast from "./helper/showToast";
 
 const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -269,7 +270,7 @@ export default function App() {
     if (requestUserPermission()) {
       // Get the firebase cloud messaging token for the device
       messaging().getToken().then(token => {
-        // console.log(token, "<<<<< this is the firebase cloud messaging token for your device");
+        console.log(token, "<<<<< this is the firebase cloud messaging token for your device");
       })
     } else {
       console.log("failed token status", authStatus);
@@ -278,7 +279,7 @@ export default function App() {
     // Check whether initial notification is available
     messaging().getInitialNotification().then(async (remoteMessage) => {
       if (remoteMessage) {
-        console.log(remoteMessage.notification, "Notification caused app to open from quit state");
+        // console.log(remoteMessage.notification, "Notification caused app to open from quit state");
       }
     })
 
@@ -289,8 +290,7 @@ export default function App() {
 
     // Handle notification on the foreground
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      console.log(remoteMessage, "<<<<< ini remote message");
-      Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
+      showToast("info", remoteMessage.notification.title, remoteMessage.notification.body);
     });
 
     return unsubscribe;
@@ -300,7 +300,7 @@ export default function App() {
     <Provider store={store}>
       <AuthenticatedUserProvider>
         <RootNavigator />
-        <Toast config={toastConfig} />
+        <Toast config={toastConfig} visibilityTime={3000}/>
       </AuthenticatedUserProvider>
     </Provider>
   );

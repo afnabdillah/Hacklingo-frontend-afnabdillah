@@ -9,6 +9,7 @@ import {
   Text,
   ImageBackground,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import {
   Actions,
@@ -41,13 +42,17 @@ import { PopChatMenu } from "./HeadersChat/PopChatMenu";
 import pickImage from "../helper/imagePicker";
 import { fetchOtherUserByEmail } from "../stores/usersSlice";
 import axios from "axios";
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
 
 export default function Chat({ route }) {
-
-  const senderEmail = useSelector(state => state.authReducer.email);
+  const senderEmail = useSelector((state) => state.authReducer.email);
   const [messages, setMessages] = useState([]);
-  const { recipientEmail, recipientName, recipientAvatar, recipientDeviceToken } = route.params;
+  const {
+    recipientEmail,
+    recipientName,
+    recipientAvatar,
+    recipientDeviceToken,
+  } = route.params;
   const [roomId, setRoomId] = useState(null);
   const currentUserUsername = useSelector(
     (state) => state.authReducer.username
@@ -55,7 +60,13 @@ export default function Chat({ route }) {
   const currentUserProfileImageUrl = useSelector(
     (state) => state.authReducer.profileImageUrl
   );
-  const recipientData = useSelector(state => state.usersReducer.userByEmail);
+  let recipientData = {};
+
+  // console.log(recipientData, "<<<< ini isi recipient data terbaru(?)");
+
+  const loadingRecipientStatus = useSelector(
+    (state) => state.usersReducer.status.userByEmail
+  );
 
   const dispatch = useDispatch();
 
@@ -95,10 +106,12 @@ export default function Chat({ route }) {
   }, [recipientEmail, senderEmail]);
 
   useEffect(() => {
-    dispatch(fetchOtherUserByEmail(recipientEmail))
-    .unwrap()
-    .catch(err => console.log(err));
-  }, [recipientEmail])
+    async function fetchRecipientData() {
+      recipientData = await dispatch(fetchOtherUserByEmail(recipientEmail)).unwrap();
+    };
+
+    fetchRecipientData();
+  }, [recipientEmail]);
 
   const onSend = useCallback(
     async (messages = []) => {
@@ -116,19 +129,23 @@ export default function Chat({ route }) {
       const roomDocRef = doc(database, "personalChats", roomId);
       const roomDocSnapshot = await getDoc(roomDocRef);
 
-      // Generate a new Room 
+      // Generate a new Room
       if (!roomDocSnapshot.exists()) {
         await setDoc(roomDocRef, {
           users: [
             {
               email: senderEmail,
               username: currentUserUsername,
-              avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
+              avatar:
+                currentUserProfileImageUrl ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
             },
             {
               email: recipientEmail,
               username: recipientName,
-              avatar: recipientAvatar || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA", // Set the recipient avatar if available
+              avatar:
+                recipientAvatar ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA", // Set the recipient avatar if available
             },
           ],
           messages: [],
@@ -141,7 +158,9 @@ export default function Chat({ route }) {
         user: {
           _id: senderEmail,
           username: currentUserUsername,
-          avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
+          avatar:
+            currentUserProfileImageUrl ||
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
         },
       };
 
@@ -151,7 +170,7 @@ export default function Chat({ route }) {
 
       // Sending notification to the other user
       if (recipientData.deviceToken) {
-
+        console.log("masuk sini dan ngirim pesan notif");
         const notification = {
           to: recipientData.deviceToken,
           notification: {
@@ -161,22 +180,24 @@ export default function Chat({ route }) {
           priority: "high",
           soundName: "default",
         };
-  
+
         axios({
           method: "POST",
           url: "https://fcm.googleapis.com/fcm/send",
           headers: {
             Authorization: `key=${Constants.manifest.extra.firebaseServerKey}`, // Server key dari firebase
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          data: notification
+          data: notification,
         })
-        .catch(err => console.log(err, "<<<< ini error kirim notif axios"));
+          // .then((response) => console.log(response, "<<<<< ini response habis ngasih push notif"))
+          .catch((err) => console.log(err, "<<<< ini error kirim notif axios"));
       }
+    },
+    [currentUserUsername]
+  );
 
-    }, [currentUserUsername]);
-
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const goToVideoChat = () => {
     const tempId = generateRoomId(senderEmail, recipientEmail);
@@ -189,12 +210,19 @@ export default function Chat({ route }) {
   const selectImage = async () => {
     const imageData = await pickImage();
     // console.log(imageData, "<<<< ini imageData");
-  }
+  };
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 5, paddingRight: 15 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 5,
+            paddingRight: 15,
+          }}
+        >
           <TouchableOpacity>
             <MaterialIcons
               onPress={goToVideoChat}
@@ -213,7 +241,11 @@ export default function Chat({ route }) {
             <AntDesign name="arrowleft" size={30} color="black" />
           </TouchableOpacity>
           <Image
-            source={{ uri: recipientAvatar || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA" }}
+            source={{
+              uri:
+                recipientAvatar ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
+            }}
             style={styles.image}
           />
           <Text style={{ fontStyle: "italic", fontSize: 20 }}>
@@ -222,11 +254,20 @@ export default function Chat({ route }) {
         </View>
       ),
       headerLeft: () => {
-        <View >
-        </View>
-      }
+        <View></View>;
+      },
     });
   }, []);
+
+  if (loadingRecipientStatus === "loading") {
+    return (
+      <View style={{ flex: 1}}>
+        <ImageBackground source={bg} style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size="large" />
+        </ImageBackground>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -238,7 +279,9 @@ export default function Chat({ route }) {
           user={{
             _id: senderEmail,
             username: currentUserUsername,
-            avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
+            avatar:
+              currentUserProfileImageUrl ||
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
           }}
           renderActions={(props) => (
             <Actions

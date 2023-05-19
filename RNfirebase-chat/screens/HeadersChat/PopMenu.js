@@ -1,14 +1,16 @@
 import { MaterialIcons, FontAwesome, AntDesign, Feather } from '@expo/vector-icons';
-import { useDebugValue, useRef } from 'react';
+import { useRef } from 'react';
 import { useState } from "react";
 import { Easing } from 'react-native';
-import { View, StyleSheet, Text, SafeAreaView, Modal, TouchableOpacity, Animated } from "react-native";
+import { StyleSheet, Text, SafeAreaView, Modal, TouchableOpacity, Animated } from "react-native";
 import { auth } from '../../config/firebase';
 import { signOut } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../stores/authSlice';
+
+
 export function PopMenu() {
     const navigation = useNavigation()
     const [visible, setVisible] = useState(false)

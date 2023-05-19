@@ -163,12 +163,9 @@ function Groups({ navigation }) {
         <Text style={{ fontSize: 14, color: "#777" }}>
           {item.users.length} members
         </Text>
-        {/* <View style={{position: "absolute", height: 20, width: 25, backgroundColor: "red", bottom: "50%", right:0 }}>
-            
-        </View> */}
         <Image
           source={{
-            uri: flagData.find((el) => el.language === item.languages)?.image,
+            uri: flagData.find((el) => el.language === item.languages)?.image || flagData[0].image,
           }}
           style={{
             position: "absolute",
@@ -249,7 +246,8 @@ function Groups({ navigation }) {
             style={styles.createGroupButton}
             onPress={navigateToCreateGroupChat}
           >
-            <Text style={styles.createGroupButtonText}>Create Group Chat</Text>
+            {/* <Text style={styles.createGroupButtonText}>Create Group Chat</Text> */}
+            <AntDesign name="addusergroup" size={24} color="white"/>
           </TouchableOpacity>
         </View>
       )}
@@ -278,7 +276,7 @@ const styles = StyleSheet.create({
   createGroupButton: {
     backgroundColor: "#0097b2",
     borderRadius: 25,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingVertical: 10,
     alignItems: "center",
     justifyContent: "center",
