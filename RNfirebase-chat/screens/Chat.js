@@ -10,6 +10,7 @@ import {
   ImageBackground,
   StyleSheet,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import {
   Actions,
@@ -36,22 +37,24 @@ import {
   Ionicons,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { Image } from "react-native";
+import { Image, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PopChatMenu } from "./HeadersChat/PopChatMenu";
 import pickImage from "../helper/imagePicker";
-import { fetchOtherUserByEmail } from "../stores/usersSlice";
-import axios from "axios";
-import Constants from "expo-constants";
+import { fetchOtherUserByEmail, uploadChatImage } from "../stores/usersSlice";
+import sendPushNotification from "../helper/sendPushNotification";
+
+const width = Dimensions.get("window").width;
 
 export default function Chat({ route }) {
   const senderEmail = useSelector((state) => state.authReducer.email);
   const [messages, setMessages] = useState([]);
+  const [selectedImage, setSelectedImage] = useState("");
+  const [selectedImageData, setSelectedImageData] = useState({});
   const {
     recipientEmail,
     recipientName,
     recipientAvatar,
-    recipientDeviceToken,
   } = route.params;
   const [roomId, setRoomId] = useState(null);
   const currentUserUsername = useSelector(
@@ -61,8 +64,6 @@ export default function Chat({ route }) {
     (state) => state.authReducer.profileImageUrl
   );
   let recipientData = {};
-
-  // console.log(recipientData, "<<<< ini isi recipient data terbaru(?)");
 
   const loadingRecipientStatus = useSelector(
     (state) => state.usersReducer.status.userByEmail
@@ -107,11 +108,18 @@ export default function Chat({ route }) {
 
   useEffect(() => {
     async function fetchRecipientData() {
-      recipientData = await dispatch(fetchOtherUserByEmail(recipientEmail)).unwrap();
-    };
-
+      recipientData = await dispatch(
+        fetchOtherUserByEmail(recipientEmail)
+      ).unwrap();
+    }
     fetchRecipientData();
   }, [recipientEmail]);
+
+  const selectImage = async () => {
+    const imageData = await pickImage();
+    setSelectedImage(imageData?.uri || "");
+    setSelectedImageData(imageData || {});
+  };
 
   const onSend = useCallback(
     async (messages = []) => {
@@ -124,12 +132,14 @@ export default function Chat({ route }) {
       setMessages((previousMessages) =>
         GiftedChat.append(previousMessages, messages)
       );
+      setSelectedImage("");
+      setSelectedImageData({});
 
       const roomId = generateRoomId(senderEmail, recipientEmail);
       const roomDocRef = doc(database, "personalChats", roomId);
       const roomDocSnapshot = await getDoc(roomDocRef);
 
-      // Generate a new Room
+      // Generate a new Room if it doesn't exist yet
       if (!roomDocSnapshot.exists()) {
         await setDoc(roomDocRef, {
           users: [
@@ -151,10 +161,12 @@ export default function Chat({ route }) {
           messages: [],
         });
       }
+
       const message = {
         _id: messages[0]._id,
         createdAt: messages[0].createdAt,
         text: messages[0].text,
+        image: messages[0].image,
         user: {
           _id: senderEmail,
           username: currentUserUsername,
@@ -170,28 +182,11 @@ export default function Chat({ route }) {
 
       // Sending notification to the other user
       if (recipientData.deviceToken) {
-        console.log("masuk sini dan ngirim pesan notif");
-        const notification = {
-          to: recipientData.deviceToken,
-          notification: {
-            title: currentUserUsername,
-            body: messages[0].text,
-          },
-          priority: "high",
-          soundName: "default",
-        };
-
-        axios({
-          method: "POST",
-          url: "https://fcm.googleapis.com/fcm/send",
-          headers: {
-            Authorization: `key=${Constants.manifest.extra.firebaseServerKey}`, // Server key dari firebase
-            "Content-Type": "application/json",
-          },
-          data: notification,
-        })
-          // .then((response) => console.log(response, "<<<<< ini response habis ngasih push notif"))
-          .catch((err) => console.log(err, "<<<< ini error kirim notif axios"));
+        sendPushNotification(
+          recipientData.deviceToken,
+          currentUserUsername,
+          messages[0].text
+        );
       }
     },
     [currentUserUsername]
@@ -205,11 +200,6 @@ export default function Chat({ route }) {
       roomId: roomId ?? tempId,
       username: currentUserUsername,
     });
-  };
-
-  const selectImage = async () => {
-    const imageData = await pickImage();
-    // console.log(imageData, "<<<< ini imageData");
   };
 
   useLayoutEffect(() => {
@@ -261,8 +251,11 @@ export default function Chat({ route }) {
 
   if (loadingRecipientStatus === "loading") {
     return (
-      <View style={{ flex: 1}}>
-        <ImageBackground source={bg} style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={{ flex: 1 }}>
+        <ImageBackground
+          source={bg}
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
           <ActivityIndicator size="large" />
         </ImageBackground>
       </View>
@@ -271,11 +264,36 @@ export default function Chat({ route }) {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ImageBackground source={bg} style={{ flex: 1 }}>
+      <ImageBackground source={bg} style={{ flex: 1, position: "relative" }}>
+        {selectedImage && (
+          <View style={styles.previewImageContainer}>
+            <View style={styles.previewImage}>
+              <Image
+                source={{ uri: selectedImage }}
+                style={{
+                  height: "100%",
+                  aspectRatio: 1,
+                  resizeMode: "cover",
+                  borderRadius: 20,
+                }}
+              />
+            </View>
+            <Pressable
+              onPress={() => {
+                setSelectedImage("");
+                setSelectedImageData({});
+              }}
+            >
+              <AntDesign name="close" size={24} color="#babdb7" />
+            </Pressable>
+          </View>
+        )}
         <GiftedChat
           messages={messages}
           showAvatarForEveryMessage={true}
-          onSend={(messages) => onSend(messages)}
+          onSend={(messages) => {
+            onSend(messages);
+          }}
           user={{
             _id: senderEmail,
             username: currentUserUsername,
@@ -287,16 +305,15 @@ export default function Chat({ route }) {
             <Actions
               {...props}
               containerStyle={{
-                position: "absolute",
-                right: 50,
-                bottom: 5,
-                zIndex: 9999,
+                alignSelf: "center",
               }}
-              // onPressActionButton={selectImage}m
+              onPressActionButton={selectImage}
               icon={() => <Ionicons name="camera" size={30} color={"grey"} />}
             />
           )}
+          textInputStyle={{ fontSize: 16, paddingHorizontal: 5 }}
           timeTextStyle={{ right: { color: "grey" } }}
+          infiniteScroll={true}
           renderSend={(props) => {
             const { text, messageIdGenerator, user, onSend } = props;
             return (
@@ -311,21 +328,40 @@ export default function Chat({ route }) {
                   marginBottom: 5,
                   paddingRight: 5,
                 }}
-                onPress={() => {
-                  if (text && onSend) {
-                    onSend(
-                      {
-                        text: text.trim(),
-                        user,
-                        _id: messageIdGenerator(),
-                      },
-                      true
-                    );
+                onPress={async () => {
+                  if ((text || selectedImage) && onSend) {
+                    try {
+
+                      // If the user wants to upload an image, upload first before sending
+                      let imageUrl = "";
+                      if (selectedImage) {
+                        imageUrl = (
+                          await dispatch(
+                            uploadChatImage(selectedImageData)
+                          ).unwrap()
+                        ).chatImageUrl;
+                      }
+
+                      // After the process, pass the imageUrl as parameter in messages
+                      onSend(
+                        {
+                          text: text.trim(),
+                          image: imageUrl,
+                          user,
+                          _id: messageIdGenerator(),
+                        },
+                        true
+                      );
+                    } catch (err) {
+                      console.log(err, "<<<< ini error send image");
+                    }
                   }
                 }}
               >
                 <MaterialCommunityIcons
-                  name={text && onSend ? "send" : "microphone"}
+                  name={
+                    (text || selectedImage) && onSend ? "send" : "microphone"
+                  }
                   size={23}
                   color={"black"}
                 />
@@ -338,26 +374,27 @@ export default function Chat({ route }) {
               containerStyle={{
                 marginLeft: 10,
                 marginRight: 10,
-                marginBottom: 2,
+                marginBottom: 5,
                 borderRadius: 20,
-                paddingTop: 5,
               }}
             />
           )}
-          renderBubble={(props) => (
-            <Bubble
-              {...props}
-              textStyle={{ right: { color: "black" } }}
-              wrapperStyle={{
-                left: {
-                  backgroundColor: "white",
-                },
-                right: {
-                  backgroundColor: "#dcf8c6",
-                },
-              }}
-            />
-          )}
+          renderBubble={(props) => {
+            return (
+              <Bubble
+                {...props}
+                textStyle={{ right: { color: "black" } }}
+                wrapperStyle={{
+                  left: {
+                    backgroundColor: "white",
+                  },
+                  right: {
+                    backgroundColor: "#dcf8c6",
+                  },
+                }}
+              ></Bubble>
+            );
+          }}
         />
       </ImageBackground>
     </SafeAreaView>
@@ -383,6 +420,28 @@ const styles = StyleSheet.create({
     padding: 5,
     marginHorizontal: 10,
     alignItems: "center",
+    borderRadius: 20,
+  },
+  previewImageContainer: {
+    position: "absolute",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    bottom: 55,
+    width: width * 0.95,
+    height: 160,
+    backgroundColor: "#dcf8c6",
+    borderColor: "#bff099",
+    borderStyle: "solid",
+    borderWidth: 3,
+    marginHorizontal: 10,
+    zIndex: 9999,
+    borderRadius: 20,
+    padding: 10,
+  },
+  previewImage: {
+    height: "100%",
+    aspectRatio: 1,
+    backgroundColor: "white",
     borderRadius: 20,
   },
   input: {

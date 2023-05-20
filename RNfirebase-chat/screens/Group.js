@@ -21,15 +21,16 @@ import {
 import { database, auth } from "../config/firebase";
 import { useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
+import showToast from "../helper/showToast";
 
 function Groups({ navigation }) {
   const route = useRoute();
   const groupLanguage = route.params ? route.params.language : undefined;
   const [loadingGroupsStatus, setLoadingGroupsStatus] = useState("idle");
-  const [groups, setGroups] = useState([]);
   const [joinedGroups, setJoinedGroups] = useState([]);
   const [unjoinedGroups, setUnjoinedGroups] = useState([]);
   const userEmail = useSelector((state) => state.authReducer.email);
+  const username = useSelector((state) => state.authReducer.username);
 
   const flagData = [
     {
@@ -108,11 +109,10 @@ function Groups({ navigation }) {
 
   const handleJoinRequest = async (item) => {
     const groupDocRef = doc(database, "groupChats", item.id);
-    const userEmail = useSelector((state) => state.authReducer.email);
-    const username = useSelector((state) => state.authReducer.username);
     await updateDoc(groupDocRef, {
       requestJoin: arrayUnion({ email: userEmail, username: username }),
     });
+    showToast("success", `You requested to join ${item.groupName}`, "Please wait until the admin accepts you");
   };
 
   const showJoinRequestAlert = (item) => {

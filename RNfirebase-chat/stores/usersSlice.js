@@ -51,12 +51,14 @@ export const uploadChatImage = createAsyncThunk(
     try {
       const formData = new FormData();
       formData.append("file", input);
+      formData.append("context", "image");
       const userId = await AsyncStorage.getItem("userid");
       const response = await axios({
         method: "POST",
         url: `${base_url}/users/chatImage`,
         headers: {
           userid: userId,
+          "Content-Type" : "multipart/form-data"
         },
         data: formData,
       });
