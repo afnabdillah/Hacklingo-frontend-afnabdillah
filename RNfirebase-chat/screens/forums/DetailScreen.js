@@ -14,7 +14,7 @@ import { insertNewComment } from "../../stores/commentsSlice";
 import { fetchPostDetails } from "../../stores/postsSlice";
 import showToast from "../../helper/showToast";
 import { ActivityIndicator } from "react-native-paper";
-import Comment from "../../components/forum/Comment";
+import Comment from "../../components/forums/Comment";
 
 export default function DetailScreen({ navigation, route }) {
   const { id } = route.params;

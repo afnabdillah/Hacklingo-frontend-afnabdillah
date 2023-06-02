@@ -12,33 +12,41 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Pressable,
   Dimensions,
 } from "react-native";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useDispatch, useSelector } from "react-redux";
-import showToast from "../helper/showToast";
-import { userSignUp } from "../stores/usersSlice";
+import showToast from "../../helper/showToast";
+import { userSignUp } from "../../stores/usersSlice";
 import { ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
-import logo from "../assets/HACKLINGO.png";
-import pickImage from "../helper/imagePicker";
+import logo from "../../assets/HACKLINGO.png";
+import pickImage from "../../helper/imagePicker";
 import messaging from "@react-native-firebase/messaging";
 
 export default SignUpView = () => {
+  
   const [email, setEmail] = useState("");
+  
   const [password, setPassword] = useState("");
+  
   const [fullName, setFullName] = useState("");
+  
   const [language, setLanguage] = useState("");
+  
   const [selectedImage, setSelectedImage] = useState("");
+  
   const [selectedImageData, setSelectedImageData] = useState({});
-  // const [columns, setColumns] = useState([""]);
+
   const [columns, setColumns] = useState([{ id: 0, value: "" }]);
+  
   const signUpStatus = useSelector(
     (state) => state.usersReducer.status.userSignUp
   );
+  
   const dispatch = useDispatch();
+  
   const navigation = useNavigation();
 
   const countries = [

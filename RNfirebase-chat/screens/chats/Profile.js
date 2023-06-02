@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,26 +14,35 @@ import {
   Ionicons,
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { updateUserDetails } from "../stores/usersSlice";
+import { updateUserDetails } from "../../stores/usersSlice";
 import { useDispatch, useSelector } from "react-redux";
-import pickImage from "../helper/imagePicker";
-import showToast from "../helper/showToast";
+import pickImage from "../../helper/imagePicker";
+import showToast from "../../helper/showToast";
 
 export default function Profile() {
+
   const [displayName, setDisplayName] = useState("");
+  
   const [displayLanguage, setDisplayLanguage] = useState("");
+  
   const [selectedImage, setSelectedImage] = useState(null);
+  
   const [selectedImageData, setSelectedImageData] = useState({});
+  
   const dispatch = useDispatch();
+  
   const navigation = useNavigation();
 
   const currentUsername = useSelector((state) => state.authReducer.username);
+  
   const currentUserProfileImageUrl = useSelector(
     (state) => state.authReducer.profileImageUrl
   );
+  
   const currentNativeLanguage = useSelector(
     (state) => state.authReducer.nativeLanguage
   );
+  
   const updateUserDetailsStatus = useSelector(
     (state) => state.usersReducer.status.updateUserDetails
   );

@@ -9,22 +9,21 @@ import {
   Alert,
   ImageBackground,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Dimensions
+  Dimensions,
 } from "react-native";
-import { database } from "../config/firebase";
+import { database } from "../../config/firebase";
 import { collection, addDoc, setDoc, doc } from "firebase/firestore";
 import SelectDropdown from "react-native-select-dropdown";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import BG from "../assets/HACKLINGO.png";
+import BG from "../../assets/HACKLINGO.png";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUsersBySearch } from "../stores/usersSlice";
+import { fetchUsersBySearch } from "../../stores/usersSlice";
 import { Searchbar } from "react-native-paper";
-import showToast from "../helper/showToast";
+import showToast from "../../helper/showToast";
 
-const {height, width} = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
-function CreateGroupChat({ route, navigation}) {
+function CreateGroupChat({ route, navigation }) {
   const {
     groupId,
     groupName: initialGroupName,
@@ -68,7 +67,7 @@ function CreateGroupChat({ route, navigation}) {
   }, []);
 
   useEffect(() => {
-    dispatch(fetchUsersBySearch({search: ""}))
+    dispatch(fetchUsersBySearch({ search: "" }))
       .unwrap()
       .then((data) => {
         data = data.data.filter((user) => user.email !== userEmail);
@@ -102,10 +101,12 @@ function CreateGroupChat({ route, navigation}) {
   };
 
   const searchUsernames = async () => {
-    let usersBySearch = await dispatch(fetchUsersBySearch({search})).unwrap();
-    usersBySearch = usersBySearch.data.filter((user) => user.email !== userEmail);
+    let usersBySearch = await dispatch(fetchUsersBySearch({ search })).unwrap();
+    usersBySearch = usersBySearch.data.filter(
+      (user) => user.email !== userEmail
+    );
     setUsers(usersBySearch);
-  }
+  };
 
   const CustomCheckBox = ({ isSelected, onPress }) => (
     <>
@@ -117,133 +118,138 @@ function CreateGroupChat({ route, navigation}) {
 
   const onCreateGroupChat = async () => {
     if (groupName !== "" && selectedLanguage !== "") {
+      const groupData = {
+        groupName,
+        users: Array.from(selectedUsers.add(userEmail)), // Include the current user's email
+        languages: selectedLanguage,
+        createdAt: new Date(),
+        messages: [],
+        admin: userEmail,
+        isProGroup,
+        requestJoin: [],
+      };
 
-        const groupData = {
-          groupName,
-          users: Array.from(selectedUsers.add(userEmail)), // Include the current user's email
-          languages: selectedLanguage,
-          createdAt: new Date(),
-          messages: [],
-          admin: userEmail,
-          isProGroup,
-          requestJoin: [],
-        };
-    
-        const groupChatsRef = collection(database, "groupChats");
-        showToast("success", "Create new group success!", "You have created a new group!");
-        if (editMode) {
-          const groupDocRef = doc(database, "groupChats", groupId);
-          await setDoc(groupDocRef, groupData);
-          navigation.goBack();
-        } else {
-          await addDoc(groupChatsRef, groupData);
-          navigation.goBack();
-        }
+      const groupChatsRef = collection(database, "groupChats");
+      showToast(
+        "success",
+        "Create new group success!",
+        "You have created a new group!"
+      );
+      if (editMode) {
+        const groupDocRef = doc(database, "groupChats", groupId);
+        await setDoc(groupDocRef, groupData);
+        navigation.goBack();
+      } else {
+        await addDoc(groupChatsRef, groupData);
+        navigation.goBack();
+      }
     } else {
-        showToast("error", "Group name and language must be filled", "You must choose a group language and name");
+      showToast(
+        "error",
+        "Group name and language must be filled",
+        "You must choose a group language and name"
+      );
     }
   };
 
   return (
-      <ImageBackground
-        source={BG}
-        style={{flex: 1, opacity: 0.7, height: height * 0.9 }}
-      >
-        <View style={styles.container}>
-          <TextInput
-            style={styles.input}
-            placeholder="Input Group Name"
-            value={groupName}
-            onChangeText={setGroupName}
-          />
-          <View style={{ marginVertical: 10 }}>
-            <View style={styles.languageSelectorContainer}>
-              <SelectDropdown
-                data={languages}
-                defaultButtonText={"Select Language"}
-                buttonTextAfterSelection={(selectedItem, index) => {
-                  return selectedItem;
-                }}
-                rowTextForSelection={(item, index) => {
-                  return item;
-                }}
-                buttonStyle={styles.dropdown1BtnStyle}
-                buttonTextStyle={styles.dropdown1BtnTxtStyle}
-                renderDropdownIcon={(isOpened) => {
-                  return (
-                    <FontAwesome
-                      name={isOpened ? "chevron-up" : "chevron-down"}
-                      color={"#f8f8ff"}
-                      size={18}
-                    />
-                  );
-                }}
-                dropdownIconPosition={"right"}
-                dropdownStyle={styles.dropdown1DropdownStyle}
-                rowStyle={styles.dropdown1RowStyle}
-                rowTextStyle={styles.dropdown1RowTxtStyle}
-                onSelect={(item) => setSelectedLanguage(item)}
-              />
-            </View>
-          </View>
-          <Text style={styles.sectionTitle}>Users</Text>
-          <Searchbar
-            value={search}
-            onChangeText={(text) => setSearch(text)}
-            onSubmitEditing={searchUsernames}
-            placeholder="search users..."
-            style={{
-              height: 40,
-              backgroundColor: "transparent",
-              marginBottom: 8,
-            }}
-            inputStyle={{ fontSize: 14, alignSelf: "center" }}
-          />
-          {loadingUsersBySearch === "loading" ? (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
+    <ImageBackground
+      source={BG}
+      style={{ flex: 1, opacity: 0.7, height: height * 0.9 }}
+    >
+      <View style={styles.container}>
+        <TextInput
+          style={styles.input}
+          placeholder="Input Group Name"
+          value={groupName}
+          onChangeText={setGroupName}
+        />
+        <View style={{ marginVertical: 10 }}>
+          <View style={styles.languageSelectorContainer}>
+            <SelectDropdown
+              data={languages}
+              defaultButtonText={"Select Language"}
+              buttonTextAfterSelection={(selectedItem, index) => {
+                return selectedItem;
               }}
-            >
-              <ActivityIndicator size="large" />
-            </View>
-          ) : (
-            users.length === 0 ? (
-                <View
-                style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                    <Text>No users found.</Text>
-                </View>
-            ) : (
-                <FlatList
-                  data={users}
-                  keyExtractor={(item) => item.email}
-                  renderItem={({ item }) => (
-                    <View style={styles.userRow}>
-                      <CustomCheckBox
-                        isSelected={selectedUsers.has(item.email)}
-                        onPress={() => toggleUserSelection(item.email)}
-                      />
-                      <Text style={styles.userName}>{item.username}</Text>
-                    </View>
-                  )}
-                />
-            )
-          )}
-          <TouchableOpacity
-            style={styles.createButton}
-            onPress={onCreateGroupChat}
-          >
-            <Text style={styles.buttonText}>Create Group Chat</Text>
-          </TouchableOpacity>
+              rowTextForSelection={(item, index) => {
+                return item;
+              }}
+              buttonStyle={styles.dropdown1BtnStyle}
+              buttonTextStyle={styles.dropdown1BtnTxtStyle}
+              renderDropdownIcon={(isOpened) => {
+                return (
+                  <FontAwesome
+                    name={isOpened ? "chevron-up" : "chevron-down"}
+                    color={"#f8f8ff"}
+                    size={18}
+                  />
+                );
+              }}
+              dropdownIconPosition={"right"}
+              dropdownStyle={styles.dropdown1DropdownStyle}
+              rowStyle={styles.dropdown1RowStyle}
+              rowTextStyle={styles.dropdown1RowTxtStyle}
+              onSelect={(item) => setSelectedLanguage(item)}
+            />
+          </View>
         </View>
-      </ImageBackground>
+        <Text style={styles.sectionTitle}>Users</Text>
+        <Searchbar
+          value={search}
+          onChangeText={(text) => setSearch(text)}
+          onSubmitEditing={searchUsernames}
+          placeholder="search users..."
+          style={{
+            height: 40,
+            backgroundColor: "transparent",
+            marginBottom: 8,
+          }}
+          inputStyle={{ fontSize: 14, alignSelf: "center" }}
+        />
+        {loadingUsersBySearch === "loading" ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator size="large" />
+          </View>
+        ) : users.length === 0 ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text>No users found.</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={users}
+            keyExtractor={(item) => item.email}
+            renderItem={({ item }) => (
+              <View style={styles.userRow}>
+                <CustomCheckBox
+                  isSelected={selectedUsers.has(item.email)}
+                  onPress={() => toggleUserSelection(item.email)}
+                />
+                <Text style={styles.userName}>{item.username}</Text>
+              </View>
+            )}
+          />
+        )}
+        <TouchableOpacity
+          style={styles.createButton}
+          onPress={onCreateGroupChat}
+        >
+          <Text style={styles.buttonText}>Create Group Chat</Text>
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
   );
 }
 

@@ -9,9 +9,9 @@ import {
   Image,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import showToast from "../helper/showToast";
-import { userLogin } from "../stores/usersSlice";
-import logo from "../assets/HACKLINGO.png";
+import showToast from "../../helper/showToast";
+import { userLogin } from "../../stores/usersSlice";
+import logo from "../../assets/HACKLINGO.png";
 import { ActivityIndicator } from "react-native-paper";
 import messaging from "@react-native-firebase/messaging";
 

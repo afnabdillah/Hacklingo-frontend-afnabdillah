@@ -26,9 +26,9 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import { database } from "../config/firebase";
+import { database } from "../../config/firebase";
 import { useDispatch, useSelector } from "react-redux";
-import bg from "../assets/BG.png";
+import bg from "../../assets/BG.png";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View } from "react-native";
 import {
@@ -39,28 +39,36 @@ import {
 } from "@expo/vector-icons";
 import { Image, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { PopChatMenu } from "./HeadersChat/PopChatMenu";
-import pickImage from "../helper/imagePicker";
-import { fetchOtherUserByEmail, uploadChatImage } from "../stores/usersSlice";
-import sendPushNotification from "../helper/sendPushNotification";
+import { PopChatMenu } from "../../components/chats/PopChatMenu";
+import pickImage from "../../helper/imagePicker";
+import { uploadChatImage } from "../../stores/usersSlice";
+import sendPushNotification from "../../helper/sendPushNotification";
 
 const width = Dimensions.get("window").width;
 
 export default function Chat({ route }) {
-  const senderEmail = useSelector((state) => state.authReducer.email);
-  const [messages, setMessages] = useState([]);
-  const [selectedImage, setSelectedImage] = useState("");
-  const [selectedImageData, setSelectedImageData] = useState({});
+
   const {
     recipientEmail,
     recipientName,
     recipientAvatar,
     recipientDeviceToken
   } = route.params;
+  
+  const senderEmail = useSelector((state) => state.authReducer.email);
+  
+  const [messages, setMessages] = useState([]);
+  
+  const [selectedImage, setSelectedImage] = useState("");
+  
+  const [selectedImageData, setSelectedImageData] = useState({});
+  
   const [roomId, setRoomId] = useState(null);
+  
   const currentUserUsername = useSelector(
     (state) => state.authReducer.username
   );
+
   const currentUserProfileImageUrl = useSelector(
     (state) => state.authReducer.profileImageUrl
   );
@@ -70,6 +78,8 @@ export default function Chat({ route }) {
   );
 
   const dispatch = useDispatch();
+
+  const navigation = useNavigation();
 
   const mergeMessages = (oldMessages, newMessages) => {
     const allMessages = [...oldMessages, ...newMessages];
@@ -182,8 +192,6 @@ export default function Chat({ route }) {
     },
     [currentUserUsername]
   );
-
-  const navigation = useNavigation();
 
   const goToVideoChat = () => {
     const tempId = generateRoomId(senderEmail, recipientEmail);

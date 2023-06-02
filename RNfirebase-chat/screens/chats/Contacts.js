@@ -9,25 +9,32 @@ import {
   Pressable
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteUsersBySearch, fetchUsersByNativeLanguage } from "../stores/usersSlice";
-import showToast from "../helper/showToast";
+import { deleteUsersBySearch, fetchUsersByNativeLanguage } from "../../stores/usersSlice";
+import showToast from "../../helper/showToast";
 import { AntDesign } from '@expo/vector-icons';
 
 function Contacts({ navigation }) {
+
   const dispatch = useDispatch();
 
   const usersBySearch = useSelector(
     (state) => state.usersReducer.usersBySearch
   );
+
   const usersByNativeLanguage = useSelector(
     (state) => state.usersReducer.users
   );
+
   const userId = useSelector((state) => state.authReducer.userId);
+
   const userEmail = useSelector((state) => state.authReducer.email);
+
   const targetLanguage = useSelector(
     (state) => state.authReducer.targetLanguage
   );
+
   const contactsList = usersBySearch.filter((user) => user._id !== userId);
+  
   const contactsListByNativeLanguage = usersByNativeLanguage
     .filter((user) => user._id !== userId)
     .sort((a, b) => a.nativeLanguage.localeCompare(b.nativeLanguage));

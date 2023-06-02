@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
-import { database } from '../config/firebase';
-import { fetchOtherUserByEmail } from '../stores/usersSlice';
-import sendPushNotification from '../helper/sendPushNotification';
+import { database } from '../../config/firebase';
+import { fetchOtherUserByEmail } from '../../stores/usersSlice';
+import sendPushNotification from '../../helper/sendPushNotification';
 import { useDispatch } from 'react-redux';
 
 const UserCard = ({ user, groupId }) => {

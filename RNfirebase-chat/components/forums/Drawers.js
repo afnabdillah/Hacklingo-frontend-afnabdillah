@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import HomeScreen from "../../screens/forum/HomeScreen";
+import HomeScreen from "../../screens/forums/HomeScreen";
 import HeaderForum from "./Header";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllForums } from "../../stores/forumsSlice";

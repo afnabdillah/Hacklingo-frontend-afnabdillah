@@ -4,7 +4,7 @@ import React, {
   useLayoutEffect,
   useCallback,
 } from "react";
-import bg from "../assets/BG.png";
+import bg from "../../assets/BG.png";
 import {
   TouchableOpacity,
   Text,
@@ -30,7 +30,7 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
-import { database } from "../config/firebase";
+import { database } from "../../config/firebase";
 import {
   MaterialIcons,
   Entypo,
@@ -40,26 +40,37 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import pickImage from "../helper/imagePicker";
-import { fetchOtherUsersByEmail, uploadChatImage } from "../stores/usersSlice";
-import showToast from "../helper/showToast";
-import sendPushNotification from "../helper/sendPushNotification";
+import pickImage from "../../helper/imagePicker";
+import { fetchOtherUsersByEmail, uploadChatImage } from "../../stores/usersSlice";
+import showToast from "../../helper/showToast";
+import sendPushNotification from "../../helper/sendPushNotification";
 
 const width = Dimensions.get("window").width;
 
 export default function GroupChat({ route, navigation }) {
+  
+  const { groupId, groupName } = route.params;
+
   const userEmail = useSelector((state) => state.authReducer.email);
+  
   const username = useSelector((state) => state.authReducer.username);
+  
   const userProfileImageUrl = useSelector(
     (state) => state.authReducer.profileImageUrl
   );
+  
   const [messages, setMessages] = useState([]);
-  const { groupId, groupName } = route.params;
+  
   const [groupLanguage, setGroupLanguage] = useState("");
+  
   const [groupMembers, setGroupMembers] = useState([]);
+  
   const [groupAdmin, setGroupAdmin] = useState(null);
+  
   const [selectedImage, setSelectedImage] = useState("");
+  
   const [selectedImageData, setSelectedImageData] = useState({});
+  
   const mergeMessages = (oldMessages, newMessages) => {
     const allMessages = [...oldMessages, ...newMessages];
     const uniqueMessages = allMessages.filter(
@@ -71,13 +82,16 @@ export default function GroupChat({ route, navigation }) {
   };
 
   const dispatch = useDispatch();
+  
   useEffect(() => {
     if (!groupId) {
       return;
     }
 
     const database = getFirestore();
+    
     const groupDocRef = doc(database, "groupChats", groupId);
+    
     const unsubscribe = onSnapshot(groupDocRef, (docSnapshot) => {
       const data = docSnapshot.data();
       if (data) {
@@ -93,7 +107,6 @@ export default function GroupChat({ route, navigation }) {
         } else {
           setMessages([]);
         }
-
         setGroupLanguage(data.languages);
         setGroupMembers(data.users || []);
         setGroupAdmin(data.admin || null);

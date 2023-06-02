@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Text, TouchableOpacity, View, Pressable, Image, ActivityIndicator } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import CardForum from "../../components/forum/card";
+import CardForum from "../../components/forums/Card";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchForumDetails } from "../../stores/forumsSlice";
@@ -10,17 +10,25 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { fetchPostsBySearch } from "../../stores/postsSlice";
 
 export default function HomeScreen({ navigation }) {
+
   const route = useRoute();
+  
   const forumName = route.name;
+  
   const forumId = route.params.forumId;
+  
   const [showFullText, setShowFullText] = useState(false);
+  
   const forumDetails = useSelector((state) => state.forumsReducer.forumDetails);
+  
   const fetchForumDetailsStatus = useSelector(
     (state) => state.forumsReducer.status.forumDetails
   );
+  
   const fetchPostsBySearchStatus = useSelector(
     (state) => state.postsReducer.status.posts
   );
+  
   const posts = useSelector((state) => state.postsReducer.posts);
 
   const dispatch = useDispatch();

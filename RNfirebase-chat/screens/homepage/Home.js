@@ -6,24 +6,26 @@ import {
   View,
   Text,
   Dimensions,
-} from 'react-native';
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux'
-import CustomImageCarousalLandscape from './Landingpage/CustomImageCarousalLandscape';
-import Carousel from './Landingpage/Carousel'
-import HeaderDefault from '../components/forum/HeaderDefault';
-import { fetchArticles } from '../stores/articlesSlices';
-import showToast from '../helper/showToast';
-import { useNavigation } from '@react-navigation/native';
-import { ActivityIndicator } from 'react-native-paper';
-const lebar = Dimensions.get("window").width
-
+} from "react-native";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import CustomImageCarousalLandscape from "../../components/landingPage/CustomImageCarousalLandscape";
+import Carousel from "../../components/landingPage/Carousel";
+import HeaderDefault from "../../components/forums/HeaderDefault";
+import { fetchArticles } from "../../stores/articlesSlices";
+import showToast from "../../helper/showToast";
+import { useNavigation } from "@react-navigation/native";
+import { ActivityIndicator } from "react-native-paper";
+const lebar = Dimensions.get("window").width;
 
 const LandingPage = () => {
-  const dispatch = useDispatch()
-  const articles = useSelector((state) => state.articlesReducer.articles);
-  const navigation = useNavigation();
   
+  const dispatch = useDispatch();
+  
+  const articles = useSelector((state) => state.articlesReducer.articles);
+  
+  const navigation = useNavigation();
+
   useEffect(() => {
     dispatch(fetchArticles())
       .unwrap()
@@ -40,41 +42,48 @@ const LandingPage = () => {
   const data2 = [
     {
       language: "English",
-      image: require('../assets/flag_inggris.jpeg'),
+      image: require("../../assets/flag_inggris.jpeg"),
     },
     {
       language: "Indonesian/Bahasa Indonesia",
-      image: require('../assets/Flag_Indonesia.png'),
+      image: require("../../assets/Flag_Indonesia.png"),
     },
     {
       language: "Dutch/Nederlands",
-      image: require('../assets/Flag_Dutch.png'),
+      image: require("../../assets/Flag_Dutch.png"),
     },
     {
       language: "German/Deutsch",
-      image: require('../assets/Flag_Germany.jpg'),
+      image: require("../../assets/Flag_Germany.jpg"),
     },
     {
       language: "Spanish/Español",
-      image: require('../assets/Flag_Spanish.png'),
+      image: require("../../assets/Flag_Spanish.png"),
     },
     {
       language: "Japanese/日本語",
-      image: require('../assets/Flag_Japanese.jpeg'),
+      image: require("../../assets/Flag_Japanese.jpeg"),
     },
     {
       language: "French/Français",
-      image: require('../assets/Flag_French.png'),
+      image: require("../../assets/Flag_French.png"),
     },
   ];
+
   const handleArticlePress = (article) => {
-    navigation.navigate('Article', { articleId : article.id }); // Navigate to DetailScreen with article data
+    navigation.navigate("Article", { articleId: article.id }); // Navigate to DetailScreen with article data
   };
+  
   const navigateToGroups = (language) => {
-    navigation.navigate("Chats", { screen: "Find Groups", params : { language } });
+    navigation.navigate("Chats", {
+      screen: "Find Groups",
+      params: { language },
+    });
   };
 
-  const fetchArticlesStatus = useSelector(state => state.articlesReducer.status.articles);
+  const fetchArticlesStatus = useSelector(
+    (state) => state.articlesReducer.status.articles
+  );
 
   return (
     <>
@@ -111,31 +120,31 @@ export default LandingPage;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    backgroundColor: 'white',
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    backgroundColor: "white",
   },
   text: {
-    textAlign: 'center',
-    color: 'black',
+    textAlign: "center",
+    color: "black",
     marginBottom: 10,
     fontSize: 22,
     fontWeight: "bold",
-    width: lebar * 1
+    width: lebar * 1,
   },
   topCarouselContainer: {
     marginBottom: 40,
     height: 300,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   bottomCarouselContainer: {
     marginBottom: 40,
     height: 200,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   carouselFlag: {
     marginBottom: 40,
-    width: lebar * 2
-  }
+    width: lebar * 2,
+  },
 });

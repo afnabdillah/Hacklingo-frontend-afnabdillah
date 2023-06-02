@@ -10,7 +10,9 @@ import { fetchUsersBySearch } from "../../stores/usersSlice";
 import showToast from "../../helper/showToast";
 
 export function HeaderChat() {
+
   const [searchUsername, setSearchUsername] = useState("");
+  
   const dispatch = useDispatch();
 
   const width = Dimensions.get("window").width;

@@ -5,8 +5,11 @@ import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function DetailProfile({route}) {
+  
   const { name, email } = route.params;
-  const lebar = Dimensions.get("window").width
+  
+  const lebar = Dimensions.get("window").width;
+  
   return (
     <>
       <View style={{flex: 1}}>

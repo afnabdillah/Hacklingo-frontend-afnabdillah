@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { database } from "../config/firebase";
+import { database } from "../../config/firebase";
 import {
   collection,
   onSnapshot,
@@ -20,16 +20,17 @@ import {
 import { Image } from "react-native";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { fetchOtherUsersByEmail } from "../stores/usersSlice";
 dayjs.extend(relativeTime);
 
 function ChatList() {
-  const [chats, setChats] = useState([]);
-  const [loadingChatsStatus, setLoadingChatsStatus] = useState("idle");
-  const navigation = useNavigation();
-  const userEmail = useSelector((state) => state.authReducer.email);
 
-  const dispatch = useDispatch();
+  const [chats, setChats] = useState([]);
+  
+  const [loadingChatsStatus, setLoadingChatsStatus] = useState("idle");
+  
+  const navigation = useNavigation();
+  
+  const userEmail = useSelector((state) => state.authReducer.email);
 
   useEffect(() => {
     if (!userEmail) return;

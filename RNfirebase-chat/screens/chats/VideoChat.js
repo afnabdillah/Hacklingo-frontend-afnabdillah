@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AgoraUIKit from 'agora-rn-uikit';
-import { Button, View, TextInput, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 

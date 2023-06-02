@@ -1,11 +1,11 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import DetailScreen from "../../screens/forum/DetailScreen";
-import DrawerNav from "./drawers";
+import DetailScreen from "../../screens/forums/DetailScreen";
+import DrawerNav from "./Drawers";
 import { FontAwesome } from "@expo/vector-icons";
 import HeaderPost from "./HeaderPost";
-import Post from "../../screens/forum/Post";
-import Comments from "../../screens/forum/Comment";
-import PostImage from "../../screens/forum/PostImage";
+import Post from "../../screens/forums/Post";
+import Comments from "../../screens/forums/Comment";
+import PostImage from "../../screens/forums/PostImage";
 
 const Stack = createNativeStackNavigator();
 

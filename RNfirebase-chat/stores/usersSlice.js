@@ -10,11 +10,7 @@ import { auth, database } from "../config/firebase";
 import {
   doc,
   setDoc,
-  collection,
-  getDocs,
-  query,
   updateDoc,
-  where,
 } from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
 import base_url from "./base_url";

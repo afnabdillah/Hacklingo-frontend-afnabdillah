@@ -18,21 +18,28 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import { database } from "../config/firebase";
+import { database } from "../../config/firebase";
 import { useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
-import showToast from "../helper/showToast";
-import sendPushNotification from "../helper/sendPushNotification";
-import { fetchOtherUserByEmail } from "../stores/usersSlice";
+import showToast from "../../helper/showToast";
+import sendPushNotification from "../../helper/sendPushNotification";
+import { fetchOtherUserByEmail } from "../../stores/usersSlice";
 import { useDispatch } from "react-redux";
 
 function Groups({ navigation }) {
+  
   const route = useRoute();
+  
   const groupLanguage = route.params ? route.params.language : undefined;
+  
   const [loadingGroupsStatus, setLoadingGroupsStatus] = useState("idle");
+  
   const [joinedGroups, setJoinedGroups] = useState([]);
+  
   const [unjoinedGroups, setUnjoinedGroups] = useState([]);
+  
   const userEmail = useSelector((state) => state.authReducer.email);
+  
   const username = useSelector((state) => state.authReducer.username);
 
   const dispatch = useDispatch();

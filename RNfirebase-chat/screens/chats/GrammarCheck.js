@@ -10,16 +10,20 @@ import {
   ActivityIndicator
 } from "react-native";
 import axios from "axios";
-import HeaderDefault from "../components/forum/HeaderDefault";
+import HeaderDefault from "../../components/forums/HeaderDefault";
 import { ScrollView } from "react-native-gesture-handler";
-import logo from "../assets/HACKLINGO.png";
+import logo from "../../assets/HACKLINGO.png";
 import Constants from "expo-constants";
-import showToast from "../helper/showToast";
+import showToast from "../../helper/showToast";
 
 const GrammarCheckScreen = () => {
+
   const [inputText, setInputText] = useState("");
+  
   const [correctedText, setCorrectedText] = useState("");
+  
   const [loading, setLoading] = useState("idle");
+  
   const apiKey = Constants.manifest.extra.grammarApiKey;
 
   const handleGrammarCheck = async () => {

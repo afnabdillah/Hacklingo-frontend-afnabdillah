@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import base_url from "./base_url";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const fetchPostDetails = createAsyncThunk(
   "postsSlice/fetchPostDetails", // this is the action name
