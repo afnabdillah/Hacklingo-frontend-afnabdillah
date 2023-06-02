@@ -28,6 +28,7 @@ import {
   updateDoc,
   arrayUnion,
   doc,
+  getDoc,
 } from "firebase/firestore";
 import { database } from "../config/firebase";
 import {
@@ -40,7 +41,9 @@ import {
 } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import pickImage from "../helper/imagePicker";
-import { uploadChatImage } from "../stores/usersSlice";
+import { fetchOtherUsersByEmail, uploadChatImage } from "../stores/usersSlice";
+import showToast from "../helper/showToast";
+import sendPushNotification from "../helper/sendPushNotification";
 
 const width = Dimensions.get("window").width;
 
@@ -90,7 +93,7 @@ export default function GroupChat({ route, navigation }) {
         } else {
           setMessages([]);
         }
-        // console.log(data.users[0], "<<< ini isi data users");
+
         setGroupLanguage(data.languages);
         setGroupMembers(data.users || []);
         setGroupAdmin(data.admin || null);
@@ -140,6 +143,19 @@ export default function GroupChat({ route, navigation }) {
       updateDoc(groupDocRef, {
         messages: arrayUnion(messageObj),
       });
+
+      // Send the push notifications to multiple people
+      getDoc(groupDocRef)
+      .then(async (snapshot) => {
+        const groupMemberEmails = snapshot.data().users;
+        const membersData = await dispatch(fetchOtherUsersByEmail(groupMemberEmails)).unwrap();
+        const deviceTokens = membersData.filter(el => el.email !== userEmail).map(el => el.deviceToken);
+        for(const deviceToken of deviceTokens) {
+          if (deviceToken) {
+            sendPushNotification(deviceToken, username, messages[0].text);
+          }
+        }
+      })
     },
     [userEmail, groupId, username]
   );
@@ -326,6 +342,7 @@ export default function GroupChat({ route, navigation }) {
                         );
                       } catch (err) {
                         console.log(err, "<<<< ini error send image");
+                        showToast("error", "There was a problem when sending your message", "Please try again later");
                       }
                     }
                   }}

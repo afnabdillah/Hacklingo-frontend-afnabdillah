@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -13,6 +13,7 @@ import showToast from "../helper/showToast";
 import { userLogin } from "../stores/usersSlice";
 import logo from "../assets/HACKLINGO.png";
 import { ActivityIndicator } from "react-native-paper";
+import messaging from "@react-native-firebase/messaging";
 
 export default LoginView = () => {
   const [email, setEmail] = useState("");
@@ -23,14 +24,15 @@ export default LoginView = () => {
     (state) => state.usersReducer.status.userLogin
   );
 
-  const onHandleLogin = () => {
+  const onHandleLogin = async () => {
     if (email !== "" && password !== "") {
-      dispatch(userLogin({ email, password }))
-        .unwrap()
-        .then(() => showToast("success", "Login success", "You logged in successfully"))
-        .catch((err) => {
-          showToast("error", "Login error", err.message);
-        });
+      try {
+        const deviceToken = await messaging().getToken();
+        await dispatch(userLogin({ email, password, deviceToken })).unwrap();
+        showToast("success", "Login success", "You logged in successfully")
+      } catch(err) {
+        showToast("error", "Login error", err.message);
+      }
     }
   };
 

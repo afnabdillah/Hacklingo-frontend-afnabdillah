@@ -55,6 +55,7 @@ export default function Chat({ route }) {
     recipientEmail,
     recipientName,
     recipientAvatar,
+    recipientDeviceToken
   } = route.params;
   const [roomId, setRoomId] = useState(null);
   const currentUserUsername = useSelector(
@@ -63,7 +64,6 @@ export default function Chat({ route }) {
   const currentUserProfileImageUrl = useSelector(
     (state) => state.authReducer.profileImageUrl
   );
-  let recipientData = {};
 
   const loadingRecipientStatus = useSelector(
     (state) => state.usersReducer.status.userByEmail
@@ -105,15 +105,6 @@ export default function Chat({ route }) {
       unsubscribe();
     };
   }, [recipientEmail, senderEmail]);
-
-  useEffect(() => {
-    async function fetchRecipientData() {
-      recipientData = await dispatch(
-        fetchOtherUserByEmail(recipientEmail)
-      ).unwrap();
-    }
-    fetchRecipientData();
-  }, [recipientEmail]);
 
   const selectImage = async () => {
     const imageData = await pickImage();
@@ -181,9 +172,9 @@ export default function Chat({ route }) {
       });
 
       // Sending notification to the other user
-      if (recipientData.deviceToken) {
+      if (recipientDeviceToken) {
         sendPushNotification(
-          recipientData.deviceToken,
+          recipientDeviceToken,
           currentUserUsername,
           messages[0].text
         );

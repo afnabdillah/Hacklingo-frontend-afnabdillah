@@ -2,6 +2,7 @@ import Constants from "expo-constants";
 import axios from "axios";
 
 function sendPushNotification(deviceToken, title, body) {
+  
   const notification = {
     to: deviceToken,
     notification: {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
   View,
@@ -18,10 +18,13 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import { database, auth } from "../config/firebase";
+import { database } from "../config/firebase";
 import { useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import showToast from "../helper/showToast";
+import sendPushNotification from "../helper/sendPushNotification";
+import { fetchOtherUserByEmail } from "../stores/usersSlice";
+import { useDispatch } from "react-redux";
 
 function Groups({ navigation }) {
   const route = useRoute();
@@ -31,6 +34,8 @@ function Groups({ navigation }) {
   const [unjoinedGroups, setUnjoinedGroups] = useState([]);
   const userEmail = useSelector((state) => state.authReducer.email);
   const username = useSelector((state) => state.authReducer.username);
+
+  const dispatch = useDispatch();
 
   const flagData = [
     {
@@ -89,6 +94,8 @@ function Groups({ navigation }) {
         (group) => !group.users.includes(userEmail)
       );
 
+      // console.log(unjoined, "<<< ini yang unjoin");
+
       setJoinedGroups(joined);
       setUnjoinedGroups(unjoined);
       setLoadingGroupsStatus("idle");
@@ -112,7 +119,21 @@ function Groups({ navigation }) {
     await updateDoc(groupDocRef, {
       requestJoin: arrayUnion({ email: userEmail, username: username }),
     });
-    showToast("success", `You requested to join ${item.groupName}`, "Please wait until the admin accepts you");
+    showToast(
+      "success",
+      `You requested to join ${item.groupName}`,
+      "Please wait until the admin accepts you"
+    );
+    const adminData = await dispatch(
+      fetchOtherUserByEmail(item.admin)
+    ).unwrap();
+    if (adminData.deviceToken) {
+      sendPushNotification(
+        adminData.deviceToken,
+        "Someone wants to join your group!", 
+        `${username} has requested to join group ${item.groupName}`
+      );
+    }
   };
 
   const showJoinRequestAlert = (item) => {
@@ -165,7 +186,9 @@ function Groups({ navigation }) {
         </Text>
         <Image
           source={{
-            uri: flagData.find((el) => el.language === item.languages)?.image || flagData[0].image,
+            uri:
+              flagData.find((el) => el.language === item.languages)?.image ||
+              flagData[0].image,
           }}
           style={{
             position: "absolute",
@@ -219,9 +242,17 @@ function Groups({ navigation }) {
             Group with {groupLanguage} language is not found, maybe you can
             create them first!
           </Text>
+          <TouchableOpacity
+            style={styles.createGroupButton}
+            onPress={navigateToCreateGroupChat}
+          >
+            <AntDesign name="addusergroup" size={24} color="white" />
+          </TouchableOpacity>
         </View>
       ) : (
-        <View style={{ flex: 1, backgroundColor: "white" }}>
+        <View
+          style={{ flex: 1, backgroundColor: "white", position: "relative" }}
+        >
           <FlatList
             data={joinedGroups}
             keyExtractor={(item) => item.id}
@@ -247,7 +278,7 @@ function Groups({ navigation }) {
             onPress={navigateToCreateGroupChat}
           >
             {/* <Text style={styles.createGroupButtonText}>Create Group Chat</Text> */}
-            <AntDesign name="addusergroup" size={24} color="white"/>
+            <AntDesign name="addusergroup" size={24} color="white" />
           </TouchableOpacity>
         </View>
       )}

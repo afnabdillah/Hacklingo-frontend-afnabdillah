@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../stores/authSlice';
+import { logoutUser } from '../../stores/usersSlice';
 
 
 export function PopMenu() {
@@ -27,9 +28,7 @@ export function PopMenu() {
     }
     const onSignOut = async () => {
         try {
-            await signOut(auth);
-            await AsyncStorage.clear(); // Clear AsyncStorage
-            dispatch(logout())
+            await dispatch(logoutUser()).unwrap();
         } catch (error) {
             console.log('Error logging out: ', error);
         }

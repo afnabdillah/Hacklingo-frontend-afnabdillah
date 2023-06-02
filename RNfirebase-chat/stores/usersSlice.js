@@ -8,7 +8,8 @@ import {
 } from "firebase/auth";
 import { auth, database } from "../config/firebase";
 import {
-  addDoc,
+  doc,
+  setDoc,
   collection,
   getDocs,
   query,
@@ -17,7 +18,7 @@ import {
 } from "firebase/firestore";
 import saveToAsyncStorage from "../helper/saveToAsyncStorage";
 import base_url from "./base_url";
-import { loginSuccess, updateSuccess } from "./authSlice";
+import { loginSuccess, logout, updateSuccess } from "./authSlice";
 import { FirebaseError } from "firebase/app";
 
 export const fetchUserDetails = createAsyncThunk(
@@ -58,7 +59,7 @@ export const uploadChatImage = createAsyncThunk(
         url: `${base_url}/users/chatImage`,
         headers: {
           userid: userId,
-          "Content-Type" : "multipart/form-data"
+          "Content-Type": "multipart/form-data",
         },
         data: formData,
       });
@@ -101,8 +102,9 @@ export const fetchUsersByNativeLanguage = createAsyncThunk(
 
 export const fetchUsersBySearch = createAsyncThunk(
   "usersSlice/fetchUsersBySearch",
-  async (search, { rejectWithValue }) => {
+  async (input, { rejectWithValue }) => {
     try {
+      const {search, context} = input;
       const userId = await AsyncStorage.getItem("userid");
       const response = await axios({
         method: "GET",
@@ -114,7 +116,7 @@ export const fetchUsersBySearch = createAsyncThunk(
           search,
         },
       });
-      return response.data;
+      return {data: response.data, context};
     } catch (err) {
       if (err.response) {
         return rejectWithValue(err.response.data);
@@ -129,16 +131,28 @@ export const userLogin = createAsyncThunk(
   "usersSlice/userLogin",
   async (input, { rejectWithValue, dispatch }) => {
     try {
-      const { email, password } = input;
+      const { email, password, deviceToken } = input;
+
       // Login first to the project db for validation
       const response = await axios({
         method: "POST",
         url: `${base_url}/users/login`,
         data: input,
       });
+
       // Login to firebase after success
       await signInWithEmailAndPassword(auth, email, password);
-      await saveToAsyncStorage(response.data);
+
+      // Save to Async Storage
+      saveToAsyncStorage(response.data);
+
+      // Update the device token on the firebase data;
+      const userRef = doc(database, "users", response.data._id);
+      updateDoc(userRef, {
+        deviceToken,
+      });
+
+      // Set the states
       dispatch(
         loginSuccess({
           userId: response.data._id,
@@ -174,12 +188,12 @@ export const userSignUp = createAsyncThunk(
       formData.append("targetLanguage", JSON.stringify(input.targetLanguage));
       formData.append("deviceToken", input.deviceToken);
       formData.append("role", "regular");
-      // console.log(input.selectedImageData, "<<<< ini hasil selected image data");
+
       if (Object.keys(input.selectedImageData).length !== 0) {
         formData.append("file", input.selectedImageData);
         formData.append("context", "image");
       }
-      // console.log(formData, "<<<< ini isi form Sign Up");
+
       // Sign up first to the project database
       const response = await axios({
         method: "POST",
@@ -196,13 +210,22 @@ export const userSignUp = createAsyncThunk(
         input.password
       );
       // Save it to firebase database
-      // console.log(response.data.profileImageUrl, "<<<<< iin hasil profile image url sign up");
-      const firebaseResult = await addDoc(collection(database, "users"), {
+      // Reference the document using the custom ID
+      const docRef = doc(database, "users", response.data._id);
+
+      // Create the data object for the document
+      const data = {
         email: user.email,
         username: response.data.username,
         profileImageUrl: response.data.profileImageUrl || "",
-      });
-      // console.log(firebaseResult, "<<<<< this is the result from firebase add Doc");
+        deviceToken: response.data.deviceToken,
+        nativeLanguage: response.data.nativeLanguage,
+        targetLanguage: response.data.targetLanguage,
+      };
+
+      // Add the document to Firestore with the custom ID
+      await setDoc(docRef, data);
+
       // Save it to async storage
       await saveToAsyncStorage(response.data);
       dispatch(
@@ -253,12 +276,49 @@ export const fetchOtherUserByEmail = createAsyncThunk(
   }
 );
 
+export const fetchOtherUsersByEmail = createAsyncThunk(
+  "usersSlice/fetchOtherUsersByEmail",
+  async (emails, { rejectWithValue }) => {
+    try {
+      const userId = await AsyncStorage.getItem("userid");
+      const response = await axios({
+        method: "GET",
+        url: `${base_url}/users/emails`,
+        headers: {
+          userid: userId,
+        },
+        params: { emails },
+      });
+      return response.data;
+    } catch (err) {
+      if (err.response) {
+        return rejectWithValue(err.response.data.message);
+      } else {
+        throw err;
+      }
+    }
+  }
+);
+
 export const logoutUser = createAsyncThunk(
   "usersSlice/logoutUser",
-  async () => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      await AsyncStorage.multiRemove(["username", "email", "userid"]);
+      const userId = await AsyncStorage.getItem("userid");
+      await AsyncStorage.clear();
       await signOut(auth);
+      dispatch(logout());
+      axios({
+        method: "PATCH",
+        url: `${base_url}/users/logout`,
+        headers: {
+          userid: userId,
+        },
+      });
+      const userRef = doc(database, "users", userId);
+      updateDoc(userRef, {
+        deviceToken: "",
+      });
     } catch (err) {
       console.log("Error logging out: ", err);
     }
@@ -270,9 +330,7 @@ export const updateUserDetails = createAsyncThunk(
   async (input, { rejectWithValue, dispatch }) => {
     try {
       input.append("context", "image");
-      // console.log(input, "<<<< ini input image");
       const userId = await AsyncStorage.getItem("userid");
-      const userEmail = await AsyncStorage.getItem("email");
       const response = await axios({
         method: "PUT",
         url: `${base_url}/users/${userId}`,
@@ -282,6 +340,18 @@ export const updateUserDetails = createAsyncThunk(
         },
         data: input,
       });
+
+      // Save it to Async Storage
+      saveToAsyncStorage(response.data);
+
+      // Save it to firebase database
+      const userRef = doc(database, "users", userId);
+      updateDoc(userRef, {
+        profileImageUrl: response.data.profileImageUrl,
+        username: response.data.username,
+        nativeLanguage: response.data.nativeLanguage,
+      });
+
       // Save it to reducer
       dispatch(
         updateSuccess({
@@ -290,30 +360,6 @@ export const updateUserDetails = createAsyncThunk(
           nativeLanguage: response.data.nativeLanguage,
         })
       );
-      // Save it to Async Storage
-      await saveToAsyncStorage(response.data);
-      // Save it to firebase database
-      const usersCollectionRef = collection(database, "users");
-      const q = query(usersCollectionRef, where("email", "==", userEmail));
-      const querySnapshot = await getDocs(q);
-      console.log(
-        querySnapshot.empty,
-        "<<<< ini isi snapshot kosong atau tidak"
-      );
-      console.log(
-        querySnapshot.docs[0].ref,
-        "<<<< ini hasil mendapatkan query dari update users"
-      );
-      if (!querySnapshot.empty) {
-        const userDocRef = querySnapshot.docs[0].ref;
-        const updatedFirebaseResult = await updateDoc(userDocRef, {
-          username: response.data.username,
-          profileImageUrl: response.data.profileImageUrl,
-        });
-        console.log(updatedFirebaseResult, "<<<< ini hasil update firebase");
-      } else {
-        throw { message: "Email not found on firebase" };
-      }
       return response.data;
     } catch (err) {
       // return err.response if it was an axios error with reject with value
@@ -361,6 +407,7 @@ const usersSlice = createSlice({
     userDetails: {},
     usersBySearch: [],
     userByEmail: {},
+    usersByEmail: [],
     status: {
       userDetails: "idle",
       users: "idle",
@@ -370,6 +417,7 @@ const usersSlice = createSlice({
       usersBySearch: "idle",
       uploadChatImage: "idle",
       userByEmail: "idle",
+      usersByEmail: "idle",
     },
   },
   reducers: {
@@ -404,7 +452,9 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUsersBySearch.fulfilled, (state, action) => {
         state.status.usersBySearch = "idle";
-        state.usersBySearch = action.payload;
+        if (action.payload.context === "contacts") {
+          state.usersBySearch = action.payload.data;
+        }
       })
       .addCase(fetchUsersBySearch.rejected, (state, action) => {
         state.status.usersBySearch = "error";
@@ -454,6 +504,16 @@ const usersSlice = createSlice({
       })
       .addCase(fetchOtherUserByEmail.rejected, (state, action) => {
         state.status.userByEmail = "error";
+      })
+      .addCase(fetchOtherUsersByEmail.pending, (state, action) => {
+        state.status.usersByEmail = "loading";
+      })
+      .addCase(fetchOtherUsersByEmail.fulfilled, (state, action) => {
+        state.status.usersByEmail = "idle";
+        state.usersByEmail = action.payload;
+      })
+      .addCase(fetchOtherUsersByEmail.rejected, (state, action) => {
+        state.status.usersByEmail = "error";
       });
   },
 });

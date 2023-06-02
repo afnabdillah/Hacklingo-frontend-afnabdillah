@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  Dimensions,
   Pressable
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,7 +15,6 @@ import { AntDesign } from '@expo/vector-icons';
 
 function Contacts({ navigation }) {
   const dispatch = useDispatch();
-  // const height = Dimensions.get("screen").height;
 
   const usersBySearch = useSelector(
     (state) => state.usersReducer.usersBySearch
