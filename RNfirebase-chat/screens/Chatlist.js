@@ -142,7 +142,7 @@ function ChatList() {
             const lastMessage = item.messages;
             const otherUser = item.users.find((u) => u.email !== userEmail);
             const lastMessageDate = new Date(
-              lastMessage.createdAt.seconds * 1000
+              lastMessage?.createdAt.seconds * 1000
             );
 
             return (
@@ -171,7 +171,7 @@ function ChatList() {
                       {dayjs(lastMessageDate).fromNow(false)}
                     </Text>
                   </View>
-                  <Text style={styles.subTitle}>{lastMessage.text}</Text>
+                  <Text style={styles.subTitle}>{lastMessage?.text}</Text>
                 </View>
               </TouchableOpacity>
             );
