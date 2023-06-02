@@ -15,11 +15,16 @@ import logo from "../../assets/HACKLINGO.png";
 import { ActivityIndicator } from "react-native-paper";
 import messaging from "@react-native-firebase/messaging";
 
-export default LoginView = () => {
+const LoginView = () => {
+
   const [email, setEmail] = useState("");
+  
   const [password, setPassword] = useState("");
+  
   const navigation = useNavigation();
+  
   const dispatch = useDispatch();
+  
   const loginStatus = useSelector(
     (state) => state.usersReducer.status.userLogin
   );
@@ -33,6 +38,8 @@ export default LoginView = () => {
       } catch(err) {
         showToast("error", "Login error", err.message);
       }
+    } else {
+      showToast("error", "Input Incomplete", "All input must be filled");
     }
   };
 
@@ -174,3 +181,5 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
 });
+
+export default LoginView;

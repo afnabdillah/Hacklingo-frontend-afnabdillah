@@ -19,7 +19,6 @@ async function pickImage () {
       name: fileName,
       type: fileType
     };
-    // console.log(imageData, "<<< ini imageData");
     return imageData;
   }
 };

@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, FlatList, Animated, onPress } from 'react-native';
+import { View, StyleSheet, Dimensions, FlatList, Animated } from 'react-native';
 import CarouselItem from './CarouselItem';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-function infiniteScroll(dataList, flatListRef) {
+const infiniteScroll = (dataList, flatListRef) => {
+
   const numberOfData = dataList.length;
+  
   let scrollValue = 0;
+  
   let scrolled = 0;
 
   setInterval(() => {
@@ -24,15 +27,18 @@ function infiniteScroll(dataList, flatListRef) {
 }
 
 const Carousel = ({ data, onPress }) => {
+
   const scrollX = new Animated.Value(0);
+  
   let position = Animated.divide(scrollX, width);
+  
   const [dataList, setDataList] = useState(data);
+  
   const flatListRef = useRef(null);
 
   useEffect(() => {
     setDataList(data);
     infiniteScroll(dataList, flatListRef);
-    // return clearInterval(infiniteScroll);
   }, [data]);
 
   if (data && data.length) {

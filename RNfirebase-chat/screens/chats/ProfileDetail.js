@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-export default function DetailProfile({route}) {
+const DetailProfile = ({route}) => {
   
   const { name, email } = route.params;
   
@@ -123,3 +123,5 @@ export default function DetailProfile({route}) {
     </>
   )
 }
+
+export default DetailProfile;

@@ -13,6 +13,7 @@ function sendPushNotification(deviceToken, title, body) {
     soundName: "default",
   };
 
+  // Send to firebase cloud messaging
   axios({
     method: "POST",
     url: "https://fcm.googleapis.com/fcm/send",

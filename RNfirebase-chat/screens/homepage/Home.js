@@ -16,6 +16,7 @@ import { fetchArticles } from "../../stores/articlesSlices";
 import showToast from "../../helper/showToast";
 import { useNavigation } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
+
 const lebar = Dimensions.get("window").width;
 
 const LandingPage = () => {

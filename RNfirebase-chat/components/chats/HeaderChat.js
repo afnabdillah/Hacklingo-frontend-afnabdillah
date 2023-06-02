@@ -2,14 +2,14 @@ import { View, Dimensions } from "react-native";
 import { Image } from "react-native";
 import logo from "../../assets/HACKLINGO.png";
 import { StyleSheet } from "react-native";
-import { PopMenu } from "./PopMenu";
+import PopMenu from "./PopMenu";
 import { Searchbar } from "react-native-paper";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { fetchUsersBySearch } from "../../stores/usersSlice";
 import showToast from "../../helper/showToast";
 
-export function HeaderChat() {
+const HeaderChat = () => {
 
   const [searchUsername, setSearchUsername] = useState("");
   
@@ -89,3 +89,5 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
 });
+
+export default HeaderChat;

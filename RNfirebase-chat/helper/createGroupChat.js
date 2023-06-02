@@ -1,7 +1,7 @@
 import { collection, addDoc } from 'firebase/firestore';
 import { database } from '../config/firebase';
 
-export default async function createGroupChat(groupName, userEmails, groupLanguage) {
+async function createGroupChat(groupName, userEmails, groupLanguage) {
   const groupData = {
     groupName,
     groupLanguage,
@@ -16,3 +16,5 @@ export default async function createGroupChat(groupName, userEmails, groupLangua
     console.error('Error creating group chat:', error);
   }
 }
+
+export default createGroupChat;

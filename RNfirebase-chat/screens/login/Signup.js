@@ -25,7 +25,7 @@ import logo from "../../assets/HACKLINGO.png";
 import pickImage from "../../helper/imagePicker";
 import messaging from "@react-native-firebase/messaging";
 
-export default SignUpView = () => {
+const SignUpView = () => {
   
   const [email, setEmail] = useState("");
   
@@ -69,7 +69,6 @@ export default SignUpView = () => {
     ) {
       const targetLanguage = columns.map(el => el.value);
       const deviceToken = await messaging().getToken();
-      console.log(deviceToken, "<<<< this is your phone's fcm token");
       const input = {
         email,
         password,
@@ -397,3 +396,5 @@ const styles = StyleSheet.create({
   },
   dropdown1RowTxtStyle: { color: "#444", alignSelf: "center" },
 });
+
+export default SignUpView;

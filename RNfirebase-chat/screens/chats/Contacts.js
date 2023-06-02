@@ -13,7 +13,7 @@ import { deleteUsersBySearch, fetchUsersByNativeLanguage } from "../../stores/us
 import showToast from "../../helper/showToast";
 import { AntDesign } from '@expo/vector-icons';
 
-function Contacts({ navigation }) {
+const Contacts = ({ navigation }) => {
 
   const dispatch = useDispatch();
 

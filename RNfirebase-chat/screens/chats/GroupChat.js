@@ -72,6 +72,8 @@ export default function GroupChat({ route, navigation }) {
   const [selectedImageData, setSelectedImageData] = useState({});
   
   const mergeMessages = (oldMessages, newMessages) => {
+
+    // merge old messages and new messages, filter and sort them based on creation date
     const allMessages = [...oldMessages, ...newMessages];
     const uniqueMessages = allMessages.filter(
       (message, index, self) =>
@@ -93,6 +95,8 @@ export default function GroupChat({ route, navigation }) {
     const groupDocRef = doc(database, "groupChats", groupId);
     
     const unsubscribe = onSnapshot(groupDocRef, (docSnapshot) => {
+
+      // Get the messages data
       const data = docSnapshot.data();
       if (data) {
         if (data.messages) {
@@ -130,6 +134,7 @@ export default function GroupChat({ route, navigation }) {
         return;
       }
 
+      // Render them into the screen first before calling to firebase
       setMessages((previousMessages) =>
         GiftedChat.append(previousMessages, messages)
       );
@@ -152,6 +157,7 @@ export default function GroupChat({ route, navigation }) {
         },
       };
 
+      // Insert the messageObj to the cloud firestore
       const groupDocRef = doc(database, "groupChats", groupId);
       updateDoc(groupDocRef, {
         messages: arrayUnion(messageObj),

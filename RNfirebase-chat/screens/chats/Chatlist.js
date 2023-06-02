@@ -74,6 +74,7 @@ function ChatList() {
         const lastMessageTimeB = b.messages.createdAt.seconds;
         return lastMessageTimeB - lastMessageTimeA
       });
+
     // Get the users data from collection users;
     const recipientEmails = mergedChats.map((el) => el.recipient.email);
     const usersCollectionRef = collection(database, "users");
@@ -85,7 +86,7 @@ function ChatList() {
     // Execute the query
     const querySnapshot = await getDocs(usersQuery);
 
-    // Retrieve the matching user documents
+    // Retrieve the matching user documents and put them into a map
     const matchingUsers = new Map();
     querySnapshot.forEach((doc) => {
       const userData = doc.data();
@@ -98,7 +99,8 @@ function ChatList() {
       matchingUsers.set(userData.email, selectedFields);
     });
 
-    mergedChats.forEach((el, i) => {
+    // Pass the user data into the images of chat list 
+    mergedChats.forEach((el) => {
       el.recipient.username = matchingUsers.get(el.recipient.email).username;
       el.recipient.avatar = matchingUsers.get(
         el.recipient.email
@@ -190,14 +192,12 @@ const styles = StyleSheet.create({
     height: 70,
     alignItems: "center",
   },
-
   image: {
     width: 60,
     height: 60,
     borderRadius: 30,
     marginRight: 10,
   },
-
   content: {
     flex: 1,
     borderBottomWidth: StyleSheet.hairlineWidth,

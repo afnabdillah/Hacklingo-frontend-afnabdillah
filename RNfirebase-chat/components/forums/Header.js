@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState } from "react";
 import { Searchbar } from "react-native-paper";
 import { Dimensions, Image, View } from "react-native";
 import logo from "./assets/LOGO.png";
@@ -6,10 +6,14 @@ import { useDispatch } from "react-redux";
 import { fetchPostsBySearch } from "../../stores/postsSlice";
 import showToast from "../../helper/showToast";
 
-export default function HeaderForum({ forumId }) {
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const dispatch = useDispatch();
+const HeaderForum = ({ forumId }) => {
+
   const width = Dimensions.get("window").width;
+  
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const dispatch = useDispatch();
+  
 
   const onChangeSearch = (query) => setSearchQuery(query);
 
@@ -38,3 +42,5 @@ export default function HeaderForum({ forumId }) {
     </View>
   );
 }
+
+export default HeaderForum;

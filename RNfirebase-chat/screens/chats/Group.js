@@ -84,6 +84,8 @@ function Groups({ navigation }) {
 
   const fetchGroups = async (language) => {
     setLoadingGroupsStatus("loading");
+
+    // Get the groups data from firebase
     const groupChatsRef = collection(database, "groupChats");
     const unsubscribe = onSnapshot(groupChatsRef, (querySnapshot) => {
       const groupsData = querySnapshot.docs.map((doc) => ({
@@ -91,18 +93,18 @@ function Groups({ navigation }) {
         ...doc.data(),
       }));
 
+      // Filter the group based on whether there is a language prop
       const filteredGroups = language
         ? groupsData.filter((group) => group.languages === language)
         : groupsData;
+
+      // Divide groups based on whether the logged in user joins or not
       const joined = filteredGroups.filter((group) =>
         group.users.includes(userEmail)
       );
       const unjoined = filteredGroups.filter(
         (group) => !group.users.includes(userEmail)
       );
-
-      // console.log(unjoined, "<<< ini yang unjoin");
-
       setJoinedGroups(joined);
       setUnjoinedGroups(unjoined);
       setLoadingGroupsStatus("idle");
@@ -123,6 +125,8 @@ function Groups({ navigation }) {
 
   const handleJoinRequest = async (item) => {
     const groupDocRef = doc(database, "groupChats", item.id);
+
+    // update the joinee email and the username to cloud firestore
     await updateDoc(groupDocRef, {
       requestJoin: arrayUnion({ email: userEmail, username: username }),
     });
@@ -131,6 +135,8 @@ function Groups({ navigation }) {
       `You requested to join ${item.groupName}`,
       "Please wait until the admin accepts you"
     );
+
+    // Get the admin data and send the push notification to the group admin
     const adminData = await dispatch(
       fetchOtherUserByEmail(item.admin)
     ).unwrap();
@@ -284,7 +290,6 @@ function Groups({ navigation }) {
             style={styles.createGroupButton}
             onPress={navigateToCreateGroupChat}
           >
-            {/* <Text style={styles.createGroupButtonText}>Create Group Chat</Text> */}
             <AntDesign name="addusergroup" size={24} color="white" />
           </TouchableOpacity>
         </View>

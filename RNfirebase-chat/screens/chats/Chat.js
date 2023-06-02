@@ -39,7 +39,7 @@ import {
 } from "@expo/vector-icons";
 import { Image, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { PopChatMenu } from "../../components/chats/PopChatMenu";
+import PopChatMenu from "../../components/chats/PopChatMenu";
 import pickImage from "../../helper/imagePicker";
 import { uploadChatImage } from "../../stores/usersSlice";
 import sendPushNotification from "../../helper/sendPushNotification";
@@ -96,9 +96,12 @@ export default function Chat({ route }) {
   };
 
   useEffect(() => {
+
+    // Create room here
     const createRoomId = generateRoomId(senderEmail, recipientEmail);
     const roomDocRef = doc(database, "personalChats", createRoomId);
 
+    // Get messages here
     const unsubscribe = onSnapshot(roomDocRef, (docSnapshot) => {
       if (docSnapshot.exists()) {
         const fetchedMessages = docSnapshot.data().messages.map((message) => ({
@@ -111,6 +114,8 @@ export default function Chat({ route }) {
       }
     });
     setRoomId(createRoomId);
+
+    // The clean up function goes here
     return () => {
       unsubscribe();
     };
@@ -163,6 +168,7 @@ export default function Chat({ route }) {
         });
       }
 
+      // Create the new message here
       const message = {
         _id: messages[0]._id,
         createdAt: messages[0].createdAt,

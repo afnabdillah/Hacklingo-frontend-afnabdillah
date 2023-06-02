@@ -24,20 +24,26 @@ import showToast from "../../helper/showToast";
 const { height } = Dimensions.get("window");
 
 function CreateGroupChat({ route, navigation }) {
+
   const {
     groupId,
     groupName: initialGroupName,
     groupMembers,
     editMode,
   } = route.params || {};
+
   const [groupName, setGroupName] = useState(initialGroupName || "");
+
   const [search, setSearch] = useState("");
+  
   const [users, setUsers] = useState([]);
+  
   const [isProGroup, setIsProGroup] = useState(false);
-  const [selectedUsers, setSelectedUsers] = useState(
-    new Set(groupMembers || [])
-  );
+  
+  const [selectedUsers, setSelectedUsers] = useState(new Set(groupMembers || []));
+  
   const [selectedLanguage, setSelectedLanguage] = useState("");
+  
   const languages = [
     "English",
     "German/Deutsch",
@@ -47,7 +53,9 @@ function CreateGroupChat({ route, navigation }) {
     "Dutch/Nederlands",
     "Spanish/Español",
   ];
+
   const userEmail = useSelector((state) => state.authReducer.email);
+
   const loadingUsersBySearch = useSelector(
     (state) => state.usersReducer.status.usersBySearch
   );
@@ -55,6 +63,7 @@ function CreateGroupChat({ route, navigation }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    
     const fetchEmail = async () => {
       setSelectedUsers((prevSelectedUsers) => {
         const newSelectedUsers = new Set(prevSelectedUsers);
@@ -118,30 +127,41 @@ function CreateGroupChat({ route, navigation }) {
 
   const onCreateGroupChat = async () => {
     if (groupName !== "" && selectedLanguage !== "") {
-      const groupData = {
-        groupName,
-        users: Array.from(selectedUsers.add(userEmail)), // Include the current user's email
-        languages: selectedLanguage,
-        createdAt: new Date(),
-        messages: [],
-        admin: userEmail,
-        isProGroup,
-        requestJoin: [],
-      };
-
-      const groupChatsRef = collection(database, "groupChats");
-      showToast(
-        "success",
-        "Create new group success!",
-        "You have created a new group!"
-      );
-      if (editMode) {
-        const groupDocRef = doc(database, "groupChats", groupId);
-        await setDoc(groupDocRef, groupData);
-        navigation.goBack();
-      } else {
-        await addDoc(groupChatsRef, groupData);
-        navigation.goBack();
+      try {
+        const groupData = {
+          groupName,
+          users: Array.from(selectedUsers.add(userEmail)), // Include the current user's email
+          languages: selectedLanguage,
+          createdAt: new Date(),
+          messages: [],
+          admin: userEmail,
+          isProGroup,
+          requestJoin: [],
+        };
+  
+        const groupChatsRef = collection(database, "groupChats");
+  
+        if (editMode) {
+          const groupDocRef = doc(database, "groupChats", groupId);
+          await setDoc(groupDocRef, groupData);
+          navigation.goBack();
+        } else {
+          await addDoc(groupChatsRef, groupData);
+          navigation.goBack();
+        }
+  
+        showToast(
+          "success",
+          "Create new group success!",
+          "You have created a new group!"
+        );
+      } catch(err) {
+        showToast(
+          "error",
+          "Create group error",
+          "There was an error while creating a group"
+        );
+        console.log(err, "<<< this is error while creating group");
       }
     } else {
       showToast(
@@ -169,12 +189,8 @@ function CreateGroupChat({ route, navigation }) {
             <SelectDropdown
               data={languages}
               defaultButtonText={"Select Language"}
-              buttonTextAfterSelection={(selectedItem, index) => {
-                return selectedItem;
-              }}
-              rowTextForSelection={(item, index) => {
-                return item;
-              }}
+              buttonTextAfterSelection={selectedItem => selectedItem}
+              rowTextForSelection={item => item}
               buttonStyle={styles.dropdown1BtnStyle}
               buttonTextStyle={styles.dropdown1BtnTxtStyle}
               renderDropdownIcon={(isOpened) => {
@@ -207,6 +223,7 @@ function CreateGroupChat({ route, navigation }) {
           }}
           inputStyle={{ fontSize: 14, alignSelf: "center" }}
         />
+
         {loadingUsersBySearch === "loading" ? (
           <View
             style={{
@@ -242,6 +259,7 @@ function CreateGroupChat({ route, navigation }) {
             )}
           />
         )}
+        
         <TouchableOpacity
           style={styles.createButton}
           onPress={onCreateGroupChat}

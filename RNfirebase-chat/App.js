@@ -1,5 +1,5 @@
 import "expo-dev-client";
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { View, ActivityIndicator } from "react-native";
@@ -12,7 +12,7 @@ import GroupChat from "./screens/chats/GroupChat";
 import Groups from "./screens/chats/Group";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { HeaderChat } from "./components/chats/HeaderChat";
+import HeaderChat from "./components/chats/HeaderChat";
 import CreateGroupChat from "./screens/chats/CreateGroupChat";
 import Profile from "./screens/chats/Profile";
 import { onAuthStateChanged } from "@firebase/auth";
@@ -27,7 +27,7 @@ import VideoChat from "./screens/chats/VideoChat";
 import Home from "./screens/homepage/Home";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { loginSuccess } from "./stores/authSlice";
-import MyStack from "./components/forums/stack";
+import MyStack from "./components/forums/Stacks";
 import { Ionicons } from "@expo/vector-icons";
 import RequestJoin from "./screens/chats/RequestJoin";
 import { FontAwesome } from "@expo/vector-icons";
@@ -35,11 +35,13 @@ import { FontAwesome } from "@expo/vector-icons";
 import LoginView from "./screens/login/Login";
 import SignUpView from "./screens/login/Signup";
 import GrammarCheckScreen from "./screens/chats/GrammarCheck";
-import Article from "./screens/forums/Article";
+import Article from "./screens/homepage/Article";
 import showToast from "./helper/showToast";
 
 const BottomTab = createBottomTabNavigator();
+
 const Stack = createStackNavigator();
+
 const TopTab = createMaterialTopTabNavigator();
 
 function ChatBottomTabNavigator() {
@@ -117,6 +119,7 @@ function ChatBottomTabNavigator() {
     </SafeAreaView>
   );
 }
+
 function ChatStack() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -163,6 +166,7 @@ function AuthStack() {
 }
 
 const AuthenticatedUserProvider = ({ children }) => {
+
   const [user, setUser] = useState(null);
 
   return (
@@ -173,11 +177,21 @@ const AuthenticatedUserProvider = ({ children }) => {
 };
 
 function RootNavigator() {
+
   const { user, setUser } = useContext(AuthenticatedUserContext);
+  
   const [isLoading, setIsLoading] = useState(true);
+  
   const userId = useSelector((state) => state.authReducer.userId);
+  
   const dispatch = useDispatch();
+  
   useEffect(() => {
+
+    /* 
+      This hook checks the whether the user has already logged in before based on the async storage,
+      If they're logged in then the async storage data will be saved to redux
+    */
     const checkAsyncStorage = async () => {
       const userData = await AsyncStorage.multiGet([
         "userid",
@@ -201,7 +215,8 @@ function RootNavigator() {
           deviceToken: userData[7][1]
         })
       );
-
+      
+      // Change the state based on whether the user is logged in or not
       const unsubscribeAuth = onAuthStateChanged(auth, (authenticatedUser) => {
         authenticatedUser ? setUser(authenticatedUser) : setUser(null);
         setIsLoading(false);
@@ -223,6 +238,7 @@ function RootNavigator() {
 
   return (
     <NavigationContainer>
+      {/* If the user is logged in, they will automatically be redirected to Chat Stack */}
       {userId ? (
         <Stack.Navigator>
           <Stack.Screen
@@ -257,7 +273,7 @@ export default function App() {
     if (requestUserPermission()) {
       // Get the firebase cloud messaging token for the device
       messaging().getToken().then(token => {
-        console.log(token, "<<<<< this is the firebase cloud messaging token for your device");
+        // console.log(token, "<<<<< this is the firebase cloud messaging token for your device");
       })
     } else {
       console.log("failed token status", authStatus);
@@ -277,7 +293,7 @@ export default function App() {
 
     // Handle notification on the foreground
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      showToast("info", remoteMessage.notification.title, remoteMessage.notification.body);
+      // showToast("info", remoteMessage.notification.title, remoteMessage.notification.body);
     });
 
     return unsubscribe;

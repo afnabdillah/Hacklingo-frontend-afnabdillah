@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
-import { createDrawerNavigator } from "@react-navigation/drawer";
+import { useEffect } from "react";
 import HomeScreen from "../../screens/forums/HomeScreen";
 import HeaderForum from "./Header";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllForums } from "../../stores/forumsSlice";
 import { View, ActivityIndicator } from "react-native";
@@ -9,7 +9,7 @@ import { Image } from "react-native";
 
 const Drawer = createDrawerNavigator();
 
-export default function DrawerNav() {
+const DrawerNav = () => {
   
   const dispatch = useDispatch();
 
@@ -69,3 +69,5 @@ export default function DrawerNav() {
     </Drawer.Navigator>
   );
 }
+
+export default DrawerNav;

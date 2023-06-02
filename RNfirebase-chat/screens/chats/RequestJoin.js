@@ -11,14 +11,19 @@ const UserCard = ({ user, groupId }) => {
     const dispatch = useDispatch();
 
     const acceptRequest = async () => {
+        // Get group data from cloud firestore
         const groupDocRef = doc(database, 'groupChats', groupId);
         await updateDoc(groupDocRef, {
             requestJoin: arrayRemove(user),
             users: arrayUnion(user.email),
         });
+
+        // Get the data of the person who wants to join
         const joineeData = await dispatch(
             fetchOtherUserByEmail(user.email)
         ).unwrap();
+
+        // Send the push notif to the joinee
         if (joineeData.deviceToken) {
             sendPushNotification(
               joineeData.deviceToken,

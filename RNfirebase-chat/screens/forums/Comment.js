@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
-import logo from "../../assets/HACKLINGO.png"
-export default function Comments() {
+import logo from "../../assets/HACKLINGO.png";
+
+
+const Comments = () => {
   const [title, setTitle] = useState('');
 
   const onHandleCreate = () => {
@@ -62,3 +64,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default Comments;

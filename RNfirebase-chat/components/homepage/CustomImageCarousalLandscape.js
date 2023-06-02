@@ -8,25 +8,37 @@ import Animated, {
   useAnimatedRef,
 } from 'react-native-reanimated';
 import Pagination from './pagination';
+
 const CustomImageCarousal = ({ data, autoPlay, pagination, navigateToGroups }) => {
+  
   const scrollViewRef = useAnimatedRef(null);
+  
   const interval = useRef();
+  
   const [isAutoPlay, setIsAutoPlay] = useState(autoPlay);
+  
   const [newData] = useState([
     { key: 'spacer-left' },
     ...data,
     { key: 'spacer-right' },
   ]);
+  
   const { width } = useWindowDimensions();
+  
   const SIZE = width * 0.7;
+  
   const SPACER = (width - SIZE) / 2;
+  
   const x = useSharedValue(0);
+  
   const offSet = useSharedValue(0);
+  
   const onScroll = useAnimatedScrollHandler({
     onScroll: event => {
       x.value = event.contentOffset.x;
     },
   });
+  
   const getStyleForIndex = (index) => {
     const style = useAnimatedStyle(() => {
       const scale = interpolate(
@@ -100,8 +112,6 @@ const CustomImageCarousal = ({ data, autoPlay, pagination, navigateToGroups }) =
   );
 };
 
-export default CustomImageCarousal;
-
 const styles = StyleSheet.create({
   imageContainer: {
     borderRadius: 18,
@@ -114,3 +124,5 @@ const styles = StyleSheet.create({
     aspectRatio: 16 / 9,
   },
 });
+
+export default CustomImageCarousal;

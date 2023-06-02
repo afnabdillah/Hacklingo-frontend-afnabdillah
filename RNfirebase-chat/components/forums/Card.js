@@ -4,7 +4,8 @@ import { FontAwesome } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 const CardForum = ({ navigation, post }) => {
-  const lebar = Dimensions.get("window").height;
+  
+  const height = Dimensions.get("window").height;
 
   return (
     <TouchableOpacity
@@ -24,7 +25,7 @@ const CardForum = ({ navigation, post }) => {
           {post.postImageUrl && (
             <Image
               source={{ uri: post.postImageUrl }}
-              style={{ width: "100%", height: lebar * 0.3, marginVertical: 20 }}
+              style={{ width: "100%", height: height * 0.3, marginVertical: 20 }}
             />
           )}
           <Text variant="bodyMedium" style={{color: "black"}}>{post.content.length >= 200 ? post.content.slice(0,200) + "..." : post.content}</Text>

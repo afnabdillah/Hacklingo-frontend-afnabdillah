@@ -2,8 +2,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 async function saveToAsyncStorage(data) {
   try {
-    // console.log(JSON.stringify(data.targetLanguange, "<<<< ini targetLanguage di save async storage"));
-    console.log(data.deviceToken, "<<<<< ini isi deviceToken di async storage");
     const storageItems = [
       ["username", data.username],
       ["email", data.email],

@@ -6,8 +6,7 @@ import Toast, { BaseToast, ErrorToast, InfoToast } from 'react-native-toast-mess
 */
 const toastConfig = {
   /*
-    Overwrite 'success' type,
-    by modifying the existing `BaseToast` component
+    Modification of success toast
   */
   success: (props) => (
     <BaseToast
@@ -22,8 +21,7 @@ const toastConfig = {
     />
   ),
   /*
-    Overwrite 'error' type,
-    by modifying the existing `ErrorToast` component
+    Modification of error toast
   */
   error: (props) => (
     <ErrorToast

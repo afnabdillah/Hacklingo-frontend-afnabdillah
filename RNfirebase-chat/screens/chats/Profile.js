@@ -50,6 +50,8 @@ export default function Profile() {
   async function handlePress() {
     // Kalau merge ambil yang ini guys
     try {
+
+      // Create the form data to insert image and update the current user
       const formData = new FormData();
       if (Object.keys(selectedImageData).length !== 0) {
         formData.append("file", selectedImageData);

@@ -6,12 +6,17 @@ import { fetchArticleById } from "../../stores/articlesSlices";
 import showToast from "../../helper/showToast";
 
 const Article = () => {
+
   const route = useRoute();
+  
   const { articleId } = route.params;
+  
   const dispatch = useDispatch();
+  
   const articleDetails = useSelector(
     (state) => state.articlesReducer.articleDetails
   );
+  
   const fetchArticleDetailsStatus = useSelector(
     (state) => state.articlesReducer.status.articleDetails
   );

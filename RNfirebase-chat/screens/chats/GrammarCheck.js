@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import axios from "axios";
 import HeaderDefault from "../../components/forums/HeaderDefault";
@@ -17,13 +17,12 @@ import Constants from "expo-constants";
 import showToast from "../../helper/showToast";
 
 const GrammarCheckScreen = () => {
-
   const [inputText, setInputText] = useState("");
-  
+
   const [correctedText, setCorrectedText] = useState("");
-  
+
   const [loading, setLoading] = useState("idle");
-  
+
   const apiKey = Constants.manifest.extra.grammarApiKey;
 
   const handleGrammarCheck = async () => {
@@ -57,7 +56,11 @@ const GrammarCheckScreen = () => {
         setLoading("idle");
       }
     } catch (error) {
-      showToast("error", "Grammar Check Error", "There was an error when fetching grammar check result");
+      showToast(
+        "error",
+        "Grammar Check Error",
+        "There was an error when fetching grammar check result"
+      );
       console.error("Error fetching grammar check results:", error);
     }
   };
@@ -111,7 +114,9 @@ const GrammarCheckScreen = () => {
               transform: [{ translateX: -20 }, { translateY: -20 }],
             }}
           >
-            {loading === "loading" && <ActivityIndicator size="large" color="#0000ff" />}
+            {loading === "loading" && (
+              <ActivityIndicator size="large" color="#0000ff" />
+            )}
           </View>
         </View>
       </ScrollView>
