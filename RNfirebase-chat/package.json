@@ -57,7 +57,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.22.1"
   },
   "private": true
 }
