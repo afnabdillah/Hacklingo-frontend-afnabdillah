@@ -42,18 +42,6 @@ const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 
-function ChatTopTabNavigator() {
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <HeaderChat />
-      <TopTab.Navigator screenOptions={{ headerShown: false }}>
-        <TopTab.Screen name="Find Contacts" component={Contacts} />
-        <TopTab.Screen name="Find Groups" component={Groups} />
-      </TopTab.Navigator>
-    </SafeAreaView>
-  );
-}
-
 function ChatBottomTabNavigator() {
   return (
     <SafeAreaView style={{ flex: 1 }}>

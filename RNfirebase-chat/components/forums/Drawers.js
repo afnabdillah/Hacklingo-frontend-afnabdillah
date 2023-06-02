@@ -10,7 +10,9 @@ import { Image } from "react-native";
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNav() {
+  
   const dispatch = useDispatch();
+
   const forums = useSelector((state) => state.forumsReducer.forums);
 
   useEffect(() => {

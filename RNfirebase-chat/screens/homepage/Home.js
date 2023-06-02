@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import CustomImageCarousalLandscape from "../../components/landingPage/CustomImageCarousalLandscape";
-import Carousel from "../../components/landingPage/Carousel";
+import CustomImageCarousalLandscape from "../../components/homepage/CustomImageCarousalLandscape";
+import Carousel from "../../components/homepage/Carousel";
 import HeaderDefault from "../../components/forums/HeaderDefault";
 import { fetchArticles } from "../../stores/articlesSlices";
 import showToast from "../../helper/showToast";
