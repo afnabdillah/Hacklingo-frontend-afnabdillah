@@ -77,7 +77,7 @@ const Carousel = ({ data, onPress }) => {
 };
 
 const styles = StyleSheet.create({
-  dotView: { flexDirection: 'row', justifyContent: 'center' },
+  dotView: { flexDirection: 'row', justifyContent: 'center', },
 });
 
 export default Carousel;

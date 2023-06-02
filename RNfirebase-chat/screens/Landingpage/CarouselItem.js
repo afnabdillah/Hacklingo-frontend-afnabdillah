@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, StyleSheet, Text, Image, Dimensions, TouchableOpacity } from 'react-native'
 
-const { width, height } = Dimensions.get('window')
+const { width, height } = Dimensions.get('window');
 
 
 const CarouselItem = ({ item, onPress }) => {
@@ -10,7 +10,7 @@ const CarouselItem = ({ item, onPress }) => {
             <Image style={styles.image} source={{ uri: item.url }} />
             <View style={styles.textView}>
                 <Text style={styles.itemTitle}> {item.title}</Text>
-                {/* <Text style={styles.itemDescription}>{item.description}</Text> */}
+                <Text style={styles.itemDescription}>{item.description.slice(0,100) + "..."}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     cardView: {
         flex: 1,
         width: width - 20,
-        height: height / 3,
+        height: height / 3 + 10,
         backgroundColor: 'white',
         margin: 10,
         borderRadius: 10,
@@ -32,10 +32,8 @@ const styles = StyleSheet.create({
     },
 
     textView: {
-        position: 'absolute',
-        bottom: 10,
-        margin: 10,
-        left: 5,
+        marginVertical: 5,
+        marginHorizontal: 10,
     },
     image: {
         width: width - 20,
@@ -44,23 +42,22 @@ const styles = StyleSheet.create({
     },
     itemTitle: {
         color: 'black',
-        fontSize: 22,
-        // shadowColor: '#000',
-        shadowOffset: { width: 0.8, height: 0.8 },
-        // shadowOpacity: 1,
-        shadowRadius: 3,
+        fontSize: 18,
+        // backgroundColor: "red",
+        // shadowOffset: { width: 0.8, height: 0.8 },
+        // shadowRadius: 3,
         marginBottom: 5,
-        fontWeight: "bold",
-        elevation: 5
+        fontWeight: 600,
+        // elevation: 5
     },
     itemDescription: {
         color: 'black',
         fontSize: 12,
-        // shadowColor: '#000',
+        paddingLeft: 3,
+        // backgroundColor: "red",
         shadowOffset: { width: 0.8, height: 0.8 },
-        // shadowOpacity: 1,
         shadowRadius: 3,
-        elevation: 5
+        // elevation: 5
     }
 })
 

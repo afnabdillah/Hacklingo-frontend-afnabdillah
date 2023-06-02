@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "846013487264",
+    "project_id": "hacklingo-a4f60",
+    "storage_bucket": "hacklingo-a4f60.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:846013487264:android:21dc83406666a642f411c5",
+        "android_client_info": {
+          "package_name": "com.hacklingo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "846013487264-5rj6236anqu2t354hqpn6bi7l4m0rrmb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hacklingo",
+            "certificate_hash": "c6ea8340ba7ee9fe52a60497ccfa9d674399de4c"
+          }
+        },
+        {
+          "client_id": "846013487264-un2oc13heddlg5rs4qa3nq8stclau693.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hacklingo",
+            "certificate_hash": "f208a0a16e7443191124bb84232cef19b7799e58"
+          }
+        },
+        {
+          "client_id": "846013487264-sdq3ootn2ojcvk1bc5jadt64ffqejf6h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyVlK8D6rlhPp9-Z08eKVNdhMAwIBXATU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "846013487264-sdq3ootn2ojcvk1bc5jadt64ffqejf6h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

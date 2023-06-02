@@ -3,7 +3,6 @@ import React, {
   useEffect,
   useLayoutEffect,
   useCallback,
-  useContext,
 } from "react";
 import bg from "../assets/BG.png";
 import {
@@ -13,8 +12,10 @@ import {
   ImageBackground,
   StyleSheet,
   Image,
+  Pressable,
+  Dimensions
 } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   GiftedChat,
   Bubble,
@@ -23,21 +24,13 @@ import {
 } from "react-native-gifted-chat";
 import {
   getFirestore,
-  collection,
-  addDoc,
-  orderBy,
-  query,
   onSnapshot,
-  where,
   updateDoc,
   arrayUnion,
   doc,
+  getDoc,
 } from "firebase/firestore";
-import { signOut } from "firebase/auth";
-import AuthenticatedUserContext from "../helper/AuthenticatedUserContext";
-import { auth, database } from "../config/firebase";
-import { getDocs } from "firebase/firestore";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { database } from "../config/firebase";
 import {
   MaterialIcons,
   Entypo,
@@ -47,19 +40,26 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { PopChatMenu } from "./HeadersChat/PopChatMenu";
-import * as ImagePicker from "expo-image-picker";
+import pickImage from "../helper/imagePicker";
+import { fetchOtherUsersByEmail, uploadChatImage } from "../stores/usersSlice";
+import showToast from "../helper/showToast";
+import sendPushNotification from "../helper/sendPushNotification";
+
+const width = Dimensions.get("window").width;
 
 export default function GroupChat({ route, navigation }) {
   const userEmail = useSelector((state) => state.authReducer.email);
   const username = useSelector((state) => state.authReducer.username);
-  const userProfileImageUrl = useSelector(state => state.authReducer.profileImageUrl);
+  const userProfileImageUrl = useSelector(
+    (state) => state.authReducer.profileImageUrl
+  );
   const [messages, setMessages] = useState([]);
   const { groupId, groupName } = route.params;
-  const [currentUsername, setCurrentUsername] = useState(null);
   const [groupLanguage, setGroupLanguage] = useState("");
   const [groupMembers, setGroupMembers] = useState([]);
   const [groupAdmin, setGroupAdmin] = useState(null);
+  const [selectedImage, setSelectedImage] = useState("");
+  const [selectedImageData, setSelectedImageData] = useState({});
   const mergeMessages = (oldMessages, newMessages) => {
     const allMessages = [...oldMessages, ...newMessages];
     const uniqueMessages = allMessages.filter(
@@ -69,6 +69,8 @@ export default function GroupChat({ route, navigation }) {
 
     return uniqueMessages.sort((a, b) => b.createdAt - a.createdAt);
   };
+
+  const dispatch = useDispatch();
   useEffect(() => {
     if (!groupId) {
       return;
@@ -84,13 +86,14 @@ export default function GroupChat({ route, navigation }) {
             _id: message._id,
             createdAt: message.createdAt.toDate(),
             text: message.text,
+            image: message.image,
             user: message.user,
           }));
           setMessages((messages) => mergeMessages(messages, fetchedMessages));
         } else {
           setMessages([]);
         }
-        // console.log(data.users[0], "<<< ini isi data users");
+
         setGroupLanguage(data.languages);
         setGroupMembers(data.users || []);
         setGroupAdmin(data.admin || null);
@@ -100,6 +103,12 @@ export default function GroupChat({ route, navigation }) {
       unsubscribe();
     };
   }, [groupId]);
+
+  const selectImage = async () => {
+    const imageData = await pickImage();
+    setSelectedImage(imageData?.uri || "");
+    setSelectedImageData(imageData || {});
+  };
 
   const onSend = useCallback(
     (messages = []) => {
@@ -111,15 +120,22 @@ export default function GroupChat({ route, navigation }) {
       setMessages((previousMessages) =>
         GiftedChat.append(previousMessages, messages)
       );
-      const { _id, createdAt, text, user } = messages[0];
+
+      setSelectedImage("");
+      setSelectedImageData({});
+
+      const { _id, createdAt, text, image } = messages[0];
       const messageObj = {
         _id,
         createdAt,
         text,
+        image,
         user: {
           _id: userEmail,
           username: username,
-          avatar: userProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
+          avatar:
+            userProfileImageUrl ||
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
         },
       };
 
@@ -127,9 +143,23 @@ export default function GroupChat({ route, navigation }) {
       updateDoc(groupDocRef, {
         messages: arrayUnion(messageObj),
       });
+
+      // Send the push notifications to multiple people
+      getDoc(groupDocRef)
+      .then(async (snapshot) => {
+        const groupMemberEmails = snapshot.data().users;
+        const membersData = await dispatch(fetchOtherUsersByEmail(groupMemberEmails)).unwrap();
+        const deviceTokens = membersData.filter(el => el.email !== userEmail).map(el => el.deviceToken);
+        for(const deviceToken of deviceTokens) {
+          if (deviceToken) {
+            sendPushNotification(deviceToken, username, messages[0].text);
+          }
+        }
+      })
     },
     [userEmail, groupId, username]
   );
+
   const renderUsername = (currentMessage) => {
     return (
       <Text style={{ fontSize: 12, color: "#777", marginBottom: 5 }}>
@@ -137,6 +167,7 @@ export default function GroupChat({ route, navigation }) {
       </Text>
     );
   };
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -222,10 +253,32 @@ export default function GroupChat({ route, navigation }) {
     );
   };
 
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground source={bg} style={{ flex: 1 }}>
+        {selectedImage && (
+          <View style={styles.previewImageContainer}>
+            <View style={styles.previewImage}>
+              <Image
+                source={{ uri: selectedImage }}
+                style={{
+                  height: "100%",
+                  aspectRatio: 1,
+                  resizeMode: "cover",
+                  borderRadius: 20,
+                }}
+              />
+            </View>
+            <Pressable
+              onPress={() => {
+                setSelectedImage("");
+                setSelectedImageData({});
+              }}
+            >
+              <AntDesign name="close" size={24} color="#babdb7" />
+            </Pressable>
+          </View>
+        )}
         <View style={{ flex: 1 }}>
           <GiftedChat
             messages={messages}
@@ -234,20 +287,19 @@ export default function GroupChat({ route, navigation }) {
             user={{
               _id: userEmail,
               username: username,
-              avatar: userProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
+              avatar:
+                userProfileImageUrl ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
             }}
             renderActions={(props) => (
               <Actions
-                {...props}
-                containerStyle={{
-                  position: "absolute",
-                  right: 50,
-                  bottom: 5,
-                  zIndex: 9999,
-                }}
-                // onPressActionButton={selectImage}
-                icon={() => <Ionicons name="camera" size={30} color={"grey"} />}
-              />
+              {...props}
+              containerStyle={{
+                alignSelf: "center",
+              }}
+              onPressActionButton={selectImage}
+              icon={() => <Ionicons name="camera" size={30} color={"grey"} />}
+            />
             )}
             timeTextStyle={{ right: { color: "grey" } }}
             renderSend={(props) => {
@@ -264,21 +316,39 @@ export default function GroupChat({ route, navigation }) {
                     marginBottom: 5,
                     paddingRight: 5,
                   }}
-                  onPress={() => {
-                    if (text && onSend) {
-                      onSend(
-                        {
-                          text: text.trim(),
-                          user,
-                          _id: messageIdGenerator(),
-                        },
-                        true
-                      );
+                  onPress={async () => {
+                    if ((text || selectedImage) && onSend) {
+                      try {
+  
+                        // If the user wants to upload an image, upload first before sending
+                        let imageUrl = "";
+                        if (selectedImage) {
+                          imageUrl = (
+                            await dispatch(
+                              uploadChatImage(selectedImageData)
+                            ).unwrap()
+                          ).chatImageUrl;
+                        }
+  
+                        // After the process, pass the imageUrl as parameter in messages
+                        onSend(
+                          {
+                            text: text.trim(),
+                            image: imageUrl,
+                            user,
+                            _id: messageIdGenerator(),
+                          },
+                          true
+                        );
+                      } catch (err) {
+                        console.log(err, "<<<< ini error send image");
+                        showToast("error", "There was a problem when sending your message", "Please try again later");
+                      }
                     }
                   }}
                 >
                   <MaterialCommunityIcons
-                    name={text && onSend ? "send" : "microphone"}
+                    name={(text || selectedImage) && onSend ? "send" : "microphone"}
                     size={23}
                     color={"black"}
                   />
@@ -324,6 +394,28 @@ const styles = StyleSheet.create({
     padding: 5,
     marginHorizontal: 10,
     alignItems: "center",
+    borderRadius: 20,
+  },
+  previewImageContainer: {
+    position: "absolute",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    bottom: 55,
+    width: width * 0.95,
+    height: 160,
+    backgroundColor: "#dcf8c6",
+    borderColor: "#bff099",
+    borderStyle: "solid",
+    borderWidth: 3,
+    marginHorizontal: 10,
+    zIndex: 9999,
+    borderRadius: 20,
+    padding: 10,
+  },
+  previewImage: {
+    height: "100%",
+    aspectRatio: 1,
+    backgroundColor: "white",
     borderRadius: 20,
   },
   input: {

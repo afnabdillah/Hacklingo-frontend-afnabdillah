@@ -6,15 +6,15 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  Dimensions
+  Pressable
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUsersByNativeLanguage } from "../stores/usersSlice";
+import { deleteUsersBySearch, fetchUsersByNativeLanguage } from "../stores/usersSlice";
 import showToast from "../helper/showToast";
+import { AntDesign } from '@expo/vector-icons';
 
 function Contacts({ navigation }) {
   const dispatch = useDispatch();
-  // const height = Dimensions.get("screen").height;
 
   const usersBySearch = useSelector(
     (state) => state.usersReducer.usersBySearch
@@ -82,10 +82,13 @@ function Contacts({ navigation }) {
       contentContainerStyle={{ backgroundColor: "white" }}
     >
       {/* Kalau merge ambil yang ini guys */}
-      <View style={{flex: 1, minHeight: 580}}>
+      <View style={{flex: 1, minHeight: 580,}}>
       {contactsList.length !== 0 && (
-        <View>
+        <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingRight: 10}}>
           <Text style={styles.sectionTitle}>Users By Search</Text>
+          <Pressable onPress={() => dispatch(deleteUsersBySearch())} style={[styles.sectionTitle, {height: 25, aspectRatio: 1}]}>
+            <AntDesign name="closesquare" size={25} color="black" />
+          </Pressable>
         </View>
       )}
       {contactsList.length !== 0 &&
@@ -98,7 +101,9 @@ function Contacts({ navigation }) {
                   navigation.navigate("Chat", {
                     recipientEmail: contact.email,
                     recipientName: contact.username,
+                    recipientAvatar: contact.profileImageUrl,
                     senderEmail: userEmail,
+                    recipientDeviceToken: contact.deviceToken,
                   });
                 }}
               >
@@ -151,7 +156,9 @@ function Contacts({ navigation }) {
                 navigation.navigate("Chat", {
                   recipientEmail: contact.email,
                   recipientName: contact.username,
+                  recipientAvatar: contact.profileImageUrl,
                   senderEmail: userEmail,
+                  recipientDeviceToken: contact.deviceToken,
                 });
               }}
             >

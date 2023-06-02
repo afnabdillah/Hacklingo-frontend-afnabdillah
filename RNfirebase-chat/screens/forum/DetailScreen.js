@@ -116,7 +116,7 @@ export default function DetailScreen({ navigation, route }) {
           )}
           {/* content */}
           <View style={{ marginHorizontal: 20, marginVertical: 10 }}>
-            <Text style={{ color: "#615d5d", fontWeight: "300", fontSize: 15 }}>
+            <Text style={{ color: "black", fontWeight: "300", fontSize: 15 }}>
               {postDetails.content}
             </Text>
           </View>

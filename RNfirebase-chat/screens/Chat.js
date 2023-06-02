@@ -2,7 +2,6 @@ import React, {
   useState,
   useEffect,
   useCallback,
-  useContext,
   useLayoutEffect,
 } from "react";
 import {
@@ -10,8 +9,8 @@ import {
   Text,
   ImageBackground,
   StyleSheet,
-  Button,
-  Platform,
+  ActivityIndicator,
+  Pressable,
 } from "react-native";
 import {
   Actions,
@@ -20,20 +19,14 @@ import {
   InputToolbar,
 } from "react-native-gifted-chat";
 import {
-  collection,
-  addDoc,
-  orderBy,
-  query,
   onSnapshot,
-  where,
   doc,
-  getDocs,
   getDoc,
   setDoc,
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import { auth, database } from "../config/firebase";
+import { database } from "../config/firebase";
 import { useDispatch, useSelector } from "react-redux";
 import bg from "../assets/BG.png";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -44,22 +37,26 @@ import {
   Ionicons,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { Image } from "react-native";
+import { Image, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PopChatMenu } from "./HeadersChat/PopChatMenu";
 import pickImage from "../helper/imagePicker";
+import { fetchOtherUserByEmail, uploadChatImage } from "../stores/usersSlice";
+import sendPushNotification from "../helper/sendPushNotification";
+
+const width = Dimensions.get("window").width;
 
 export default function Chat({ route }) {
-
-  const senderEmail = useSelector(state => state.authReducer.email);
-  
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedImageView, setSeletedImageView] = useState("");
-  const [userEmail, setUserEmail] = useState("");
-  const [username, setUsername] = useState("");
+  const senderEmail = useSelector((state) => state.authReducer.email);
   const [messages, setMessages] = useState([]);
-  const { recipientEmail, recipientName, recipientAvatar } = route.params;
-  const [currentUserData, setCurrentUserData] = useState(null);
+  const [selectedImage, setSelectedImage] = useState("");
+  const [selectedImageData, setSelectedImageData] = useState({});
+  const {
+    recipientEmail,
+    recipientName,
+    recipientAvatar,
+    recipientDeviceToken
+  } = route.params;
   const [roomId, setRoomId] = useState(null);
   const currentUserUsername = useSelector(
     (state) => state.authReducer.username
@@ -67,6 +64,12 @@ export default function Chat({ route }) {
   const currentUserProfileImageUrl = useSelector(
     (state) => state.authReducer.profileImageUrl
   );
+
+  const loadingRecipientStatus = useSelector(
+    (state) => state.usersReducer.status.userByEmail
+  );
+
+  const dispatch = useDispatch();
 
   const mergeMessages = (oldMessages, newMessages) => {
     const allMessages = [...oldMessages, ...newMessages];
@@ -77,6 +80,7 @@ export default function Chat({ route }) {
 
     return uniqueMessages.sort((a, b) => b.createdAt - a.createdAt);
   };
+
   const generateRoomId = (email1, email2) => {
     return email1 < email2 ? `${email1}_${email2}` : `${email2}_${email1}`;
   };
@@ -102,54 +106,84 @@ export default function Chat({ route }) {
     };
   }, [recipientEmail, senderEmail]);
 
+  const selectImage = async () => {
+    const imageData = await pickImage();
+    setSelectedImage(imageData?.uri || "");
+    setSelectedImageData(imageData || {});
+  };
+
   const onSend = useCallback(
     async (messages = []) => {
       if (!currentUserUsername) {
         console.error("User data not loaded yet. Please try again later.");
         return;
       }
+
+      // Render the message on screen
       setMessages((previousMessages) =>
         GiftedChat.append(previousMessages, messages)
       );
+      setSelectedImage("");
+      setSelectedImageData({});
 
       const roomId = generateRoomId(senderEmail, recipientEmail);
       const roomDocRef = doc(database, "personalChats", roomId);
       const roomDocSnapshot = await getDoc(roomDocRef);
 
+      // Generate a new Room if it doesn't exist yet
       if (!roomDocSnapshot.exists()) {
         await setDoc(roomDocRef, {
           users: [
             {
               email: senderEmail,
               username: currentUserUsername,
-              avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
+              avatar:
+                currentUserProfileImageUrl ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
             },
             {
               email: recipientEmail,
               username: recipientName,
-              avatar: recipientAvatar || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA", // Set the recipient avatar if available
+              avatar:
+                recipientAvatar ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA", // Set the recipient avatar if available
             },
           ],
           messages: [],
         });
       }
+
       const message = {
         _id: messages[0]._id,
         createdAt: messages[0].createdAt,
         text: messages[0].text,
+        image: messages[0].image,
         user: {
           _id: senderEmail,
           username: currentUserUsername,
-          avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
+          avatar:
+            currentUserProfileImageUrl ||
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
         },
       };
 
       await updateDoc(roomDocRef, {
         messages: arrayUnion(message),
       });
-    }, [currentUserUsername]);
 
-  const navigation = useNavigation()
+      // Sending notification to the other user
+      if (recipientDeviceToken) {
+        sendPushNotification(
+          recipientDeviceToken,
+          currentUserUsername,
+          messages[0].text
+        );
+      }
+    },
+    [currentUserUsername]
+  );
+
+  const navigation = useNavigation();
 
   const goToVideoChat = () => {
     const tempId = generateRoomId(senderEmail, recipientEmail);
@@ -159,15 +193,17 @@ export default function Chat({ route }) {
     });
   };
 
-  const selectImage = async () => {
-    const imageData = await pickImage();
-    console.log(imageData, "<<<< ini imageData");
-  }
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 5, paddingRight: 15 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 5,
+            paddingRight: 15,
+          }}
+        >
           <TouchableOpacity>
             <MaterialIcons
               onPress={goToVideoChat}
@@ -180,52 +216,95 @@ export default function Chat({ route }) {
         </View>
       ),
       headerTitle: () => (
+        // This is the Chat Header
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity onPress={() => navigation.navigate("ChatList")}>
             <AntDesign name="arrowleft" size={30} color="black" />
           </TouchableOpacity>
           <Image
-            source={{ uri: recipientAvatar || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA" }}
+            source={{
+              uri:
+                recipientAvatar ||
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
+            }}
             style={styles.image}
           />
-          <Text style={{ fontStyle: "italic", fontSize: 25 }}>
+          <Text style={{ fontStyle: "italic", fontSize: 20 }}>
             {recipientName}
           </Text>
         </View>
       ),
       headerLeft: () => {
-        <View >
-        </View>
-      }
+        <View></View>;
+      },
     });
   }, []);
 
+  if (loadingRecipientStatus === "loading") {
+    return (
+      <View style={{ flex: 1 }}>
+        <ImageBackground
+          source={bg}
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" />
+        </ImageBackground>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ImageBackground source={bg} style={{ flex: 1 }}>
+      <ImageBackground source={bg} style={{ flex: 1, position: "relative" }}>
+        {selectedImage && (
+          <View style={styles.previewImageContainer}>
+            <View style={styles.previewImage}>
+              <Image
+                source={{ uri: selectedImage }}
+                style={{
+                  height: "100%",
+                  aspectRatio: 1,
+                  resizeMode: "cover",
+                  borderRadius: 20,
+                }}
+              />
+            </View>
+            <Pressable
+              onPress={() => {
+                setSelectedImage("");
+                setSelectedImageData({});
+              }}
+            >
+              <AntDesign name="close" size={24} color="#babdb7" />
+            </Pressable>
+          </View>
+        )}
         <GiftedChat
           messages={messages}
           showAvatarForEveryMessage={true}
-          onSend={(messages) => onSend(messages)}
+          onSend={(messages) => {
+            onSend(messages);
+          }}
           user={{
             _id: senderEmail,
             username: currentUserUsername,
-            avatar: currentUserProfileImageUrl || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
+            avatar:
+              currentUserProfileImageUrl ||
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJLfl1C7sB_LM02ks6yyeDPX5hrIKlTBHpQA",
           }}
           renderActions={(props) => (
             <Actions
               {...props}
               containerStyle={{
-                position: "absolute",
-                right: 50,
-                bottom: 5,
-                zIndex: 9999,
+                alignSelf: "center",
               }}
-              // onPressActionButton={selectImage}m
+              onPressActionButton={selectImage}
               icon={() => <Ionicons name="camera" size={30} color={"grey"} />}
             />
           )}
+          textInputStyle={{ fontSize: 16, paddingHorizontal: 5 }}
           timeTextStyle={{ right: { color: "grey" } }}
+          infiniteScroll={true}
           renderSend={(props) => {
             const { text, messageIdGenerator, user, onSend } = props;
             return (
@@ -240,21 +319,40 @@ export default function Chat({ route }) {
                   marginBottom: 5,
                   paddingRight: 5,
                 }}
-                onPress={() => {
-                  if (text && onSend) {
-                    onSend(
-                      {
-                        text: text.trim(),
-                        user,
-                        _id: messageIdGenerator(),
-                      },
-                      true
-                    );
+                onPress={async () => {
+                  if ((text || selectedImage) && onSend) {
+                    try {
+
+                      // If the user wants to upload an image, upload first before sending
+                      let imageUrl = "";
+                      if (selectedImage) {
+                        imageUrl = (
+                          await dispatch(
+                            uploadChatImage(selectedImageData)
+                          ).unwrap()
+                        ).chatImageUrl;
+                      }
+
+                      // After the process, pass the imageUrl as parameter in messages
+                      onSend(
+                        {
+                          text: text.trim(),
+                          image: imageUrl,
+                          user,
+                          _id: messageIdGenerator(),
+                        },
+                        true
+                      );
+                    } catch (err) {
+                      console.log(err, "<<<< ini error send image");
+                    }
                   }
                 }}
               >
                 <MaterialCommunityIcons
-                  name={text && onSend ? "send" : "microphone"}
+                  name={
+                    (text || selectedImage) && onSend ? "send" : "microphone"
+                  }
                   size={23}
                   color={"black"}
                 />
@@ -267,26 +365,27 @@ export default function Chat({ route }) {
               containerStyle={{
                 marginLeft: 10,
                 marginRight: 10,
-                marginBottom: 2,
+                marginBottom: 5,
                 borderRadius: 20,
-                paddingTop: 5,
               }}
             />
           )}
-          renderBubble={(props) => (
-            <Bubble
-              {...props}
-              textStyle={{ right: { color: "black" } }}
-              wrapperStyle={{
-                left: {
-                  backgroundColor: "white",
-                },
-                right: {
-                  backgroundColor: "#dcf8c6",
-                },
-              }}
-            />
-          )}
+          renderBubble={(props) => {
+            return (
+              <Bubble
+                {...props}
+                textStyle={{ right: { color: "black" } }}
+                wrapperStyle={{
+                  left: {
+                    backgroundColor: "white",
+                  },
+                  right: {
+                    backgroundColor: "#dcf8c6",
+                  },
+                }}
+              ></Bubble>
+            );
+          }}
         />
       </ImageBackground>
     </SafeAreaView>
@@ -314,6 +413,28 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 20,
   },
+  previewImageContainer: {
+    position: "absolute",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    bottom: 55,
+    width: width * 0.95,
+    height: 160,
+    backgroundColor: "#dcf8c6",
+    borderColor: "#bff099",
+    borderStyle: "solid",
+    borderWidth: 3,
+    marginHorizontal: 10,
+    zIndex: 9999,
+    borderRadius: 20,
+    padding: 10,
+  },
+  previewImage: {
+    height: "100%",
+    aspectRatio: 1,
+    backgroundColor: "white",
+    borderRadius: 20,
+  },
   input: {
     flex: 1,
     backgroundColor: "white",
@@ -331,8 +452,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   image: {
-    width: 45,
-    height: 45,
+    width: 35,
+    aspectRatio: 1,
     borderRadius: 30,
     marginRight: 10,
     marginLeft: 10,

@@ -2,8 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 async function saveToAsyncStorage(data) {
   try {
-    console.log(JSON.stringify(data.targetLanguange, "<<<< ini targetLanguage di save async storage"));
-
+    // console.log(JSON.stringify(data.targetLanguange, "<<<< ini targetLanguage di save async storage"));
+    console.log(data.deviceToken, "<<<<< ini isi deviceToken di async storage");
     const storageItems = [
       ["username", data.username],
       ["email", data.email],
@@ -11,7 +11,8 @@ async function saveToAsyncStorage(data) {
       ["profileimageurl", data.profileImageUrl || ""],
       ["nativelanguage", data.nativeLanguage],
       ["targetlanguage", JSON.stringify(data.targetLanguage)],
-      ["role", data.role]
+      ["role", data.role],
+      ["devicetoken", data.deviceToken]
     ] 
     await AsyncStorage.multiSet(storageItems);
   } catch(err) {

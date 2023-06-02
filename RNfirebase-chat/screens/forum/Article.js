@@ -31,7 +31,7 @@ const Article = () => {
   }
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{paddingHorizontal: 10, paddingBottom: 20, paddingTop: 10}}>
       <Text style={styles.title}>
         {articleDetails.title}
       </Text>

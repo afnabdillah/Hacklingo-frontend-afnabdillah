@@ -1,45 +1,59 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { database } from "../config/firebase";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { Image } from "react-native";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { fetchOtherUsersByEmail } from "../stores/usersSlice";
 dayjs.extend(relativeTime);
 
 function ChatList() {
   const [chats, setChats] = useState([]);
+  const [loadingChatsStatus, setLoadingChatsStatus] = useState("idle");
   const navigation = useNavigation();
   const userEmail = useSelector((state) => state.authReducer.email);
-  const username = useSelector((state) => state.authReducer.username);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!userEmail) return;
+    setLoadingChatsStatus("loading");
     const personalChatsRef = collection(database, "personalChats");
     const personalChatsQuery = query(personalChatsRef);
     const personalChatsUnsubscribe = onSnapshot(
       personalChatsQuery,
-      (snapshot) => {
-        const personalChatsData = snapshot.docs.map((doc) => ({
-          ...doc.data(),
-          chatId: doc.id,
-          isGroup: false,
-        }));
+      async (snapshot) => {
+        const personalChatsData = snapshot.docs.map((doc) => {
+          let {messages, users} = doc.data();
+          return {
+            messages: messages[messages.length-1],
+            users: users,
+            chatId: doc.id,
+            isGroup: false,
+          }
+        });
         const userChats = personalChatsData.filter((chat) => {
           return chat.users.some((userObj) => userObj.email === userEmail);
         });
-
-        setChats((prevChats) =>
-          mergeChatLists(prevChats, userChats, userEmail)
-        );
+        const mergedChats = await mergeChatLists(userChats);
+        setChats(mergedChats);
+        setLoadingChatsStatus("idle");
       }
     );
 
@@ -47,57 +61,123 @@ function ChatList() {
       personalChatsUnsubscribe();
     };
   }, [userEmail]);
-  const mergeChatLists = (prevChats, newChats, userEmail) => {
+
+  const mergeChatLists = async (newChats) => {
     const mergedChats = newChats
-      .map((chat) => {
-        const recipient = chat.users.find((user) => user !== userEmail);
+    .map((chat) => {
+        const recipient = chat.users.find((user) => user.email !== userEmail);
         return { ...chat, recipient };
       })
-      .sort((a, b) => b.createdAt - a.createdAt);
+      .sort((a, b) => {
+        const lastMessageTimeA = a.messages.createdAt.seconds;
+        const lastMessageTimeB = b.messages.createdAt.seconds;
+        return lastMessageTimeB - lastMessageTimeA
+      });
+    // Get the users data from collection users;
+    const recipientEmails = mergedChats.map((el) => el.recipient.email);
+    const usersCollectionRef = collection(database, "users");
+    const usersQuery = query(
+      usersCollectionRef,
+      where("email", "in", recipientEmails)
+    );
+
+    // Execute the query
+    const querySnapshot = await getDocs(usersQuery);
+
+    // Retrieve the matching user documents
+    const matchingUsers = new Map();
+    querySnapshot.forEach((doc) => {
+      const userData = doc.data();
+      const selectedFields = {
+        email: userData.email,
+        username: userData.username,
+        profileImageUrl: userData.profileImageUrl,
+        deviceToken: userData.deviceToken,
+      };
+      matchingUsers.set(userData.email, selectedFields);
+    });
+
+    mergedChats.forEach((el, i) => {
+      el.recipient.username = matchingUsers.get(el.recipient.email).username;
+      el.recipient.avatar = matchingUsers.get(
+        el.recipient.email
+      ).profileImageUrl;
+      el.recipient.deviceToken = matchingUsers.get(
+        el.recipient.email
+      ).deviceToken;
+    });
     return mergedChats;
   };
 
+  if (loadingChatsStatus === "loading") {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#fff",
+        }}
+      >
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <View style={{ flex: 1, paddingTop: 10, backgroundColor: "#fff" }}>
-      <FlatList
-        data={chats}
-        keyExtractor={(item) => item.chatId}
-        renderItem={({ item }) => {
-          const lastMessage = item.messages[item.messages.length - 1];
-          const otherUser = item.users.find((u) => u.email !== userEmail);
-          const lastMessageDate = new Date(
-            lastMessage?.createdAt.seconds * 1000 +
-              lastMessage?.createdAt.nanoseconds / 1000
-          );
+      {chats.length === 0 && loadingChatsStatus === "idle" ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text style={{ color: "grey", fontSize: 14 }}>
+            You don't have any chat history yet.
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={chats}
+          keyExtractor={(item) => item.chatId}
+          renderItem={({ item }) => {
+            const lastMessage = item.messages;
+            const otherUser = item.users.find((u) => u.email !== userEmail);
+            const lastMessageDate = new Date(
+              lastMessage.createdAt.seconds * 1000
+            );
 
-          return (
-            <TouchableOpacity
-              style={styles.container}
-              onPress={() => {
-                navigation.navigate("Chat", {
-                  recipientEmail: otherUser.email,
-                  recipientName: otherUser.username,
-                  senderEmail: userEmail,
-                  recipientAvatar: otherUser.avatar,
-                });
-              }}
-            >
-              <Image source={{ uri: otherUser.avatar }} style={styles.image} />
-              <View style={styles.content}>
-                <View style={styles.row}>
-                  <Text numberOfLines={1} style={styles.name}>
-                    {otherUser.username}
-                  </Text>
-                  <Text style={styles.subTitle}>
-                    {dayjs(lastMessageDate).fromNow(false)}
-                  </Text>
+            return (
+              <TouchableOpacity
+                style={styles.container}
+                onPress={() => {
+                  navigation.navigate("Chat", {
+                    recipientEmail: otherUser.email,
+                    recipientName: otherUser.username,
+                    senderEmail: userEmail,
+                    recipientAvatar: otherUser.avatar,
+                    recipientDeviceToken: otherUser.deviceToken,
+                  });
+                }}
+              >
+                <Image
+                  source={{ uri: otherUser.avatar }}
+                  style={styles.image}
+                />
+                <View style={styles.content}>
+                  <View style={styles.row}>
+                    <Text numberOfLines={1} style={styles.name}>
+                      {otherUser.username}
+                    </Text>
+                    <Text style={styles.subTitle}>
+                      {dayjs(lastMessageDate).fromNow(false)}
+                    </Text>
+                  </View>
+                  <Text style={styles.subTitle}>{lastMessage.text}</Text>
                 </View>
-                <Text style={styles.subTitle}>{lastMessage?.text}</Text>
-              </View>
-            </TouchableOpacity>
-          );
-        }}
-      />
+              </TouchableOpacity>
+            );
+          }}
+        />
+      )}
     </View>
   );
 }

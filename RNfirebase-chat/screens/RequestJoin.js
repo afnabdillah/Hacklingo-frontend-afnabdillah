@@ -2,16 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { database } from '../config/firebase';
-import { useNavigation } from '@react-navigation/native';
+import { fetchOtherUserByEmail } from '../stores/usersSlice';
+import sendPushNotification from '../helper/sendPushNotification';
+import { useDispatch } from 'react-redux';
 
 const UserCard = ({ user, groupId }) => {
-    const navigatiion = useNavigation()
+
+    const dispatch = useDispatch();
+
     const acceptRequest = async () => {
         const groupDocRef = doc(database, 'groupChats', groupId);
         await updateDoc(groupDocRef, {
             requestJoin: arrayRemove(user),
             users: arrayUnion(user.email),
         });
+        const joineeData = await dispatch(
+            fetchOtherUserByEmail(user.email)
+        ).unwrap();
+        if (joineeData.deviceToken) {
+            sendPushNotification(
+              joineeData.deviceToken,
+              `The admin has accepted you!`, 
+              `You can now participate in the group!`
+            );
+          }
     };
 
     const denyRequest = async () => {
@@ -64,7 +78,7 @@ const RequestJoin = ({ route }) => {
                         }}
                         style={styles.noUserImage}
                     />
-                    <Text style={styles.noUserText}>No user applied to your group</Text>
+                    <Text style={styles.noUserText}>No user applied to your group.</Text>
                 </>
             ) : (
                 requestedUsers.map((user, index) => (
@@ -80,6 +94,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        width: "95%",
         backgroundColor: '#fff',
         padding: 10,
         borderRadius: 10,
@@ -100,7 +115,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         paddingHorizontal: 10,
         paddingVertical: 5,
-        marginRight: 5,
+        marginRight: 10,
     },
     denyButton: {
         backgroundColor: '#f44336',

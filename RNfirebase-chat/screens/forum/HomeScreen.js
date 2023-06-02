@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Text, TouchableOpacity, View, Pressable, Image } from "react-native";
+import { Text, TouchableOpacity, View, Pressable, Image, ActivityIndicator } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import CardForum from "../../components/forum/card";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchForumDetails } from "../../stores/forumsSlice";
 import showToast from "../../helper/showToast";
-import { ActivityIndicator } from "react-native-paper";
 import { MaterialIcons } from "@expo/vector-icons";
 import { fetchPostsBySearch } from "../../stores/postsSlice";
 

@@ -24,6 +24,7 @@ import { ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import logo from "../assets/HACKLINGO.png";
 import pickImage from "../helper/imagePicker";
+import messaging from "@react-native-firebase/messaging";
 
 export default SignUpView = () => {
   const [email, setEmail] = useState("");
@@ -59,14 +60,16 @@ export default SignUpView = () => {
       columns[0] !== ""
     ) {
       const targetLanguage = columns.map(el => el.value);
-
+      const deviceToken = await messaging().getToken();
+      console.log(deviceToken, "<<<< this is your phone's fcm token");
       const input = {
         email,
         password,
         username : fullName,
         nativeLanguage : language,
         targetLanguage,
-        selectedImageData
+        selectedImageData,
+        deviceToken,
       }
       dispatch(userSignUp(input))
         .unwrap()

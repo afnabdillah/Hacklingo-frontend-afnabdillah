@@ -20,15 +20,16 @@ export default function HeaderForum({ forumId }) {
   };
 
   return (
-    <View style={{ flexDirection: "row", backgroundColor: "#0097b2" }}>
+    <View style={{ flexDirection: "row", backgroundColor: "#0097b2", alignItems: "center"}}>
       <Searchbar
-        placeholder="Search"
+        placeholder="search posts..."
         style={{
           backgroundColor: "#F6F1F1",
           width: width * 0.64,
           marginRight: 10,
-          height: 50,
+          height: 40
         }}
+        inputStyle={{fontSize: 14, alignSelf: "center"}}
         onSubmitEditing={onPostSearch}
         onChangeText={onChangeSearch}
         value={searchQuery}

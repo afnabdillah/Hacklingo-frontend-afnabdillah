@@ -19,10 +19,10 @@ import { ActivityIndicator } from 'react-native-paper';
 const lebar = Dimensions.get("window").width
 
 
-const App = () => {
+const LandingPage = () => {
   const dispatch = useDispatch()
   const articles = useSelector((state) => state.articlesReducer.articles);
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   
   useEffect(() => {
     dispatch(fetchArticles())
@@ -33,7 +33,7 @@ const App = () => {
   const data = articles.map((article) => ({
     title: article.title,
     url: article.articleImageUrl, // Replace with the actual image URL from your data if available
-    description: "", // Add a description if available in your data
+    description: article.content, // Add a description if available in your data
     id: article._id,
   }));
 
@@ -106,7 +106,7 @@ const App = () => {
   );
 };
 
-export default App;
+export default LandingPage;
 
 const styles = StyleSheet.create({
   container: {
