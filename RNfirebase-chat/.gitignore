@@ -12,6 +12,7 @@ web-build/
 .env
 .env-text-sulthan
 .env-text-affan
+google-services.json
 
 # macOS
 .DS_Store
