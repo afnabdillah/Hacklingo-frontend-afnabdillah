@@ -47,26 +47,29 @@ import sendPushNotification from "../../helper/sendPushNotification";
 const width = Dimensions.get("window").width;
 
 export default function Chat({ route }) {
-
   const {
     recipientEmail,
     recipientName,
     recipientAvatar,
-    recipientDeviceToken
+    recipientDeviceToken,
   } = route.params;
-  
+
   const senderEmail = useSelector((state) => state.authReducer.email);
-  
+
   const [messages, setMessages] = useState([]);
-  
+
   const [selectedImage, setSelectedImage] = useState("");
-  
+
   const [selectedImageData, setSelectedImageData] = useState({});
-  
+
   const [roomId, setRoomId] = useState(null);
-  
+
   const currentUserUsername = useSelector(
     (state) => state.authReducer.username
+  );
+
+  const loadingUploadImage = useSelector(
+    (state) => state.usersReducer.status.uploadChatImage
   );
 
   const currentUserProfileImageUrl = useSelector(
@@ -96,7 +99,6 @@ export default function Chat({ route }) {
   };
 
   useEffect(() => {
-
     // Create room here
     const createRoomId = generateRoomId(senderEmail, recipientEmail);
     const roomDocRef = doc(database, "personalChats", createRoomId);
@@ -270,6 +272,7 @@ export default function Chat({ route }) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground source={bg} style={{ flex: 1, position: "relative" }}>
+        {/* Renders this view if the user has chosen an image */}
         {selectedImage && (
           <View style={styles.previewImageContainer}>
             <View style={styles.previewImage}>
@@ -282,6 +285,13 @@ export default function Chat({ route }) {
                   borderRadius: 20,
                 }}
               />
+            </View>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              {loadingUploadImage === "loading" && (
+                <View>
+                  <ActivityIndicator size={30} />
+                </View>
+              )}
             </View>
             <Pressable
               onPress={() => {
@@ -336,7 +346,6 @@ export default function Chat({ route }) {
                 onPress={async () => {
                   if ((text || selectedImage) && onSend) {
                     try {
-
                       // If the user wants to upload an image, upload first before sending
                       let imageUrl = "";
                       if (selectedImage) {

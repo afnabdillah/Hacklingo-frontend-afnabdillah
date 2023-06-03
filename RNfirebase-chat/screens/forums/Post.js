@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -7,27 +7,34 @@ import {
   StyleSheet,
   Image,
   KeyboardAvoidingView,
-  Platform,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { insertNewPost } from "../../stores/postsSlice";
-import pickImage from "../../helper/imagePicker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import showToast from "../../helper/showToast";
 import { useNavigation } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
+import showToast from "../../helper/showToast";
+import pickImage from "../../helper/imagePicker";
 import logo from "../../assets/HACKLINGO.png";
 
 export default function Post({ route }) {
+
+  const { forumId } = route.params;
+
   const [title, setTitle] = useState("");
+  
   const [content, setContent] = useState("");
+  
   const [selectedImage, setSelectedImage] = useState("");
+  
   const [selectedImageData, setSelectedImageData] = useState({});
+  
   const insertPostStatus = useSelector(
     (state) => state.postsReducer.status.newPost
   );
-  const { forumId } = route.params;
+  
   const dispatch = useDispatch();
+  
   const navigation = useNavigation();
 
   const onPickImage = async () => {
@@ -42,6 +49,8 @@ export default function Post({ route }) {
 
   const onCreatePost = () => {
     if (title !== "" && content !== "") {
+
+      // Create the form data for creating posts
       const form = new FormData();
       if (Object.keys(selectedImageData)[0]) {
         form.append("file", selectedImageData);
@@ -75,7 +84,6 @@ export default function Post({ route }) {
         keyboardVerticalOffset={-75} // adjust this value as needed
       >
         <View>
-          {/* <KeyboardAvoidingView behavior="padding"> */}
           <Text style={styles.label}>Title:</Text>
           <TextInput
             style={styles.input}
@@ -148,12 +156,9 @@ export default function Post({ route }) {
                 left: "50%",
                 top: "50%",
                 transform: [{translateX: -15}, {translateY: -15}],
-                // alignItems: "center",
-                // justifyContent: "center",
               }}
             >
               <ActivityIndicator size={30} />
-              {/* <Text>Uploading your post ...</Text> */}
             </View>
           )}
           </View>

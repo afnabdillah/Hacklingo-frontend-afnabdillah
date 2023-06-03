@@ -29,7 +29,7 @@ export const fetchForumDetails = createAsyncThunk(
 
 export const fetchAllForums = createAsyncThunk(
   "forumsSlice/fetchAllForums", // this is the action name
-  async (input, {rejectWithValue}) => {
+  async (_, {rejectWithValue}) => {
     // this is the action
     try {
       const userId = await AsyncStorage.getItem("userid");
@@ -64,24 +64,24 @@ const forumsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchForumDetails.pending, (state, action) => {
+      .addCase(fetchForumDetails.pending, (state) => {
         state.status.forumDetails = "loading";
       })
       .addCase(fetchForumDetails.fulfilled, (state, action) => {
         state.status.forumDetails = "idle";
         state.forumDetails = action.payload;
       })
-      .addCase(fetchForumDetails.rejected, (state, action) => {
+      .addCase(fetchForumDetails.rejected, (state) => {
         state.status.forumDetails = "error";
       })
-      .addCase(fetchAllForums.pending, (state, action) => {
+      .addCase(fetchAllForums.pending, (state) => {
         state.status.forums = "loading";
       })
       .addCase(fetchAllForums.fulfilled, (state, action) => {
         state.status.forums = "idle";
         state.forums = action.payload;
       })
-      .addCase(fetchAllForums.rejected, (state, action) => {
+      .addCase(fetchAllForums.rejected, (state) => {
         state.status.forums = "error";
       })
   },

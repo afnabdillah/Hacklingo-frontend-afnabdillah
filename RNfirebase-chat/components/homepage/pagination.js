@@ -10,7 +10,6 @@ const Pagination = ({ data, x, size }) => {
   return (
     <View style={styles.paginationContainer}>
       {data.map((_, i) => {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
         const animatedDotStyle = useAnimatedStyle(() => {
           const widthAnimation = interpolate(
             x.value,

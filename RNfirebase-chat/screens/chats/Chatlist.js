@@ -34,12 +34,12 @@ function ChatList() {
 
   useEffect(() => {
     if (!userEmail) return;
-    setLoadingChatsStatus("loading");
     const personalChatsRef = collection(database, "personalChats");
     const personalChatsQuery = query(personalChatsRef);
     const personalChatsUnsubscribe = onSnapshot(
       personalChatsQuery,
       async (snapshot) => {
+        setLoadingChatsStatus("loading");
         const personalChatsData = snapshot.docs.map((doc) => {
           let {messages, users} = doc.data();
           return {
@@ -64,6 +64,12 @@ function ChatList() {
   }, [userEmail]);
 
   const mergeChatLists = async (newChats) => {
+    // If there are no history yet, return empty array to chat list
+    if (newChats.length === 0) {
+      return [];
+    }
+
+    
     const mergedChats = newChats
     .map((chat) => {
         const recipient = chat.users.find((user) => user.email !== userEmail);

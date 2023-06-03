@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -6,6 +6,7 @@ import {
   Image,
   TextInput,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -13,18 +14,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { insertNewComment } from "../../stores/commentsSlice";
 import { fetchPostDetails } from "../../stores/postsSlice";
 import showToast from "../../helper/showToast";
-import { ActivityIndicator } from "react-native-paper";
 import Comment from "../../components/forums/Comment";
 
 export default function DetailScreen({ navigation, route }) {
   const { id } = route.params;
+
   const [commentText, setCommentText] = useState("");
+
   const dispatch = useDispatch();
 
   const postDetails = useSelector((state) => state.postsReducer.postDetails);
+
   const postDetailsStatus = useSelector(
     (state) => state.postsReducer.status.postDetails
   );
+
   const lebar = Dimensions.get("window").height;
 
   const handleAddComment = async () => {
@@ -101,11 +105,11 @@ export default function DetailScreen({ navigation, route }) {
           {postDetails.postImageUrl && (
             <View style={{ marginTop: 10, width: "100%", height: lebar * 0.3 }}>
               <TouchableOpacity
-                onPress={() => {
-                  return navigation.navigate("Image", {
+                onPress={() =>
+                  navigation.navigate("Image", {
                     postImageUrl: postDetails.postImageUrl,
-                  });
-                }}
+                  })
+                }
               >
                 <Image
                   source={{ uri: postDetails.postImageUrl }}

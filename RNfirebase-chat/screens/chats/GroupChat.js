@@ -13,7 +13,8 @@ import {
   StyleSheet,
   Image,
   Pressable,
-  Dimensions
+  Dimensions,
+  ActivityIndicator
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -57,6 +58,10 @@ export default function GroupChat({ route, navigation }) {
   
   const userProfileImageUrl = useSelector(
     (state) => state.authReducer.profileImageUrl
+  );
+
+  const loadingUploadImage = useSelector(
+    (state) => state.usersReducer.status.uploadChatImage
   );
   
   const [messages, setMessages] = useState([]);
@@ -287,6 +292,13 @@ export default function GroupChat({ route, navigation }) {
                   borderRadius: 20,
                 }}
               />
+            </View>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              {loadingUploadImage === "loading" && (
+                <View>
+                  <ActivityIndicator size={30} />
+                </View>
+              )}
             </View>
             <Pressable
               onPress={() => {

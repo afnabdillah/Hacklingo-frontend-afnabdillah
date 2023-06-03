@@ -67,24 +67,24 @@ const articlesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchArticles.pending, (state, action) => {
+      .addCase(fetchArticles.pending, (state) => {
         state.status.articles = "loading";
       })
       .addCase(fetchArticles.fulfilled, (state, action) => {
         state.status.articles = "idle";
         state.articles = action.payload;
       })
-      .addCase(fetchArticles.rejected, (state, action) => {
+      .addCase(fetchArticles.rejected, (state) => {
         state.status.articles = "error";
       })
-      .addCase(fetchArticleById.pending, (state, action) => {
+      .addCase(fetchArticleById.pending, (state) => {
         state.status.articleDetails = "loading";
       })
       .addCase(fetchArticleById.fulfilled, (state, action) => {
         state.status.articleDetails = "idle";
         state.articleDetails = action.payload;
       })
-      .addCase(fetchArticleById.rejected, (state, action) => {
+      .addCase(fetchArticleById.rejected, (state) => {
         state.status.articleDetails = "error";
       })
   },

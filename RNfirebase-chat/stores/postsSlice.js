@@ -146,30 +146,30 @@ const postsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchPostDetails.pending, (state, action) => {
+      .addCase(fetchPostDetails.pending, (state) => {
         state.status.postDetails = "loading";
       })
       .addCase(fetchPostDetails.fulfilled, (state, action) => {
         state.status.postDetails = "idle";
         state.postDetails = action.payload;
       })
-      .addCase(fetchPostDetails.rejected, (state, action) => {
+      .addCase(fetchPostDetails.rejected, (state) => {
         state.status.postDetails = "error";
       })
-      .addCase(fetchPostsBySearch.pending, (state, action) => {
+      .addCase(fetchPostsBySearch.pending, (state) => {
         state.status.posts = "loading";
       })
       .addCase(fetchPostsBySearch.fulfilled, (state, action) => {
         state.status.posts = "idle";
         state.posts = action.payload;
       })
-      .addCase(fetchPostsBySearch.rejected, (state, action) => {
+      .addCase(fetchPostsBySearch.rejected, (state) => {
         state.status.posts = "error";
       })
-      .addCase(insertNewPost.pending, (state, action) => {
+      .addCase(insertNewPost.pending, (state) => {
         state.status.newPost = "loading";
       })
-      .addCase(insertNewPost.fulfilled, (state, action) => {
+      .addCase(insertNewPost.fulfilled, (state) => {
         state.status.newPost = "idle";
       })
       .addCase(insertNewPost.rejected, (state, action) => {

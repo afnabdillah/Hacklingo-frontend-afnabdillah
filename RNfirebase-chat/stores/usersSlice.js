@@ -1,6 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -12,10 +11,11 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import saveToAsyncStorage from "../helper/saveToAsyncStorage";
-import base_url from "./base_url";
 import { loginSuccess, logout, updateSuccess } from "./authSlice";
 import { FirebaseError } from "firebase/app";
+import axios from "axios";
+import saveToAsyncStorage from "../helper/saveToAsyncStorage";
+import base_url from "./base_url";
 
 export const fetchUserDetails = createAsyncThunk(
   "usersSlice/fetchUserDetails", // this is the action name
@@ -417,33 +417,33 @@ const usersSlice = createSlice({
     },
   },
   reducers: {
-    deleteUsersBySearch(state, action) {
+    deleteUsersBySearch(state) {
       state.usersBySearch = [];
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserDetails.pending, (state, action) => {
+      .addCase(fetchUserDetails.pending, (state) => {
         state.status.userDetails = "loading";
       })
       .addCase(fetchUserDetails.fulfilled, (state, action) => {
         state.status.userDetails = "idle";
         state.userDetails = action.payload;
       })
-      .addCase(fetchUserDetails.rejected, (state, action) => {
+      .addCase(fetchUserDetails.rejected, (state) => {
         state.status.userDetails = "error";
       })
-      .addCase(fetchUsersByNativeLanguage.pending, (state, action) => {
+      .addCase(fetchUsersByNativeLanguage.pending, (state) => {
         state.status.users = "loading";
       })
       .addCase(fetchUsersByNativeLanguage.fulfilled, (state, action) => {
         state.status.users = "idle";
         state.users = action.payload;
       })
-      .addCase(fetchUsersByNativeLanguage.rejected, (state, action) => {
+      .addCase(fetchUsersByNativeLanguage.rejected, (state) => {
         state.status.users = "error";
       })
-      .addCase(fetchUsersBySearch.pending, (state, action) => {
+      .addCase(fetchUsersBySearch.pending, (state) => {
         state.status.usersBySearch = "loading";
       })
       .addCase(fetchUsersBySearch.fulfilled, (state, action) => {
@@ -452,63 +452,63 @@ const usersSlice = createSlice({
           state.usersBySearch = action.payload.data;
         }
       })
-      .addCase(fetchUsersBySearch.rejected, (state, action) => {
+      .addCase(fetchUsersBySearch.rejected, (state) => {
         state.status.usersBySearch = "error";
       })
-      .addCase(updateUserDetails.pending, (state, action) => {
+      .addCase(updateUserDetails.pending, (state) => {
         state.status.updateUserDetails = "loading";
       })
-      .addCase(updateUserDetails.fulfilled, (state, action) => {
+      .addCase(updateUserDetails.fulfilled, (state) => {
         state.status.updateUserDetails = "idle";
       })
-      .addCase(updateUserDetails.rejected, (state, action) => {
+      .addCase(updateUserDetails.rejected, (state) => {
         state.status.updateUserDetails = "error";
       })
-      .addCase(userSignUp.pending, (state, action) => {
+      .addCase(userSignUp.pending, (state) => {
         state.status.userSignUp = "loading";
       })
-      .addCase(userSignUp.fulfilled, (state, action) => {
+      .addCase(userSignUp.fulfilled, (state) => {
         state.status.userSignUp = "idle";
       })
-      .addCase(userSignUp.rejected, (state, action) => {
+      .addCase(userSignUp.rejected, (state) => {
         state.status.userSignUp = "error";
       })
-      .addCase(userLogin.pending, (state, action) => {
+      .addCase(userLogin.pending, (state) => {
         state.status.userLogin = "loading";
       })
-      .addCase(userLogin.fulfilled, (state, action) => {
+      .addCase(userLogin.fulfilled, (state) => {
         state.status.userLogin = "idle";
       })
-      .addCase(userLogin.rejected, (state, action) => {
+      .addCase(userLogin.rejected, (state) => {
         state.status.userLogin = "error";
       })
-      .addCase(uploadChatImage.pending, (state, action) => {
+      .addCase(uploadChatImage.pending, (state) => {
         state.status.uploadChatImage = "loading";
       })
-      .addCase(uploadChatImage.fulfilled, (state, action) => {
+      .addCase(uploadChatImage.fulfilled, (state) => {
         state.status.uploadChatImage = "idle";
       })
-      .addCase(uploadChatImage.rejected, (state, action) => {
+      .addCase(uploadChatImage.rejected, (state) => {
         state.status.uploadChatImage = "error";
       })
-      .addCase(fetchOtherUserByEmail.pending, (state, action) => {
+      .addCase(fetchOtherUserByEmail.pending, (state) => {
         state.status.userByEmail = "loading";
       })
       .addCase(fetchOtherUserByEmail.fulfilled, (state, action) => {
         state.status.userByEmail = "idle";
         state.userByEmail = action.payload;
       })
-      .addCase(fetchOtherUserByEmail.rejected, (state, action) => {
+      .addCase(fetchOtherUserByEmail.rejected, (state) => {
         state.status.userByEmail = "error";
       })
-      .addCase(fetchOtherUsersByEmail.pending, (state, action) => {
+      .addCase(fetchOtherUsersByEmail.pending, (state) => {
         state.status.usersByEmail = "loading";
       })
       .addCase(fetchOtherUsersByEmail.fulfilled, (state, action) => {
         state.status.usersByEmail = "idle";
         state.usersByEmail = action.payload;
       })
-      .addCase(fetchOtherUsersByEmail.rejected, (state, action) => {
+      .addCase(fetchOtherUsersByEmail.rejected, (state) => {
         state.status.usersByEmail = "error";
       });
   },

@@ -7,7 +7,7 @@ import Animated, {
   interpolate,
   useAnimatedRef,
 } from 'react-native-reanimated';
-import Pagination from './pagination';
+import Pagination from './Pagination';
 
 const CustomImageCarousal = ({ data, autoPlay, pagination, navigateToGroups }) => {
   
